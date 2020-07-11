@@ -1,25 +1,86 @@
 @page "/login"
+@page "/login/{action}"
 
+@inject IJSRuntime JsRuntime
 @inject LocalUser LocalUser
+@inject LogService Logger
 @inject NavigationManager Navigation
 
+@if (LocalUser.IsAuthorized)
+{
+    Navigation.NavigateTo("/");
+}
+else if (Action != null)
+{
+    IsLogining = true;
+}
+else
+{
+    IsLogining = false;
+}
+
 <MainLayout>
-    <h1>This is login page for unauthorized user only.</h1>
-    <button @onclick="Login">Login</button>
+    <div class="login-page" style="cursor: @(IsLogining ? "wait" : "default")">
+        <div class="wrapper">
+            @if (IsLogining)
+            {
+                <WaitingPage Text="Logining..."/>
+            }
+            else
+            {
+                <div class="banner">
+                    <img src="/img/iconfinder_news-car-announcement-advertisement-broadcast_4313131.svg"/>
+                    <img src="/img/iconfinder_Health_Education-Article-Smartphone-Knowledge-Blog_5959004.svg"/>
+                    <img src="/img/iconfinder_IntelligentlyConsumeSocialMedia-fakenews-lie-news-socialmedia-covid19_6141534.svg"/>
+                </div>
+                <div class="error">
+                    @Error
+                </div>
+                <div class="login-providers">
+                    <a class="microsoft" href="@LocalUser.GetMsLoginUri(Navigation.ToAbsoluteUri("/login/ms-callback").ToString())">
+                        <img src="/img/iconfinder_Microsoft_381606.svg"/> Login with <b>Microsoft</b> account
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
 </MainLayout>
 
 @code
 {
-    protected override void OnInitialized()
-    {
-        if (LocalUser.IsAuthorized) {
-            Navigation.NavigateTo("/");
-        }
-    }
+    [Parameter]
+    public string Action { get; set; }
 
-    private async Task Login()
+    private string Error { get; set; }
+
+    private bool IsLogining { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
-        await LocalUser.LoginAsync();
-        Navigation.NavigateTo("/");
+        switch (Action)
+        {
+        case null:
+            break;
+
+        case "ms-callback":
+            if (await LocalUser.LoginWithMsCallbacAsync(Navigation.Uri))
+            {
+                Logger.Info("Login success.");
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                Error = "Login with Microsoft Account failed. Please try it again.";
+                Navigation.NavigateTo("/login");
+            }
+            break;
+
+        default:
+            Logger.Error($"Invalid action: {Action}.");
+            Navigation.NavigateTo("/login");
+            break;
+        }
+
+        IsLogining = false;
     }
 }
