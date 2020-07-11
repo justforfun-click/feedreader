@@ -1,4 +1,7 @@
+using FeedReader.WebClient.Models;
+using FeedReader.WebClient.Services;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
 namespace FeedReader.WebClient
@@ -9,7 +12,15 @@ namespace FeedReader.WebClient
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
-            await builder.Build().RunAsync();
+            builder.Services.AddSingleton<LogService>();
+            builder.Services.AddSingleton<LocalStorageService>();
+            builder.Services.AddSingleton<LocalUser>();
+            builder.Services.AddAuthorizationCore();
+
+            var host = builder.Build();
+            var localUser = host.Services.GetRequiredService<LocalUser>();
+            await localUser.InitializeAsync();
+            await host.RunAsync();
         }
     }
 }

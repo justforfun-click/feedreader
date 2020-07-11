@@ -1,0 +1,20 @@
+@inject LocalUser LocalUser
+
+<div class="main-layout">
+    <div class="header">
+        <PageHeader/>
+    </div>
+
+    <div class="body">
+        @ChildContent
+    </div>
+
+    <div class="footer">
+        <PageFooter/>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

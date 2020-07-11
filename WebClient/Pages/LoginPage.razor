@@ -1,0 +1,25 @@
+@page "/login"
+
+@inject LocalUser LocalUser
+@inject NavigationManager Navigation
+
+<MainLayout>
+    <h1>This is login page for unauthorized user only.</h1>
+    <button @onclick="Login">Login</button>
+</MainLayout>
+
+@code
+{
+    protected override void OnInitialized()
+    {
+        if (LocalUser.IsAuthorized) {
+            Navigation.NavigateTo("/");
+        }
+    }
+
+    private async Task Login()
+    {
+        await LocalUser.LoginAsync();
+        Navigation.NavigateTo("/");
+    }
+}

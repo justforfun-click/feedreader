@@ -1,0 +1,14 @@
+.main-layout {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+
+    > .header, > .body, > .footer {
+        width: 100%;
+    }
+
+    > .body {
+        flex: 1;
+    }
+}

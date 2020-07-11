@@ -1,0 +1,18 @@
+@inject LocalUser LocalUser
+@inject NavigationManager Navigation
+
+<div class="page-header">
+    <div class="title">
+        <a href="/">FeedReader</a>
+    </div>
+    <div class="action-bar">
+        @if (LocalUser.IsAuthorized)
+        {
+            <a class="btn" href="/logout">Logout</a>
+        }
+        else
+        {
+            <a class="btn" href="/login">Login</a>
+        }
+    </div>
+</div>

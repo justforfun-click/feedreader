@@ -1,0 +1,12 @@
+@page "/"
+
+@inject LocalUser LocalUser
+
+@if (LocalUser.IsAuthorized)
+{
+    <IndexPageForAuthorizedUser/>
+}
+else
+{
+    <IndexPageForUnauthorizedUser/>
+}

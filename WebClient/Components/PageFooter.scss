@@ -1,0 +1,32 @@
+.page-footer {
+    &, > div, a {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    width: 100%;
+    height: 40px;
+    background: #232f3e;
+    color: #dddddd;
+
+    > div {
+        height: 100%;
+    }
+
+    > .copyright {
+        flex: 1;
+        font-size: 14px;
+    }
+
+    > .socials {
+        a {
+            margin-right: 10px;
+
+            img {
+                width: 24px;
+                height: 24px;
+            }
+        }
+    }
+}

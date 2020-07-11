@@ -1,0 +1,26 @@
+@page "/logout"
+
+@inject LocalUser LocalUser
+@inject LogService Logger
+@inject NavigationManager Navigation
+
+<MainLayout>
+    <h1>This is logout page for authorized user only.</h1>
+    <button @onclick="LogoutAsync">Logout</button>
+</MainLayout>
+
+@code
+{
+    protected override void OnInitialized()
+    {
+        if (!LocalUser.IsAuthorized) {
+            Navigation.NavigateTo("/");
+        }
+    }
+
+    private async Task LogoutAsync()
+    {
+        await LocalUser.LogoutAsync();
+        Navigation.NavigateTo("/");
+    }
+}
