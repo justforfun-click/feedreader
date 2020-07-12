@@ -40,6 +40,9 @@ else
                     <a class="microsoft" href="@LocalUser.GetMsLoginUri(Navigation.ToAbsoluteUri("/login/ms-callback").ToString())">
                         <img src="/img/iconfinder_Microsoft_381606.svg"/> Login with <b>Microsoft</b> account
                     </a>
+                    <a class="microsoft" href="@LocalUser.GetGoogleLoginUri(Navigation.ToAbsoluteUri("/login/google-callback").ToString())">
+                        <img src="/img/iconfinder_2_939729.svg"/> Login with <b>Google</b> account
+                    </a>
                 </div>
             }
         </div>
@@ -70,7 +73,20 @@ else
             }
             else
             {
-                Error = "Login with Microsoft Account failed. Please try it again.";
+                Error = "Login with Microsoft account failed. Please try it again.";
+                Navigation.NavigateTo("/login");
+            }
+            break;
+
+        case "google-callback":
+            if (await LocalUser.LoginWithGoogleCallbackAsync(Navigation.Uri))
+            {
+                Logger.Info("Loggin success.");
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                Error = "Login with Google account failed. Please try it again.";
                 Navigation.NavigateTo("/login");
             }
             break;

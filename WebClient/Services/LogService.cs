@@ -29,7 +29,7 @@ namespace FeedReader.WebClient.Services
 
         private void Log(string level, string msg, string func, string file, int line)
         {
-            Console.WriteLine($"[FeedReader.{level}]: {msg}({func}, {file}:{line}");
+            Console.WriteLine($"[FeedReader.{level}]: {msg} ({func}, {file}:{line}");
         }
     }
 }
