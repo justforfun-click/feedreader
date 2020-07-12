@@ -1,8 +1,8 @@
-using Microsoft.IdentityModel.Tokens;
+using JWT.Builder;
+using JWT.Algorithms;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
@@ -92,7 +92,8 @@ namespace FeedReader.WebClient.Models
                 }
 
                 // Validate token.
-                return await ValidateTokenAsync(token);
+                await ValidateMicrosoftTokenAsync(token);
+                return true;
             }
             catch (Exception ex)
             {
@@ -107,40 +108,50 @@ namespace FeedReader.WebClient.Models
             await _localStorage.ClearAsync();
         }
 
-        private async Task<bool> ValidateTokenAsync(string token)
+        private async Task ValidateMicrosoftTokenAsync(string token)
         {
             // Decode the token.
-            var jwtHandler = new JwtSecurityTokenHandler();
-            var jwt = jwtHandler.ReadJwtToken(token);
-            if (jwt.Issuer == "https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0")
-            {
-                await ValidateMsTokenAsync(jwtHandler, jwt);
-            }
-
-            // Token is valid, save it.
-            Token = token;
-            await _localStorage.SetAsync(LOCAL_USER_LOCAL_STORAGE_KEY, this);
-            return true;
-        }
-
-        private async Task ValidateMsTokenAsync(JwtSecurityTokenHandler jwtHandler, JwtSecurityToken jwt)
-        {
+            var header = new JwtBuilder().DoNotVerifySignature().DecodeHeader<IDictionary<string, string>>(token);
+            var kid = GetRequiredFieldInTheToken(header, "kid");
+            
             // Get Microsoft public keys.
             using (var client = new HttpClient())
             {
                 var keys = JsonConvert.DeserializeObject<MicrosoftKeys>(await client.GetStringAsync("https://login.microsoftonline.com/common/discovery/v2.0/keys"));
-                var key = keys.Keys.Where(k => k.Kid == (string)jwt.Header["kid"]).First();
-                var signCert = new SigningCredentials(new X509SecurityKey(new X509Certificate2(Base64UrlEncoder.DecodeBytes(key.X5c.First()))), "RSA256");
+                var key = keys.Keys.Where(k => k.Kid == kid).First();
+                var cert = new X509Certificate2(Convert.FromBase64String(key.X5c.First()), "RSA256");
 
                 // Validate token.
-                SecurityToken token;
-                var principal = jwtHandler.ValidateToken(jwt.RawData, new TokenValidationParameters
+                var payload = new JwtBuilder().WithAlgorithm(new RS256Algorithm(cert)).MustVerifySignature().Decode<IDictionary<string, string>>(token);
+
+                // Verify iss is microsoft.
+                if (GetRequiredFieldInTheToken(payload, "iss") != "https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0")
                 {
-                    ValidateIssuer = false,
-                    ValidAudience =  CLIENT_ID,
-                    IssuerSigningKey = signCert.Key
-                }, out token);
+                    throw new ArgumentException("The iss in token is not Microsoft.");
+                }
+
+                // Verify aud is our client.
+                if (GetRequiredFieldInTheToken(payload, "aud") != CLIENT_ID)
+                {
+                    throw new ArgumentException("The aud in token is not feedreader.org.");
+                }
+
+                // Verify email address is present.
+                GetRequiredFieldInTheToken(payload, "email");
+
+                // Token is valid, save it.
+                Token = token;
+                await _localStorage.SetAsync(LOCAL_USER_LOCAL_STORAGE_KEY, this);
             }
+        }
+
+        private string GetRequiredFieldInTheToken(IDictionary<string, string> payload, string key)
+        {
+            if (!payload.ContainsKey(key) || string.IsNullOrEmpty(payload[key]))
+            {
+                throw new ArgumentException($"The '{key}' can't be found in the token.");
+            }
+            return payload[key].Trim();
         }
     }
 }
