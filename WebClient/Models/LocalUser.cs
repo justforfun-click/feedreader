@@ -48,10 +48,35 @@ namespace FeedReader.WebClient.Models
         [JsonIgnore]
         public bool IsAuthorized { get { return !string.IsNullOrWhiteSpace(Token); } }
 
+        public List<Feed> Feeds { get; set; } = new List<Feed>();
+
         public LocalUser(LogService logger, LocalStorageService localStorage)
         {
             _logger = logger;
             _localStorage = localStorage;
+
+            // Generate test feeds
+            Feeds = new List<Feed>()
+            {
+                new Feed()
+                {
+                    Name = "C++ Blog",
+                    Uri = "https://isocpp.org/blog/rss",
+                    Group = "C++",
+                },
+                new Feed()
+                {
+                    Name = "Morden C++",
+                    Uri = "http://www.modernescpp.com/?format=feed",
+                    Group = "C++",
+                },
+                new Feed()
+                {
+                    Name = "Fox News - Log Name Test, I'm very long, really very long.",
+                    Uri = "http://feeds.foxnews.com/foxnews/national",
+                    Group = "News - Long Group Name Test, I'm very long, really very long."
+                }
+            };
         }
 
         public async Task InitializeAsync()

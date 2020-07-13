@@ -1,0 +1,110 @@
+.authorized-user-page {
+    display: flex;
+    ;
+    height: 100%;
+    background-color: white;
+
+    > .left-panel {
+        width: 320px;
+        border-right: 1px solid #efefef;
+        padding: 10px;
+
+        .section {
+            > .header {
+                display: flex;
+                height: 44px;
+
+                .name {
+                    display: flex;
+                    align-items: center;
+                    color: #9f9f9f;
+                    text-transform: uppercase;
+                    font-size: 12px;
+                    flex: 1;
+                }
+
+                .toolbar {
+                    display: flex;
+                    align-items: center;
+
+                    .icon {
+                        justify-content: center;
+                        display: flex;
+                        align-items: center;
+                        width: 24px;
+                        height: 24px;
+
+                        &:hover {
+                            background-color: rgba(0, 0, 0, 0.05);
+                            cursor: pointer;
+                        }
+
+                        svg {
+                            width: 12px;
+                            height: 12px;
+                            fill: #9f9f9f;
+                        }
+                    }
+                }
+            }
+
+            > .feed-group-list {
+                .name {
+                    display: flex;
+                    flex: 1px;
+                    min-width: 0px;
+
+                    span {
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+
+                .group {
+                    padding-bottom: 20px;
+                    font-size: 14px;
+
+                    .header {
+                        display: flex;
+
+                        .icon {
+                            width: 24px;
+                            height: 24px;
+                            justify-content: center;
+            
+                            svg {
+                                width: 16px;
+                                height: 16px;
+                                fill: #9f9f9f;
+                            }
+                        }
+
+                        .name {
+                            cursor: default;
+                        }
+                    }
+
+                    .feed-list {
+                        padding-left: 20px;
+
+                        .feed {
+                            display: flex;
+                            padding-top: 10px;
+
+                            img {
+                                width: 16px;
+                                height: 16px;
+                                margin-right: 8px;
+                            }
+
+                            .name {
+                                cursor: pointer;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
