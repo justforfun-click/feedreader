@@ -37,10 +37,10 @@ else
                     @Error
                 </div>
                 <div class="login-providers">
-                    <a class="microsoft" href="@LocalUser.GetMsLoginUri(Navigation.ToAbsoluteUri("/login/ms-callback").ToString())">
+                    <a class="microsoft" href="@MicrosoftLoginUri">
                         <img src="/img/iconfinder_Microsoft_381606.svg"/> Login with <b>Microsoft</b> account
                     </a>
-                    <a class="microsoft" href="@LocalUser.GetGoogleLoginUri(Navigation.ToAbsoluteUri("/login/google-callback").ToString())">
+                    <a class="microsoft" href="@GoogleLoginUri">
                         <img src="/img/iconfinder_2_939729.svg"/> Login with <b>Google</b> account
                     </a>
                 </div>
@@ -51,6 +51,10 @@ else
 
 @code
 {
+    private const string MICROSOFT_CLIENT_ID = "dcaaa2ba-a614-4b8c-b78e-1fb39cb8899a";
+
+    private const string GOOGLE_CLIENT_ID = "2423499784-8btrctmdul3lrcjlg9uvaoa8clrtvc0f.apps.googleusercontent.com";
+
     [Parameter]
     public string Action { get; set; }
 
@@ -58,45 +62,97 @@ else
 
     private bool IsLogining { get; set; }
 
+    private string MicrosoftLoginUri { get; set; }
+
+    private string GoogleLoginUri { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var callbackUri = Navigation.ToAbsoluteUri("/login/ms-callback");
+        MicrosoftLoginUri = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id={MICROSOFT_CLIENT_ID}&redirect_uri={callbackUri}&response_type=id_token&scope=openid+profile+email&nonce=feedreader";
+
+        callbackUri = Navigation.ToAbsoluteUri("/login/google-callback");
+        GoogleLoginUri = $"https://accounts.google.com/o/oauth2/v2/auth?client_id={GOOGLE_CLIENT_ID}&redirect_uri={callbackUri}&response_type=id_token&scope=openid+profile+email&nonce=feedreader";
+    }
+
     protected override async Task OnInitializedAsync()
     {
         switch (Action)
         {
-        case null:
-            break;
+            case null:
+                break;
 
-        case "ms-callback":
-            if (await LocalUser.LoginWithMsCallbacAsync(Navigation.Uri))
-            {
-                Logger.Info("Login success.");
-                Navigation.NavigateTo("/");
-            }
-            else
-            {
-                Error = "Login with Microsoft account failed. Please try it again.";
+            case "ms-callback":
+                await LoginWithMicrosoftCallbacAsync(Navigation.Uri);
+                break;
+
+            case "google-callback":
+                await LoginWithGoogleCallbackAsync(Navigation.Uri);
+                break;
+
+            default:
+                Logger.Error($"Invalid action: {Action}.");
                 Navigation.NavigateTo("/login");
-            }
-            break;
-
-        case "google-callback":
-            if (await LocalUser.LoginWithGoogleCallbackAsync(Navigation.Uri))
-            {
-                Logger.Info("Loggin success.");
-                Navigation.NavigateTo("/");
-            }
-            else
-            {
-                Error = "Login with Google account failed. Please try it again.";
-                Navigation.NavigateTo("/login");
-            }
-            break;
-
-        default:
-            Logger.Error($"Invalid action: {Action}.");
-            Navigation.NavigateTo("/login");
-            break;
+                break;
         }
 
         IsLogining = false;
+    }
+
+    private async Task LoginWithMicrosoftCallbacAsync(string callbackUri)
+    {
+        try
+        {
+            // Get jwt token from the uri.
+            var fragment = callbackUri.Substring(callbackUri.IndexOf('#') + 1);
+            var queries = HttpUtility.ParseQueryString(fragment);
+            var token = queries["id_token"];
+            if (token == null)
+            {
+                var error = queries["error"];
+                if (error == null)
+                {
+                    throw new Exception($"Unexpected ms-callback, uri: {callbackUri}.");
+                }
+                else
+                {
+                    throw new Exception($"Get error from ms login callbac: {error}");
+                }
+            }
+            else
+            {
+                await LocalUser.LoginAsync(token);
+                Navigation.NavigateTo("/");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Error($"Login with Microsoft account failed, ex: {ex.Message}");
+            Error = "Login with Microsoft account failed, please try again later.";
+        }
+    }
+
+    private async Task LoginWithGoogleCallbackAsync(string callbackUri)
+    {
+        try
+        {
+            var fragment = callbackUri.Substring(callbackUri.IndexOf('#') + 1);
+            var queries = HttpUtility.ParseQueryString(fragment);
+            var token = queries["id_token"];
+            if (token == null)
+            {
+                throw new Exception($"Unexpected google-callback, uri: {callbackUri}.");
+            }
+            else
+            {
+                await LocalUser.LoginAsync(token);
+                Navigation.NavigateTo("/");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Error($"Loggin with google account failed, ex: {ex.Message}");
+            Error = "Login with Google account failed, pleaes try again later.";
+        }
     }
 }

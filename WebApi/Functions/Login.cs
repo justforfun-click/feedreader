@@ -52,12 +52,10 @@ namespace FeedReader.WebApi
                 .Encode();
 
             // Return user info
-            return new OkObjectResult(new User
+            return new OkObjectResult(new Share.DataContracts.User
             {
                 Token = token,
-                Uuid = userEntity.Uuid,
-                Name = userEntity.Name,
-                AvatarUrl = userEntity.AvatarUrl
+                Uuid = userEntity.Uuid
             });
         }
 

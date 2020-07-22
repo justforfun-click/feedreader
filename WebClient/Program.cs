@@ -14,6 +14,7 @@ namespace FeedReader.WebClient
             builder.RootComponents.Add<App>("app");
             builder.Services.AddSingleton<LogService>();
             builder.Services.AddSingleton<LocalStorageService>();
+            builder.Services.AddSingleton<ApiService>();
             builder.Services.AddSingleton<LocalUser>();
             builder.Services.AddAuthorizationCore();
 
