@@ -1,5 +1,7 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
+﻿using FeedReader.Share.DataContracts;
+using Microsoft.WindowsAzure.Storage.Table;
 using System;
+using System.Collections.Generic;
 
 namespace FeedReader.WebApi.Entities
 {
@@ -14,5 +16,7 @@ namespace FeedReader.WebApi.Entities
         public string AvatarUrl { get; set; }
 
         public DateTime RegistrationTime { get; set; }
+
+        public string Feeds { get; set; }
     }
 }

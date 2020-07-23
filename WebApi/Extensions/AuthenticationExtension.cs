@@ -43,15 +43,15 @@ namespace FeedReader.WebApi.Extensions
             public IEnumerable<MicrosoftKey> Keys { get; set; }
         }
 
-        private HttpRequest _httpReq;
+        private readonly HttpRequest _req;
 
-        private AuthenticationAttribute _attr;
+        private readonly AuthenticationAttribute _attr;
 
         public Type Type => typeof(User);
 
         public AuthenticationValueProvider(HttpRequest req, AuthenticationAttribute attr)
         {
-            _httpReq = req;
+            _req = req;
             _attr = attr;
         }
 
@@ -60,10 +60,10 @@ namespace FeedReader.WebApi.Extensions
             try
             {
                 // Get token from header.
-                var token = _httpReq.Headers["authentication"];
+                var token = _req.Headers["authentication"];
                 if (string.IsNullOrWhiteSpace(token))
                 {
-                    token = _httpReq.Query["authentication"];
+                    token = _req.Query["authentication"];
                 }
 
                 // Decode it.
@@ -233,11 +233,13 @@ namespace FeedReader.WebApi.Extensions
 
     class AuthenticationBinding : IBinding
     {
+        private readonly AuthenticationAttribute _attr;
+
         public bool FromAttribute => false;
 
         public AuthenticationBinding(AuthenticationAttribute attr)
         {
-            mAttr = attr;
+            _attr = attr;
         }
 
         public Task<IValueProvider> BindAsync(object value, ValueBindingContext context)
@@ -248,15 +250,13 @@ namespace FeedReader.WebApi.Extensions
         public Task<IValueProvider> BindAsync(BindingContext context)
         {
             var req = context.BindingData.First(pair => pair.Value is HttpRequest).Value as HttpRequest;
-            return Task.FromResult<IValueProvider>(new AuthenticationValueProvider(req, mAttr));
+            return Task.FromResult<IValueProvider>(new AuthenticationValueProvider(req, _attr));
         }
 
         public ParameterDescriptor ToParameterDescriptor()
         {
             return new ParameterDescriptor();
         }
-
-        private AuthenticationAttribute mAttr;
     }
 
     class AuthenticationBindingProvider : IBindingProvider

@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.WebClient", "Web
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.WebApi", "WebApi\FeedReader.WebApi.csproj", "{17B6F8F4-100B-4F13-A1EF-A26C5AED96C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeedReader.Share", "Share\FeedReader.Share.csproj", "{1901AB61-3F73-4264-A487-EA7592A08DAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.Share", "Share\FeedReader.Share.csproj", "{1901AB61-3F73-4264-A487-EA7592A08DAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

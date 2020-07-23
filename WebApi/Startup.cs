@@ -11,6 +11,7 @@ namespace FeedReader.WebApi
         public void Configure(IWebJobsBuilder builder)
         {
             builder.AddExtension<AuthenticationExtension>();
+            builder.AddExtension<HttpRequestContentExtension>();
             builder.AddExtension<TableStorageExtension>();
         }
     }
