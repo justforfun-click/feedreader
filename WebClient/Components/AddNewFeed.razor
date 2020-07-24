@@ -1,0 +1,126 @@
+@inject LocalUser LocalUser
+@inject NavigationManager Navigation
+
+<div class="add-new-feed">
+    <div class="title">Add New Feed</div>
+    <div class="form">
+        <div class="field">
+            <div class="label">Title <span>optional</span></div>
+            <input placeholder="Title" @bind="@FeedName"/>
+        </div>
+
+        <div class="field">
+            <div class="label">Group <span>required</span></div>
+            <div class="group-selection">
+                <select @onchange="OnGroupSelectionChanged">
+                    @foreach (var group in Groups)
+                    {
+                        <option value="@group">@group</option>
+                    }
+                </select>
+                <input placeholder="New Group Name" style="@NewGroupNameFiledStyle" @bind="NewGroupName"/>
+            </div>
+            <div class="error">@NewGroupNameError &nbsp;</div>
+        </div>
+
+        <div class="field">
+            <div class="label">Feed URL <span>required. We support <a href="https://en.wikipedia.org/wiki/RSS">RSS</a>, <a href="https://en.wikipedia.org/wiki/Atom_(Web_standard)">Atom</a>, <a href="https://en.wikipedia.org/wiki/JSON_Feed">JSON Feed</a> format.</span></div>
+            <input placeholder="Feed URL" @bind="FeedURL"/>
+            <div class="error">@FeedUrlError &nbsp;</div>
+        </div>
+
+        <div class="buttons">
+            <div class="button primary" @onclick="SaveNewFeed">Save</div>
+            <div class="button" @onclick="OnCancel">Cancel</div>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnCancel { get; set; }
+
+    [Parameter]
+    public EventCallback<Feed> OnSave { get; set; }
+
+    private List<string> Groups { get; set; }
+
+    private string FeedName { get; set; }
+
+    private string FeedURL { get; set; }
+
+    private string FeedUrlError { get; set; }
+
+    private string SelectedGroup { get; set; }
+
+    private string NewGroupName { get; set; }
+
+    private string NewGroupNameError { get; set; }
+
+    private string NewGroupNameFiledStyle { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Groups = LocalUser.Feeds.GroupBy(f => f.Group).Select(g => g.Key).ToList();
+        Groups.Insert(0, SelectedGroup = "Default");
+        Groups.Add("Create a new group");
+        NewGroupNameFiledStyle = "display: none";
+    }
+
+    private async Task SaveNewFeed()
+    {
+        var url = FeedURL?.Trim().ToLower();
+        if (string.IsNullOrEmpty(url))
+        {
+            FeedUrlError = "Feed URL is required.";
+        }
+        else if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+        {
+            FeedUrlError = "URL is invalid.";
+        }
+        else if (LocalUser.Feeds.Find(f => f.Uri == url) != null)
+        {
+            FeedUrlError = "The feed has been subscribed already.";
+        }
+        else
+        {
+            FeedUrlError = null;
+        }
+
+        var newGroupName = NewGroupName?.Trim();
+        if (SelectedGroup == "Create a new group" && string.IsNullOrEmpty(newGroupName))
+        {
+            NewGroupNameError = "Group name is required.";
+        }
+        else
+        {
+            NewGroupNameError = null;
+        }
+
+        if (FeedUrlError != null || NewGroupNameError != null)
+        {
+            return;
+        }
+
+        await OnSave.InvokeAsync(new Feed()
+        {
+            Group = (SelectedGroup == "Create a new group" ? newGroupName : SelectedGroup),
+            Name = FeedName ?? FeedURL,
+            Uri = FeedURL
+        });
+    }
+
+    private void OnGroupSelectionChanged(ChangeEventArgs e)
+    {
+        SelectedGroup = e.Value.ToString();
+        if (SelectedGroup == "Create a new group")
+        {
+            NewGroupNameFiledStyle = "display: block";
+        }
+        else
+        {
+            NewGroupNameFiledStyle = "display: none";
+        }
+    }
+}

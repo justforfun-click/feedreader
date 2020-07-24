@@ -1,15 +1,13 @@
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FeedReader.WebClient.Services;
-using FeedReader.Share.Extensions;
 using System;
 
 namespace FeedReader.WebClient.Models
 {
-    public class LocalUser : Share.DataContracts.User
+    public class LocalUser
     {
-        private const string LOCAL_USER_LOCAL_STORAGE_KEY = "feedreader.local_user";
+        private const string LOCAL_USER_LOCAL_STORAGE_KEY = "feedreader.local_user_token";
 
         private class MicrosoftKey
         {
@@ -33,7 +31,8 @@ namespace FeedReader.WebClient.Models
 
         private readonly ApiService _api;
 
-        [JsonIgnore]
+        public string Token { get; set; }
+
         public bool IsAuthorized { get { return !string.IsNullOrWhiteSpace(Token); } }
 
         public List<Feed> Feeds { get; set; } = new List<Feed>();
@@ -43,45 +42,21 @@ namespace FeedReader.WebClient.Models
             _logger = logger;
             _localStorage = localStorage;
             _api = api;
-
-            // Generate test feeds
-            Feeds = new List<Feed>()
-            {
-                new Feed()
-                {
-                    Name = "C++ Blog",
-                    Uri = "https://isocpp.org/blog/rss",
-                    Group = "C++",
-                },
-                new Feed()
-                {
-                    Name = "Morden C++",
-                    Uri = "http://www.modernescpp.com/?format=feed",
-                    Group = "C++",
-                },
-                new Feed()
-                {
-                    Name = "Fox News - Log Name Test, I'm very long, really very long.",
-                    Uri = "http://feeds.foxnews.com/foxnews/national",
-                    Group = "News - Long Group Name Test, I'm very long, really very long."
-                }
-            };
         }
 
         public async Task InitializeAsync()
         {
             try
             {
-                var localUser = await _localStorage.GetAsync<LocalUser>(LOCAL_USER_LOCAL_STORAGE_KEY);
-                if (localUser != null && !string.IsNullOrWhiteSpace(localUser.Token))
+                var token = await _localStorage.GetAsync<string>(LOCAL_USER_LOCAL_STORAGE_KEY);
+                if (!string.IsNullOrWhiteSpace(token))
                 {
-                    await LoginAsync(localUser.Token);
+                    await LoginAsync(token);
                 }
             }
             catch (Exception ex)
             {
                 _logger.Error($"Deserialize local user failed or login failed, require to re-login ex: {ex.Message}.");
-                (new Share.DataContracts.User()).CopyPropertiesTo(this);
                 await _localStorage.ClearAsync();
             }
         }
@@ -89,14 +64,44 @@ namespace FeedReader.WebClient.Models
         public async Task LoginAsync(string token)
         {
             var user = await _api.LoginAsync(token);
-            user.CopyPropertiesTo(this);
-            await _localStorage.SetAsync(LOCAL_USER_LOCAL_STORAGE_KEY, this);
+            await _localStorage.SetAsync(LOCAL_USER_LOCAL_STORAGE_KEY, Token = user.Token);
+            SyncFeeds(user.Feeds);
         }
 
         public async Task LogoutAsync()
         {
             Token = null;
             await _localStorage.ClearAsync();
+        }
+
+        public async Task SubscribeFeedAsync(Feed feed)
+        {
+            try
+            {
+                Feeds.Add(feed);
+                SyncFeeds(await _api.SubscribeFeed(feed));
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Subscribe feed failed, ex: {ex.Message}");
+
+                // remove from list.
+                var existedFeed = Feeds.Find(f => feed.Uri == f.Uri);
+                if (existedFeed != null)
+                {
+                    Feeds.Remove(existedFeed);
+                }
+            }
+        }
+
+        private void SyncFeeds(List<Share.DataContracts.Feed> feeds)
+        {
+            Feeds.Clear();
+            feeds.ForEach(f => Feeds.Add(new Feed() {
+                Name = f.Name,
+                Uri = f.Uri,
+                Group = f.Group,
+            }));
         }
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -13,6 +12,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 using FeedReader.WebApi.Entities;
 using JWT.Builder;
 using JWT.Algorithms;
+using System.Collections.Generic;
 
 namespace FeedReader.WebApi
 {
@@ -55,7 +55,8 @@ namespace FeedReader.WebApi
             return new OkObjectResult(new Share.DataContracts.User
             {
                 Token = token,
-                Uuid = userEntity.Uuid
+                Uuid = userEntity.Uuid,
+                Feeds = JsonConvert.DeserializeObject<List<Share.DataContracts.Feed>>(userEntity.Feeds)
             });
         }
 

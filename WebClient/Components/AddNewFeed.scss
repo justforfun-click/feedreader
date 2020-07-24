@@ -1,0 +1,81 @@
+.add-new-feed {
+    padding: 20px 100px;
+
+    .title {
+        font-size: 34px;
+        font-weight: 700;
+    }
+
+    .form {
+        padding-top: 40px;
+
+        .field {
+            margin-bottom: 30px;
+
+            .label {
+                font-size: 14px;
+                font-weight: 700;
+                margin-bottom: 12px;
+
+                a, span {
+                    font-size: 12px;
+                    color: #9e9e9e;
+                }
+
+                a {
+                    text-decoration: underline;
+                }
+            }
+
+            .error {
+                color: red;
+                font-size: 12px;
+                padding: 4px 2px 0px;
+            }
+
+            input, select {
+                border: 1px solid rgba(0, 0, 0, 0.15);
+                border-radius: 4px;
+                padding: 8px 12px;
+                font-size: 16px;
+            }
+
+            input {
+                width: 100%;
+            }
+
+            select {
+                width: auto;
+            }
+
+            .group-selection {
+                display: flex;
+
+                input {
+                    margin-left: 4px;
+                }
+            }
+        }
+
+        .buttons {
+            display: flex;
+
+            .button {
+                padding: 12px 20px;
+                border-radius: 4px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                border: 1px solid rgba(0, 0, 0, 0.15);
+                margin-right: 20px;
+            }
+
+            .button.primary {
+                background-color: #2bb24c;
+                color: white;
+                border: 1px solid transparent;
+            }
+        }
+    }
+}
