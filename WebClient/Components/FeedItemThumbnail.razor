@@ -1,0 +1,22 @@
+@if (FeedItem.TopicPictureUri != null)
+{
+    <a class="feed-item-thumbnail-with-topic-picture" href="@FeedItem.PermentLink" target="_blank">
+        <img src="@FeedItem.TopicPictureUri"/>
+        <div class="title">@FeedItem.Title</div>
+        <div class="time-and-channel">@FeedItem.PubDate&nbsp;<span><b>via</b>&nbsp;@FeedItem.Channel</span></div>
+    </a>
+}
+else
+{
+    <a class="feed-item-thumbnail-without-topic-picture" href="@FeedItem.PermentLink" target="_blank">
+        <div class="title">@FeedItem.Title</div>
+        <div class="summary"><span>@FeedItem.Summary</span></div>
+        <div class="time-and-channel">@FeedItem.PubDate&nbsp;<span><b>via</b>&nbsp;@FeedItem.Channel</span></div>
+    </a>
+}
+
+@code
+{
+    [Parameter]
+    public Share.DataContracts.FeedItem FeedItem { get; set; }
+}

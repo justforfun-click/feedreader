@@ -1,0 +1,55 @@
+.feed-item-thumbnail-with-topic-picture,
+.feed-item-thumbnail-without-topic-picture {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    height: 350px;
+    overflow: hidden;
+    margin: 0px 12px 12px 0px;
+    border: 1px solid rgb(220, 227, 236);
+
+    .title {
+        font-size: 18px;
+        font-weight: 700;
+        line-height: 20px;
+        margin: 10px;
+    }
+
+    .time-and-channel {
+        display: flex;
+        font-size: 13px;
+        line-height: 18px;
+        color: gray;
+        margin: 10px;
+
+        span {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+    }
+}
+
+.feed-item-thumbnail-with-topic-picture {
+    img {
+        width: 300px;
+        height: 230px;
+        object-fit: cover;
+    }
+
+    .title {
+        flex: 1;
+        overflow: hidden;
+    }
+}
+
+.feed-item-thumbnail-without-topic-picture {
+    .summary {
+        flex: 1;
+        margin: 10px;
+        color: rgb(26, 36, 51);
+        font-size: 14px;
+        line-height: 21px;
+        overflow: hidden;
+    }
+}

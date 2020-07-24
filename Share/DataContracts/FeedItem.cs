@@ -8,6 +8,12 @@ namespace FeedReader.Share.DataContracts
 
         public string PermentLink { get; set; }
 
+        public string TopicPictureUri { get; set; }
+
+        public string Channel { get; set; }
+
+        public string Summary { get; set; }
+
         public string Content { get; set; }
 
         public DateTime PubDate { get; set; }

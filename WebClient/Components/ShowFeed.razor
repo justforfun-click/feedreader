@@ -13,11 +13,7 @@
         {
             foreach (var item in Feed.Items)
             {
-                <a class="feed-item" href="@item.PermentLink" target="_blank">
-                    <div class="pub-date">@item.PubDate</div>
-                    <div class="title">@item.Title</div>
-                    <div class="content">@((MarkupString)item.Content)</div>
-                </a>
+                <FeedItemThumbnail FeedItem=@item></FeedItemThumbnail>
             }
         }
     </div>
