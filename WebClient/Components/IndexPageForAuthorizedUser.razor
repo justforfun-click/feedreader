@@ -1,3 +1,5 @@
+@implements IDisposable
+@inject FeedService FeedService
 @inject LocalUser LocalUser
 
 <MainLayout>
@@ -31,7 +33,7 @@
                             <div class="feed-list">
                                 @foreach (var feed in group)
                                 {
-                                    <div class="feed">
+                                    <div class="feed" @onclick="() => ShowFeed(feed)">
                                         <img src="@feed.IconUri"/>
                                         <div class="name" title="@feed.Name"><span>@feed.Name</span></div>
                                     </div>
@@ -52,6 +54,16 @@
 {
     private RenderFragment RightPanelContent { get; set; }
 
+    protected override void OnInitialized()
+    {
+        FeedService.RefreshRequested += OnRefreshRequested;
+    }
+
+    public void Dispose()
+    {
+        FeedService.RefreshRequested -= OnRefreshRequested;
+    }
+
     private void AddNewFeed()
     {
         RightPanelContent = @<AddNewFeed OnCancel="Cancel" OnSave="SaveNewFeed"/>;
@@ -68,11 +80,16 @@
 
     private void ShowFeed(Feed feed)
     {
-        RightPanelContent = @<div>Feed: @feed.Name</div>;
+        RightPanelContent = @<ShowFeed Feed=@feed/>;
     }
 
     private void Cancel()
     {
         RightPanelContent = @<div></div>;
+    }
+
+    private void OnRefreshRequested()
+    {
+        StateHasChanged();
     }
 }

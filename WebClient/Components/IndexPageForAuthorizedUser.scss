@@ -1,6 +1,5 @@
 .authorized-user-page {
     display: flex;
-    ;
     height: 100%;
     background-color: white;
 
@@ -106,5 +105,9 @@
                 }
             }
         }
+    }
+
+    > .right-panel {
+        flex: 1;
     }
 }

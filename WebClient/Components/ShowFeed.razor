@@ -1,0 +1,35 @@
+@inject FeedService FeedService
+
+<div class="show-feed">
+    <div class="feed-description">
+        <a class="name" href="@Feed.Uri" target="_blank">@Feed.Name</a>
+    </div>
+    <div class="feed-items">
+        @if (Feed.Items.Count == 0)
+        {
+            <WaitingPage Text="Loading..."/>
+        }
+        else
+        {
+            foreach (var item in Feed.Items)
+            {
+                <a class="feed-item" href="@item.PermentLink" target="_blank">
+                    <div class="pub-date">@item.PubDate</div>
+                    <div class="title">@item.Title</div>
+                    <div class="content">@((MarkupString)item.Content)</div>
+                </a>
+            }
+        }
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public Feed Feed {get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FeedService.RefreshFeed(Feed);
+    }
+}

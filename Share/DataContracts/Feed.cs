@@ -9,5 +9,7 @@ namespace FeedReader.Share.DataContracts
         public string Name { get; set; }
 
         public string Group { get; set;  }
+
+        public List<FeedItem> Items { get; set; } = new List<FeedItem>();
     }
 }

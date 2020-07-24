@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace FeedReader.WebClient.Models
 {
@@ -18,5 +19,7 @@ namespace FeedReader.WebClient.Models
                 return $"https://www.google.com/s2/favicons?domain={uri.Host}";
             }
         }
+
+        public List<Share.DataContracts.FeedItem> Items { get; set; } = new List<Share.DataContracts.FeedItem>();
     }
 }
