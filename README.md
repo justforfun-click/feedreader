@@ -1,7 +1,7 @@
 FeedReader
 ==
 
-[![Build Status](https://dev.azure.com/xieyubo/build/_apis/build/status/feedreaderorg.feedreader?branchName=master)](https://dev.azure.com/xieyubo/build/_build/latest?definitionId=11&branchName=master)
+[![Build Status](https://dev.azure.com/feedreader/feedreader/_apis/build/status/feedreaderorg.feedreader?branchName=master)](https://dev.azure.com/feedreader/feedreader/_build/latest?definitionId=1&branchName=master)
 
 This is a learning project. The target goal is building an online web feed reader with blazor web assembly
 and azure functions.
