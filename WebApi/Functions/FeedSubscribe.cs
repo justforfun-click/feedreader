@@ -18,60 +18,64 @@ namespace FeedReader.WebApi.Functions
     public static class FeedSubscribe
     {
         [FunctionName("FeedSubscribe")]
-        public static async Task<IActionResult> Run(
+        public static Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "feed/subscribe")] HttpRequest req,
             [Authentication] User user,
             [HttpRequestContent(Type = typeof(Feed))] Feed feed,
             [TableStorage] CloudTableClient tableClient,
             ILogger log)
         {
-            if (feed == null)
+            return HttpFilter.RunAsync(req, async () =>
             {
-                return new BadRequestErrorMessageResult("feed is missed.");
-            }
+                if (feed == null)
+                {
+                    return new BadRequestErrorMessageResult("feed is missed.");
+                }
 
-            if (string.IsNullOrEmpty(feed.Uri))
-            {
-                return new BadRequestErrorMessageResult("feed uri is required.");
-            }
-            else
-            {
-                feed.Uri = feed.Uri.Trim().ToLower();
-            }
+                if (string.IsNullOrEmpty(feed.Uri))
+                {
+                    return new BadRequestErrorMessageResult("feed uri is required.");
+                }
+                else
+                {
+                    feed.Uri = feed.Uri.Trim().ToLower();
+                }
 
-            // Retrive current user's feeds.
-            List<Feed> userFeeds = null;
-            var userTable = tableClient.GetTableReference("users");
-            var userEntity = (UserEntity)(await userTable.ExecuteAsync(TableOperation.Retrieve<UserEntity>(partitionKey: user.Uuid, rowkey: user.Uuid))).Result;
-            if (!string.IsNullOrEmpty(userEntity.Feeds)) {
-                userFeeds = JsonConvert.DeserializeObject<List<Feed>>(userEntity.Feeds);
-            }
-            else
-            {
-                userFeeds = new List<Feed>();
-            }
+                // Retrive current user's feeds.
+                List<Feed> userFeeds = null;
+                var userTable = tableClient.GetTableReference("users");
+                var userEntity = (UserEntity)(await userTable.ExecuteAsync(TableOperation.Retrieve<UserEntity>(partitionKey: user.Uuid, rowkey: user.Uuid))).Result;
+                if (!string.IsNullOrEmpty(userEntity.Feeds))
+                {
+                    userFeeds = JsonConvert.DeserializeObject<List<Feed>>(userEntity.Feeds);
+                }
+                else
+                {
+                    userFeeds = new List<Feed>();
+                }
 
-            // Delete the old item.
-            var oldItem = userFeeds.FirstOrDefault(f => f.Uri == feed.Uri);
-            if (oldItem != null)
-            {
-                userFeeds.Remove(oldItem);
-            }
+                // Delete the old item.
+                var oldItem = userFeeds.FirstOrDefault(f => f.Uri == feed.Uri);
+                if (oldItem != null)
+                {
+                    userFeeds.Remove(oldItem);
+                }
 
-            // Add the new item.
-            userFeeds.Add(new Feed()
-            {
-                Uri = feed.Uri,
-                Name = feed.Name,
-                Group = feed.Group
+                // Add the new item.
+                userFeeds.Add(new Feed()
+                {
+                    Uri = feed.Uri,
+                    Name = feed.Name,
+                    Group = feed.Group
+                });
+
+                // Save to table.
+                userEntity.Feeds = JsonConvert.SerializeObject(userFeeds);
+                await userTable.ExecuteAsync(TableOperation.Replace(userEntity));
+
+                // return new subscribed feeds to client.
+                return new OkObjectResult(userEntity.Feeds);
             });
-
-            // Save to table.
-            userEntity.Feeds = JsonConvert.SerializeObject(userFeeds);
-            await userTable.ExecuteAsync(TableOperation.Replace(userEntity));
-
-            // return new subscribed feeds to client.
-            return new OkObjectResult(userEntity.Feeds);
         }
     }
 }

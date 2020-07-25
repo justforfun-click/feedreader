@@ -11,7 +11,11 @@ namespace FeedReader.WebClient.Services
 {
     public class ApiService
     {
+        #if DEBUG
+        private readonly HttpClient _http = new HttpClient() { BaseAddress = new Uri("http://localhost:7071/v1/") };
+        #else
         private readonly HttpClient _http = new HttpClient() { BaseAddress = new Uri("https://feedreaderapi.azurewebsites.net/v1/") };
+        #endif
 
         public async Task<Share.DataContracts.User> LoginAsync(string token)
         {

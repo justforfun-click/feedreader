@@ -14,18 +14,21 @@ namespace FeedReader.WebApi.Functions
     public static class FeedRefresh
     {
         [FunctionName("FeedRefresh")]
-        public static async Task<IActionResult> Run(
+        public static Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "feed/refresh")] HttpRequest req,
             [Authentication] User user,
             ILogger log)
         {
-            var feedUri = req.Query["feed-uri"];
-            if (string.IsNullOrWhiteSpace(feedUri))
+            return HttpFilter.RunAsync(req, async () =>
             {
-                return new BadRequestErrorMessageResult("'feed-uri' parameter is missing.");
-            }
+                var feedUri = req.Query["feed-uri"];
+                if (string.IsNullOrWhiteSpace(feedUri))
+                {
+                    return new BadRequestErrorMessageResult("'feed-uri' parameter is missing.");
+                }
 
-            return new OkObjectResult(await new FeedProcessor().RefreshFeed(feedUri));
+                return new OkObjectResult(await new FeedProcessor().RefreshFeed(feedUri));
+            });
         }
     }
 }

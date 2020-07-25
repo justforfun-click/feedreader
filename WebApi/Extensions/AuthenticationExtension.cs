@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs.Description;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.Azure.WebJobs.Host.Config;
@@ -55,49 +56,45 @@ namespace FeedReader.WebApi.Extensions
             _attr = attr;
         }
 
-        public async Task<object> GetValueAsync()
+        public Task<object> GetValueAsync()
         {
-            try
+            return HttpFilter.RunAsync(_req, async () =>
             {
-                // Get token from header.
-                var token = _req.Headers["authentication"];
-                if (string.IsNullOrWhiteSpace(token))
+                try
                 {
-                    token = _req.Query["authentication"];
-                }
-
-                // Decode it.
-                var payload = new JwtBuilder().DoNotVerifySignature().Decode<IDictionary<string, string>>(token);
-                var iss = GetRequiredField(payload, "iss");
-
-                // Authenticate token based on issuer.
-                if (iss == Consts.FEEDREADER_ISS)
-                {
-                    return AuthenticateFeedReaderToken(token);
-                }
-                else if (_attr.AllowThirdPartyToken)
-                {
-                    switch (iss)
+                    // Get token from header.
+                    var token = _req.Headers["authentication"];
+                    if (string.IsNullOrWhiteSpace(token))
                     {
-                        case Consts.MICROSOFT_ISS:
-                            return await AuthenticateMsTokenAsync(token);
+                        token = _req.Query["authentication"];
+                    }
 
-                        case Consts.GOOGLE_ISS:
-                            return await AuthenticateGoogleTokenAsync(token);
+                    // Decode it.
+                    var payload = new JwtBuilder().DoNotVerifySignature().Decode<IDictionary<string, string>>(token);
+                    var iss = GetRequiredField(payload, "iss");
 
-                        default:
-                            throw new UnauthorizedAccessException();
+                    // Authenticate token based on issuer.
+                    if (iss == Consts.FEEDREADER_ISS)
+                    {
+                        return AuthenticateFeedReaderToken(token);
+                    }
+                    else if (_attr.AllowThirdPartyToken)
+                    {
+                        switch (iss)
+                        {
+                            case Consts.MICROSOFT_ISS:
+                                return await AuthenticateMsTokenAsync(token);
+
+                            case Consts.GOOGLE_ISS:
+                                return await AuthenticateGoogleTokenAsync(token);
+                        }
                     }
                 }
-                else
+                catch
                 {
-                    throw new UnauthorizedAccessException();
                 }
-            }
-            catch
-            {
-                throw new UnauthorizedAccessException();
-            }
+                return new UnauthorizedResult();
+            });
         }
 
         public string ToInvokeString()

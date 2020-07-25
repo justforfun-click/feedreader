@@ -10,14 +10,6 @@
 {
     Navigation.NavigateTo("/");
 }
-else if (Action != null)
-{
-    IsLogining = true;
-}
-else
-{
-    IsLogining = false;
-}
 
 <MainLayout>
     <div class="login-page" style="cursor: @(IsLogining ? "wait" : "default")">
@@ -68,6 +60,15 @@ else
 
     protected override void OnInitialized()
     {
+        if (Action != null)
+        {
+            IsLogining = true;
+        }
+        else
+        {
+            IsLogining = false;
+        }
+
         var callbackUri = Navigation.ToAbsoluteUri("/login/ms-callback");
         MicrosoftLoginUri = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id={MICROSOFT_CLIENT_ID}&redirect_uri={callbackUri}&response_type=id_token&scope=openid+profile+email&nonce=feedreader";
 

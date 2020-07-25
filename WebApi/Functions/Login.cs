@@ -21,42 +21,45 @@ namespace FeedReader.WebApi
         private const string FeedReaderUuidPrefix = "feedreader:";
 
         [FunctionName("login")]
-        public static async Task<IActionResult> Run(
+        public static Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             [Authentication(AllowThirdPartyToken = true)] User user,
             [TableStorage] CloudTableClient tableClient,
             ILogger log)
         {
-            // Get feedreader uuid?
-            var uuid = await GetFeedReaderUuid(user, tableClient);
-
-            // Login, reget the user data.
-            var userTable = tableClient.GetTableReference("users");
-            var res = await userTable.ExecuteAsync(TableOperation.Retrieve<UserEntity>(partitionKey: uuid, rowkey: uuid));
-            if (res == null || res.Result == null)
+            return HttpFilter.RunAsync(req, async () =>
             {
-                return new NotFoundResult();
-            }
+                // Get feedreader uuid?
+                var uuid = await GetFeedReaderUuid(user, tableClient);
 
-            // Generate our jwt token.
-            var now = DateTimeOffset.UtcNow;
-            var userEntity = (UserEntity)res.Result;
-            var token = new JwtBuilder()
-                .WithAlgorithm(new HMACSHA256Algorithm())
-                .WithSecret(Environment.GetEnvironmentVariable(Consts.ENV_KEY_JWT_SECRET))
-                .AddClaim("iss", Consts.FEEDREADER_ISS)
-                .AddClaim("aud", Consts.FEEDREADER_AUD)
-                .AddClaim("uuid", userEntity.Uuid)
-                .AddClaim("iat", now.ToUnixTimeSeconds())
-                .AddClaim("exp", now.AddDays(7).ToUnixTimeSeconds())
-                .Encode();
+                // Login, reget the user data.
+                var userTable = tableClient.GetTableReference("users");
+                var res = await userTable.ExecuteAsync(TableOperation.Retrieve<UserEntity>(partitionKey: uuid, rowkey: uuid));
+                if (res == null || res.Result == null)
+                {
+                    return new UnauthorizedResult();
+                }
 
-            // Return user info
-            return new OkObjectResult(new Share.DataContracts.User
-            {
-                Token = token,
-                Uuid = userEntity.Uuid,
-                Feeds = JsonConvert.DeserializeObject<List<Share.DataContracts.Feed>>(userEntity.Feeds)
+                // Generate our jwt token.
+                var now = DateTimeOffset.UtcNow;
+                var userEntity = (UserEntity)res.Result;
+                var token = new JwtBuilder()
+                    .WithAlgorithm(new HMACSHA256Algorithm())
+                    .WithSecret(Environment.GetEnvironmentVariable(Consts.ENV_KEY_JWT_SECRET))
+                    .AddClaim("iss", Consts.FEEDREADER_ISS)
+                    .AddClaim("aud", Consts.FEEDREADER_AUD)
+                    .AddClaim("uuid", userEntity.Uuid)
+                    .AddClaim("iat", now.ToUnixTimeSeconds())
+                    .AddClaim("exp", now.AddDays(7).ToUnixTimeSeconds())
+                    .Encode();
+
+                // Return user info
+                return new OkObjectResult(new Share.DataContracts.User
+                {
+                    Token = token,
+                    Uuid = userEntity.Uuid,
+                    Feeds = JsonConvert.DeserializeObject<List<Share.DataContracts.Feed>>(userEntity.Feeds)
+                });
             });
         }
 
