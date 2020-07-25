@@ -94,6 +94,25 @@ namespace FeedReader.WebClient.Models
             }
         }
 
+        public async Task UnsubscribeFeedAsync(Feed feed)
+        {
+            try
+            {
+                Feeds.Remove(Feeds.Find(f => f.Uri == feed.Uri));
+                SyncFeeds(await _api.UnsubscribeFeed(feed.Uri));
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Unsubscribe feed failed, ex: {ex.Message}");
+
+                // Add it back.
+                if (Feeds.Find(f => f.Uri == feed.Uri) == null)
+                {
+                    Feeds.Add(feed);
+                }
+            }
+        }
+
         private void SyncFeeds(List<Share.DataContracts.Feed> feeds)
         {
             Feeds.Clear();

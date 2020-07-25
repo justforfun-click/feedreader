@@ -57,6 +57,7 @@
     protected override void OnInitialized()
     {
         FeedService.RefreshRequested += OnRefreshRequested;
+        ShowFeed();
     }
 
     public void Dispose()
@@ -78,17 +79,31 @@
         _ = LocalUser.SubscribeFeedAsync(feed);
     }
 
-    private void ShowFeed(Feed feed)
+    private void ShowFeed(Feed feed = null)
     {
-        RightPanelContent = @<ShowFeed Feed=@feed/>;
+        feed = feed ?? LocalUser.Feeds.FirstOrDefault();
+        if (feed != null)
+        {
+            RightPanelContent = @<ShowFeed Feed=@feed OnUnsubscribe="Unsubscribe"/>;
 
-        // Refresh the feed.
-        _ = FeedService.RefreshFeedAsync(feed);
+            // Refresh the feed.
+            _ = FeedService.RefreshFeedAsync(feed);
+        }
+        else
+        {
+            AddNewFeed();
+        }
     }
 
     private void Cancel()
     {
         RightPanelContent = @<div></div>;
+    }
+
+    private void Unsubscribe(Feed feed)
+    {
+        _ = LocalUser.UnsubscribeFeedAsync(feed);
+        ShowFeed();
     }
 
     private void OnRefreshRequested()

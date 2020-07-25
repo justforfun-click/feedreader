@@ -26,7 +26,10 @@ namespace FeedReader.WebApi.Functions
                 {
                     return new BadRequestErrorMessageResult("'feed-uri' parameter is missing.");
                 }
-
+                else
+                {
+                    feedUri = feedUri.ToString().ToLower();
+                }
                 return new OkObjectResult(await new FeedProcessor().RefreshFeed(feedUri));
             });
         }

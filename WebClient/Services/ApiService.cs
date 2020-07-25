@@ -39,6 +39,11 @@ namespace FeedReader.WebClient.Services
             return JsonConvert.DeserializeObject<List<Share.DataContracts.Feed>>(await result.Content.ReadAsStringAsync());
         }
 
+        public async Task<List<Share.DataContracts.Feed>> UnsubscribeFeed(string feedUri)
+        {
+            return JsonConvert.DeserializeObject<List<Share.DataContracts.Feed>>(await _http.GetStringAsync($"feed/unsubscribe?feed-uri={HttpUtility.UrlEncode(feedUri)}"));
+        }
+
         public async Task<Share.DataContracts.Feed> RefreshFeed(string feedUri)
         {
             return JsonConvert.DeserializeObject<Share.DataContracts.Feed>(await _http.GetStringAsync($"feed/refresh?feed-uri={HttpUtility.UrlEncode(feedUri)}"));

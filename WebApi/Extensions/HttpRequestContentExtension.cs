@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Http;
 
 namespace FeedReader.WebApi.Extensions
 {
@@ -35,18 +36,28 @@ namespace FeedReader.WebApi.Extensions
             _attr = attr;
         }
 
-        public async Task<object> GetValueAsync()
+        public Task<object> GetValueAsync()
         {
-            if (_req.ContentLength > _attr.MaxLength)
+            return HttpFilter.RunAsync(_req, async () =>
             {
-                throw new OverflowException($"Request body is too large, limitation: {_attr.MaxLength / 1024} KB");
-            }
+                if (_req.ContentLength > _attr.MaxLength)
+                {
+                    return new BadRequestErrorMessageResult($"Request body is too large, limitation: {_attr.MaxLength / 1024} KB.");
+                }
 
-            using (var sr = new StreamReader(_req.Body, Encoding.UTF8))
-            {
-                var body = await sr.ReadToEndAsync();
-                return JsonConvert.DeserializeObject(body, _attr.Type);
-            }
+                using (var sr = new StreamReader(_req.Body, Encoding.UTF8))
+                {
+                    var body = await sr.ReadToEndAsync();
+                    try
+                    {
+                        return JsonConvert.DeserializeObject(body, _attr.Type);
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                }
+            });
         }
 
         public string ToInvokeString()

@@ -6,10 +6,36 @@
     padding: 20px;
 
     .feed-description {
+        display: flex;
+
         .name {
+            flex: 1;
             font-size: 34px;
             font-weight: 700;
             color: black;
+        }
+
+        .toolbar {
+            &, .icon {
+                display: flex;
+                text-align: center;
+                align-items: center;
+            }
+
+            .icon {
+                padding: 8px;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: rgba(0, 0, 0, 0.05);
+                }
+
+                svg {
+                    height: 16px;
+                    width: 16px;
+                    fill: #9f9f9f;
+                }
+            }
         }
     }
 

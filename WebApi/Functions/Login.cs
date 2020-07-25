@@ -20,9 +20,9 @@ namespace FeedReader.WebApi
     {
         private const string FeedReaderUuidPrefix = "feedreader:";
 
-        [FunctionName("login")]
+        [FunctionName("Login")]
         public static Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "login")] HttpRequest req,
             [Authentication(AllowThirdPartyToken = true)] User user,
             [TableStorage] CloudTableClient tableClient,
             ILogger log)
