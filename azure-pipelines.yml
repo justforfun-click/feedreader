@@ -19,6 +19,13 @@ steps:
   displayName: dontnet publush
 
 - task: PublishBuildArtifacts@1
+  displayName: Publish WebApi
+  inputs:
+    artifactName: 'FeedReader.WebApi'
+    pathToPublish: 'WebApi/bin/Release/netcoreapp3.1/publish'
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish WebClient
   inputs:
     artifactName: 'FeedReader.WebClient'
     pathToPublish: 'WebClient/bin/Release/netstandard2.1/publish/wwwroot'
