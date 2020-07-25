@@ -75,12 +75,15 @@
         ShowFeed(feed);
 
         // Subscribe the feed.
-        LocalUser.SubscribeFeedAsync(feed);
+        _ = LocalUser.SubscribeFeedAsync(feed);
     }
 
     private void ShowFeed(Feed feed)
     {
         RightPanelContent = @<ShowFeed Feed=@feed/>;
+
+        // Refresh the feed.
+        _ = FeedService.RefreshFeedAsync(feed);
     }
 
     private void Cancel()

@@ -1,5 +1,3 @@
-@inject FeedService FeedService
-
 <div class="show-feed">
     <div class="feed-description">
         <a class="name" href="@Feed.Uri" target="_blank">@Feed.Name</a>
@@ -23,9 +21,4 @@
 {
     [Parameter]
     public Feed Feed {get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await FeedService.RefreshFeed(Feed);
-    }
 }

@@ -15,7 +15,7 @@ namespace FeedReader.WebClient.Services
             _api = api;
         }
 
-        public async Task RefreshFeed(Feed feed)
+        public async Task RefreshFeedAsync(Feed feed)
         {
             var res = await _api.RefreshFeed(feed.Uri);
             if (!string.IsNullOrWhiteSpace(res.Name) && (string.IsNullOrWhiteSpace(feed.Name) || feed.Name == feed.Uri))
