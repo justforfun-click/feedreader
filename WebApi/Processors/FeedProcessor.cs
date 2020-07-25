@@ -19,11 +19,22 @@ namespace FeedReader.WebApi.Processors
         public async Task<Feed> RefreshFeed(string uri)
         {
             Feed feed = new Feed();
-            var xml = new XmlDocument();
-            xml.LoadXml(await new HttpClient().GetStringAsync(uri));
-            foreach (XmlNode channelNode in xml.SelectNodes("/rss/channel"))
+            try
             {
-                PraseChannel(channelNode, feed);
+                var xml = new XmlDocument();
+                xml.LoadXml(await new HttpClient().GetStringAsync(uri));
+                foreach (XmlNode channelNode in xml.SelectNodes("/rss/channel"))
+                {
+                    PraseChannel(channelNode, feed);
+                }
+            }
+            catch (HttpRequestException)
+            {
+                feed.Error = "The feed uri is not reachable.";
+            }
+            catch (XmlException)
+            {
+                feed.Error = "The feed content is not valid.";
             }
             return feed;
         }

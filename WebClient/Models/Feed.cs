@@ -11,6 +11,8 @@ namespace FeedReader.WebClient.Models
 
         public string Group { get; set; }
 
+        public string Error { get; set; }
+
         public string IconUri
         {
             get

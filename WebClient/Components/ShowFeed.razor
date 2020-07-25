@@ -11,7 +11,11 @@
         </div>
     </div>
     <div class="feed-items">
-        @if (Feed.Items.Count == 0)
+        @if (!string.IsNullOrWhiteSpace(Feed.Error))
+        {
+            <div class="error">Error: @Feed.Error</div>
+        }
+        else if (Feed.Items.Count == 0)
         {
             <WaitingPage Text="Loading..."/>
         }

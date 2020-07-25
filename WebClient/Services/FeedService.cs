@@ -23,6 +23,8 @@ namespace FeedReader.WebClient.Services
                 feed.Name = res.Name;
             }
 
+            feed.Error = res.Error;
+
             if (res.Items != null)
             {
                 feed.Items.Clear();

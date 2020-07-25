@@ -11,5 +11,7 @@ namespace FeedReader.Share.DataContracts
         public string Group { get; set;  }
 
         public List<FeedItem> Items { get; set; } = new List<FeedItem>();
+
+        public string Error { get; set; }
     }
 }
