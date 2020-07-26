@@ -6,17 +6,26 @@ pool:
 
 steps:
 - task: UseDotNet@2
+  displayName: Install DotNet 5.0.x
+  inputs:
+    version: "5.0.x"
+    performMultiLevelLookup: true
+    includePreviewVersions: true
+
+- task: UseDotNet@2
+  displayName: Install DotNet 3.1.x
   inputs:
     version: "3.1.x"
+    performMultiLevelLookup: true
 
 - task: DotNetCoreCLI@2
-  displayName: dotnet restore
+  displayName: DotNet Restore
   inputs:
     command: restore
     includeNuGetOrg: true
 
 - script: dotnet publish -c Release --no-restore
-  displayName: dontnet publush
+  displayName: Build
 
 - task: PublishBuildArtifacts@1
   displayName: Publish WebApi
@@ -28,5 +37,5 @@ steps:
   displayName: Publish WebClient
   inputs:
     artifactName: 'FeedReader.WebClient'
-    pathToPublish: 'WebClient/bin/Release/netstandard2.1/publish/wwwroot'
+    pathToPublish: 'WebClient/bin/Release/net5.0/browser-wasm/publish/wwwroot'
   
