@@ -58,7 +58,7 @@ namespace FeedReader.WebApi
                 {
                     Token = token,
                     Uuid = userEntity.Uuid,
-                    Feeds = JsonConvert.DeserializeObject<List<Share.DataContracts.Feed>>(userEntity.Feeds)
+                    Feeds = JsonConvert.DeserializeObject<List<Share.DataContracts.Feed>>(userEntity.Feeds ?? ""),
                 });
             });
         }

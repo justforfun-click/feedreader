@@ -18,7 +18,7 @@ namespace FeedReader.WebApi.Functions
     {
         [FunctionName("FeedUnsubscribe")]
         public static Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = "feed/unsubscribe")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "feed/unsubscribe")] HttpRequest req,
             [Authentication] User user,
             [TableStorage] CloudTableClient tableClient,
             ILogger log)

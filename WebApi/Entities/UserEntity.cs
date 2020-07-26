@@ -18,5 +18,7 @@ namespace FeedReader.WebApi.Entities
         public DateTime RegistrationTime { get; set; }
 
         public string Feeds { get; set; }
+
+        public string ReadedHashs { get; set; }
     }
 }

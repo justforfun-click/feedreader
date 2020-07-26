@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using FeedReader.WebClient.Models;
+using FeedReader.Share.DataContracts;
 
 namespace FeedReader.WebClient.Services
 {
@@ -15,7 +15,7 @@ namespace FeedReader.WebClient.Services
             _api = api;
         }
 
-        public async Task RefreshFeedAsync(Feed feed)
+        public async Task RefreshFeedAsync(Models.Feed feed)
         {
             var res = await _api.RefreshFeed(feed.Uri);
             if (!string.IsNullOrWhiteSpace(res.Name) && (string.IsNullOrWhiteSpace(feed.Name) || feed.Name == feed.Uri))
@@ -29,6 +29,20 @@ namespace FeedReader.WebClient.Services
             {
                 feed.Items.Clear();
                 feed.Items.AddRange(res.Items);
+            }
+            RefreshRequested?.Invoke();
+        }
+
+        public async Task MarkAsReadedAsync(FeedItem feedItem)
+        {
+            feedItem.IsReaded = true;
+            try
+            {
+                await _api.MarkAsReaded(feedItem.PermentLink);
+            }
+            catch
+            {
+                feedItem.IsReaded = false;
             }
             RefreshRequested?.Invoke();
         }

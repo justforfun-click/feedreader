@@ -48,5 +48,10 @@ namespace FeedReader.WebClient.Services
         {
             return JsonConvert.DeserializeObject<Share.DataContracts.Feed>(await _http.GetStringAsync($"feed/refresh?feed-uri={HttpUtility.UrlEncode(feedUri)}"));
         }
+
+        public async Task MarkAsReaded(string feedItemUri)
+        {
+            await _http.GetAsync($"feed/mark_as_readed?feed-item-uri={HttpUtility.UrlEncode(feedItemUri)}");
+        }
     }
 }

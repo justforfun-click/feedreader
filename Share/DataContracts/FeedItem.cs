@@ -17,5 +17,7 @@ namespace FeedReader.Share.DataContracts
         public string Content { get; set; }
 
         public DateTime PubDate { get; set; }
+
+        public bool IsReaded { get; set; }
     }
 }
