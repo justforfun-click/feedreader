@@ -2,6 +2,7 @@
 <html>       
 <head>
     <base href="/" />
+    <title>FeedReader</title>
     <link rel="icon" href="img/iconfinder_Google_Reader_99884.png"/>
     <link id="stylesheet" rel="stylesheet"/>
     <script>
@@ -10,7 +11,11 @@
     <script data-ad-client="ca-pub-2338350216618507" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </head>
 <body>
-    <app />
+    <app>
+        <div class="waiting-page">
+            <div class="loader">Loading...</div>
+        </div>
+    </app>
     <script src="_framework/blazor.webassembly.js"></script>
     <script>
         function openWindow(url) {
