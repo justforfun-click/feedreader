@@ -1,12 +1,20 @@
+@inject IJSRuntime JsRuntime
+
 <div class="show-feed">
     <div class="feed-description">
-        <a class="name" href="@Feed.Uri" target="_blank">@Feed.Name</a>
-        <div class="toolbar">
-            <div class="icon" title="unsubscribe" @onclick="Unsubscribe">
-                <!-- comes from open-iconic: trash -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8">
-                    <path d="M3 0c-.55 0-1 .45-1 1h-1c-.55 0-1 .45-1 1h7c0-.55-.45-1-1-1h-1c0-.55-.45-1-1-1h-1zm-2 3v4.81c0 .11.08.19.19.19h4.63c.11 0 .19-.08.19-.19v-4.81h-1v3.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-3.5h-1v3.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-3.5h-1z" />
-                </svg>
+        <div class="icon">
+            <FallbackImage Src="@Feed.IconUri" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(Feed.Uri).Host}")"/>
+        </div>
+        <div class="name-and-toolbar">
+            <a class="name" href="@(string.IsNullOrWhiteSpace(Feed.WebsiteLink) ? Feed.Uri : Feed.WebsiteLink)" title="@(string.IsNullOrWhiteSpace(Feed.Name) ? Feed.Uri : Feed.Name)" target="_blank"><span>@(string.IsNullOrWhiteSpace(Feed.Name) ? Feed.Uri : Feed.Name)</span></a>
+            <a class="description" href="@Feed.Uri" target="_blank" title="@(string.IsNullOrWhiteSpace(Feed.Description) ? Feed.Uri : Feed.Description)"><span>@(string.IsNullOrWhiteSpace(Feed.Description) ? Feed.Uri : Feed.Description)</span></a>
+            <div class="toolbar">
+                <div class="icon" title="unsubscribe" @onclick="Unsubscribe">
+                    <!-- comes from open-iconic: trash -->
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8">
+                        <path d="M3 0c-.55 0-1 .45-1 1h-1c-.55 0-1 .45-1 1h7c0-.55-.45-1-1-1h-1c0-.55-.45-1-1-1h-1zm-2 3v4.81c0 .11.08.19.19.19h4.63c.11 0 .19-.08.19-.19v-4.81h-1v3.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-3.5h-1v3.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5v-3.5h-1z" />
+                    </svg>
+                </div>
             </div>
         </div>
     </div>

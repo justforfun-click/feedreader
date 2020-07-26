@@ -34,8 +34,8 @@
                                 @foreach (var feed in group)
                                 {
                                     <div class="feed" @onclick="() => ShowFeed(feed)">
-                                        <img src="@feed.IconUri"/>
-                                        <div class="name" title="@feed.Name"><span>@feed.Name</span></div>
+                                        <FallbackImage Src="@feed.IconUri" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(feed.Uri).Host}")"/>
+                                        <div class="name" title="@(string.IsNullOrWhiteSpace(feed.Name) ? feed.Uri : feed.Name)"><span>@(string.IsNullOrWhiteSpace(feed.Name) ? feed.Uri : feed.Name)</span></div>
                                     </div>
                                 }
                             </div>

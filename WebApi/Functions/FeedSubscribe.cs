@@ -12,6 +12,7 @@ using FeedReader.WebApi.Entities;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Linq;
+using FeedReader.WebApi.Processors;
 
 namespace FeedReader.WebApi.Functions
 {
@@ -61,13 +62,20 @@ namespace FeedReader.WebApi.Functions
                     userFeeds.Remove(oldItem);
                 }
 
-                // Add the new item.
-                userFeeds.Add(new Feed()
+                // Get information of this feed.
+                var res = await new FeedProcessor().RefreshFeedAsync(feed.Uri, noItems: true);
+
+                // Use user customized name.
+                if (!string.IsNullOrWhiteSpace(feed.Name))
                 {
-                    Uri = feed.Uri,
-                    Name = feed.Name,
-                    Group = feed.Group
-                });
+                    res.Name = feed.Name;
+                }
+
+                // User user customized group.
+                res.Group = feed.Group;
+
+                // Add the new item.
+                userFeeds.Add(res);
 
                 // Save to table.
                 userEntity.Feeds = JsonConvert.SerializeObject(userFeeds);

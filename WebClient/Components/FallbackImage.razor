@@ -1,0 +1,19 @@
+﻿@inject IJSRuntime JsRuntime
+
+<img id="img-@GetHashCode()" src="@(string.IsNullOrWhiteSpace(Src) ? FallbackSrc : Src)" @onerror="OnError" />
+
+@code
+{
+    [Parameter]
+    public string Src { get; set; }
+
+    [Parameter]
+    public string FallbackSrc { get; set; }
+
+    private ElementReference img;
+
+    private void OnError()
+    {
+        JsRuntime.InvokeVoidAsync("imgFallback", $"img-{GetHashCode()}", FallbackSrc);
+    }
+}

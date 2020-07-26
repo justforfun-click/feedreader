@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FeedReader.WebClient.Services;
 using System;
+using FeedReader.Share.DataContracts;
 
 namespace FeedReader.WebClient.Models
 {
@@ -65,7 +66,7 @@ namespace FeedReader.WebClient.Models
         {
             var user = await _api.LoginAsync(token);
             await _localStorage.SetAsync(LOCAL_USER_LOCAL_STORAGE_KEY, Token = user.Token);
-            SyncFeeds(user.Feeds);
+            Feeds = user.Feeds;
         }
 
         public async Task LogoutAsync()
@@ -79,7 +80,7 @@ namespace FeedReader.WebClient.Models
             try
             {
                 Feeds.Add(feed);
-                SyncFeeds(await _api.SubscribeFeed(feed));
+                Feeds = await _api.SubscribeFeed(feed);
             }
             catch (Exception ex)
             {
@@ -99,7 +100,7 @@ namespace FeedReader.WebClient.Models
             try
             {
                 Feeds.Remove(Feeds.Find(f => f.Uri == feed.Uri));
-                SyncFeeds(await _api.UnsubscribeFeed(feed.Uri));
+                Feeds = await _api.UnsubscribeFeed(feed.Uri);
             }
             catch (Exception ex)
             {
@@ -111,16 +112,6 @@ namespace FeedReader.WebClient.Models
                     Feeds.Add(feed);
                 }
             }
-        }
-
-        private void SyncFeeds(List<Share.DataContracts.Feed> feeds)
-        {
-            Feeds.Clear();
-            feeds.ForEach(f => Feeds.Add(new Feed() {
-                Name = f.Name,
-                Uri = f.Uri,
-                Group = f.Group,
-            }));
         }
     }
 }

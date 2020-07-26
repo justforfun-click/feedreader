@@ -16,16 +16,27 @@ namespace FeedReader.WebApi.Processors
 
         private static readonly Regex ImgRegex = new Regex("<img\\s.*?\\bsrc\\s*=\\s*[\"'](.*?)[\"'].*?>");
 
-        public async Task<Feed> RefreshFeed(string uri)
+        public async Task<Feed> RefreshFeedAsync(string uri, bool noItems = false)
         {
-            Feed feed = new Feed();
+            Feed feed = new Feed() { Uri = uri };
             try
             {
                 var xml = new XmlDocument();
-                xml.LoadXml(await new HttpClient().GetStringAsync(uri));
-                foreach (XmlNode channelNode in xml.SelectNodes("/rss/channel"))
+                xml.LoadXml(await new HttpClient().GetStringAsync(feed.Uri));
+
+                // Parse channel. As spec, every feed has only one channel.
+                var channelNode = xml.SelectSingleNode("/rss/channel");
+                feed.Name = channelNode["title"].InnerText;
+                feed.WebsiteLink = channelNode["link"].InnerText;
+                feed.Description = channelNode["description"].InnerText;
+                feed.IconUri = channelNode.SelectSingleNode("/rss/channel/image")?["url"].InnerText;
+                if (!noItems)
                 {
-                    PraseChannel(channelNode, feed);
+                    foreach (XmlNode itemNode in channelNode.SelectNodes("/rss/channel/item"))
+                    {
+                        var item = ParseItem(itemNode);
+                        feed.Items.Add(item);
+                    }
                 }
             }
             catch (HttpRequestException)
@@ -37,17 +48,6 @@ namespace FeedReader.WebApi.Processors
                 feed.Error = "The feed content is not valid.";
             }
             return feed;
-        }
-
-        private void PraseChannel(XmlNode channelNode, Feed feed)
-        {
-            string channelName = channelNode["title"].InnerText;
-            foreach (XmlNode itemNode in channelNode.SelectNodes("/rss/channel/item"))
-            {
-                var item = ParseItem(itemNode);
-                item.Channel = channelName;
-                feed.Items.Add(item);
-            }
         }
 
         private FeedItem ParseItem(XmlNode itemNode)

@@ -62,7 +62,7 @@
 
     protected override void OnInitialized()
     {
-        Groups = LocalUser.Feeds.GroupBy(f => f.Group).Select(g => g.Key).ToList();
+        Groups = LocalUser.Feeds.GroupBy(f => f.Group).Select(g => g.Key).Where(g => g != "Default").ToList();
         Groups.Insert(0, SelectedGroup = "Default");
         Groups.Add("Create a new group");
         NewGroupNameFiledStyle = "display: none";
@@ -106,7 +106,7 @@
         await OnSave.InvokeAsync(new Feed()
         {
             Group = (SelectedGroup == "Create a new group" ? newGroupName : SelectedGroup),
-            Name = FeedName ?? FeedURL,
+            Name = FeedName,
             Uri = FeedURL
         });
     }

@@ -37,7 +37,7 @@ namespace FeedReader.WebApi.Functions
                     feedUri = feedUri.ToString().ToLower();
                 }
 
-                var feed = await new FeedProcessor().RefreshFeed(feedUri);
+                var feed = await new FeedProcessor().RefreshFeedAsync(feedUri);
                 if (string.IsNullOrWhiteSpace(feed.Error) && feed.Items != null)
                 {
                     // get user readed hashs.

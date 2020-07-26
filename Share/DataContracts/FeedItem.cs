@@ -10,8 +10,6 @@ namespace FeedReader.Share.DataContracts
 
         public string TopicPictureUri { get; set; }
 
-        public string Channel { get; set; }
-
         public string Summary { get; set; }
 
         public string Content { get; set; }

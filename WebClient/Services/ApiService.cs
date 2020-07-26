@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using FeedReader.WebClient.Models;
+using FeedReader.Share.DataContracts;
 using Newtonsoft.Json;
 
 namespace FeedReader.WebClient.Services
@@ -17,7 +17,7 @@ namespace FeedReader.WebClient.Services
         private readonly HttpClient _http = new HttpClient() { BaseAddress = new Uri("https://feedreaderapi.azurewebsites.net/v1/") };
         #endif
 
-        public async Task<Share.DataContracts.User> LoginAsync(string token)
+        public async Task<User> LoginAsync(string token)
         {
             _http.DefaultRequestHeaders.Remove("authentication");
             _http.DefaultRequestHeaders.Add("authentication", token);
@@ -27,26 +27,26 @@ namespace FeedReader.WebClient.Services
             return user;
         }
 
-        public async Task<List<Share.DataContracts.Feed>> SubscribeFeed(Feed feed)
+        public async Task<List<Feed>> SubscribeFeed(Feed feed)
         {
-            var content = new StringContent(JsonConvert.SerializeObject(new Share.DataContracts.Feed()
+            var content = new StringContent(JsonConvert.SerializeObject(new Feed()
             {
                 Name = feed.Name,
                 Group = feed.Group,
                 Uri = feed.Uri
             }), Encoding.UTF8);
             var result = await _http.PostAsync("feed/subscribe", content);
-            return JsonConvert.DeserializeObject<List<Share.DataContracts.Feed>>(await result.Content.ReadAsStringAsync());
+            return JsonConvert.DeserializeObject<List<Feed>>(await result.Content.ReadAsStringAsync());
         }
 
-        public async Task<List<Share.DataContracts.Feed>> UnsubscribeFeed(string feedUri)
+        public async Task<List<Feed>> UnsubscribeFeed(string feedUri)
         {
-            return JsonConvert.DeserializeObject<List<Share.DataContracts.Feed>>(await _http.GetStringAsync($"feed/unsubscribe?feed-uri={HttpUtility.UrlEncode(feedUri)}"));
+            return JsonConvert.DeserializeObject<List<Feed>>(await _http.GetStringAsync($"feed/unsubscribe?feed-uri={HttpUtility.UrlEncode(feedUri)}"));
         }
 
-        public async Task<Share.DataContracts.Feed> RefreshFeed(string feedUri)
+        public async Task<Feed> RefreshFeed(string feedUri)
         {
-            return JsonConvert.DeserializeObject<Share.DataContracts.Feed>(await _http.GetStringAsync($"feed/refresh?feed-uri={HttpUtility.UrlEncode(feedUri)}"));
+            return JsonConvert.DeserializeObject<Feed>(await _http.GetStringAsync($"feed/refresh?feed-uri={HttpUtility.UrlEncode(feedUri)}"));
         }
 
         public async Task MarkAsReaded(string feedItemUri)

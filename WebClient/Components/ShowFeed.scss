@@ -7,40 +7,79 @@
 
     .feed-description {
         display: flex;
+        padding-top: 4px;
 
-        .name {
-            flex: 1;
-            font-size: 34px;
-            font-weight: 700;
-            color: black;
+        > .icon {
+            width: 64px;
+            height: 64px;
+
+            img {
+                width: 64px;
+                height: 64px;
+            }
         }
 
-        .toolbar {
-            &, .icon {
-                display: flex;
-                text-align: center;
-                align-items: center;
+        .name-and-toolbar {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            margin-left: 12px;
+
+            span {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 0;
+                flex: 1;
             }
 
-            .icon {
-                padding: 8px;
-                cursor: pointer;
+            .name {
+                display: flex;
+                flex: 1;
+                font-size: 22px;
+                font-weight: 700;
+                color: black;
+            }
 
-                &:hover {
-                    background-color: rgba(0, 0, 0, 0.05);
+            .description {
+                display: flex;
+                flex: 1;
+                align-items: center;
+                font-size: 13px;
+                color: #9f9f9f;
+                margin-top: -6px;
+            }
+
+            .toolbar {
+                height: 14px;
+
+                &, .icon {
+                    display: flex;
+                    text-align: center;
+                    align-items: center;
                 }
 
-                svg {
-                    height: 16px;
-                    width: 16px;
-                    fill: #9f9f9f;
+                .icon {
+                    cursor: pointer;
+
+                    &:hover {
+                        svg {
+                            fill: black !important;
+                        }
+                    }
+
+                    svg {
+                        height: 14px;
+                        width: 14px;
+                        fill: #9f9f9f;
+                    }
                 }
             }
         }
     }
 
     .feed-items {
-        padding-top: 40px;
+        padding-top: 22px;
         display: flex;
         flex-wrap: wrap;
         width: 100%;

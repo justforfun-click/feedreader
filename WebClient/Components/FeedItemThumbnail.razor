@@ -6,7 +6,7 @@
     <div class="feed-item-thumbnail-with-topic-picture @(FeedItem.IsReaded ? "readed" : "")" @onclick="Click">
         <img src="@FeedItem.TopicPictureUri"/>
         <div class="title">@FeedItem.Title</div>
-        <div class="time-and-channel">@FeedItem.PubDate&nbsp;<span><b>via</b>&nbsp;@FeedItem.Channel</span></div>
+        <div class="time-and-channel">@FeedItem.PubDate</div>
     </div>
 }
 else
@@ -14,7 +14,7 @@ else
     <div class="feed-item-thumbnail-without-topic-picture @(FeedItem.IsReaded ? "readed" : "")" @onclick="Click">
         <div class="title">@FeedItem.Title</div>
         <div class="summary"><span>@FeedItem.Summary</span></div>
-        <div class="time-and-channel">@FeedItem.PubDate&nbsp;<span><b>via</b>&nbsp;@FeedItem.Channel</span></div>
+        <div class="time-and-channel">@FeedItem.PubDate</div>
     </div>
 }
 

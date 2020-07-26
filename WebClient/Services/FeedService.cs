@@ -15,14 +15,17 @@ namespace FeedReader.WebClient.Services
             _api = api;
         }
 
-        public async Task RefreshFeedAsync(Models.Feed feed)
+        public async Task RefreshFeedAsync(Feed feed)
         {
             var res = await _api.RefreshFeed(feed.Uri);
-            if (!string.IsNullOrWhiteSpace(res.Name) && (string.IsNullOrWhiteSpace(feed.Name) || feed.Name == feed.Uri))
+            if (string.IsNullOrWhiteSpace(feed.Name))
             {
+                // Only update name if we don't have customized name.
                 feed.Name = res.Name;
             }
-
+            feed.IconUri = res.IconUri;
+            feed.WebsiteLink = res.WebsiteLink;
+            feed.Description = res.Description;
             feed.Error = res.Error;
 
             if (res.Items != null)
