@@ -33,7 +33,7 @@ namespace FeedReader.WebApi.Processors
                 feed.Name = channelNode["title"].InnerText;
                 feed.WebsiteLink = channelNode["link"].InnerText;
                 feed.Description = channelNode["description"].InnerText;
-                feed.IconUri = channelNode.SelectSingleNode("/rss/channel/image")?["url"].InnerText;
+                feed.IconUri = channelNode.SelectSingleNode("/rss/channel/image")?["url"]?.InnerText;
                 if (!noItems)
                 {
                     foreach (XmlNode itemNode in channelNode.SelectNodes("/rss/channel/item"))
