@@ -71,7 +71,7 @@
                             width: 24px;
                             height: 24px;
                             justify-content: center;
-            
+
                             svg {
                                 width: 16px;
                                 height: 16px;
@@ -99,6 +99,18 @@
 
                             .name {
                                 cursor: pointer;
+                            }
+
+                            .unreaded-items-count {
+                                font-size: 12px;
+                                display: flex;
+                                align-items: center;
+                            }
+                        }
+
+                        .active {
+                            .name {
+                                font-weight: 700;
                             }
                         }
                     }

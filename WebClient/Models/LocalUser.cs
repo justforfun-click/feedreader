@@ -2,7 +2,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FeedReader.WebClient.Services;
 using System;
-using FeedReader.Share.DataContracts;
+using FeedReader.WebClient.Datas;
+using System.Threading;
 
 namespace FeedReader.WebClient.Models
 {
@@ -32,17 +33,22 @@ namespace FeedReader.WebClient.Models
 
         private readonly ApiService _api;
 
+        private readonly FeedService _feedService;
+
+        private CancellationTokenSource _feedRefreshCancellToken;
+
         public string Token { get; set; }
 
         public bool IsAuthorized { get { return !string.IsNullOrWhiteSpace(Token); } }
 
         public List<Feed> Feeds { get; set; } = new List<Feed>();
 
-        public LocalUser(LogService logger, LocalStorageService localStorage, ApiService api)
+        public LocalUser(LogService logger, LocalStorageService localStorage, ApiService api, FeedService feedService)
         {
             _logger = logger;
             _localStorage = localStorage;
             _api = api;
+            _feedService = feedService;
         }
 
         public async Task InitializeAsync()
@@ -64,14 +70,35 @@ namespace FeedReader.WebClient.Models
 
         public async Task LoginAsync(string token)
         {
+            if (_feedRefreshCancellToken != null)
+            {
+                _feedRefreshCancellToken.Cancel();
+            }
+
             var user = await _api.LoginAsync(token);
             await _localStorage.SetAsync(LOCAL_USER_LOCAL_STORAGE_KEY, Token = user.Token);
             Feeds = user.Feeds;
+            var cancelToken = _feedRefreshCancellToken = new CancellationTokenSource();
+            _ = Task.Run(async () =>
+            {
+                foreach(var feed in user.Feeds)
+                {
+                    if (cancelToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
+                    await _feedService.RefreshFeedAsync(feed);
+                }
+            });
         }
 
         public async Task LogoutAsync()
         {
             Token = null;
+            if (_feedRefreshCancellToken != null)
+            {
+                _feedRefreshCancellToken.Cancel();
+            }
             await _localStorage.ClearAsync();
         }
 

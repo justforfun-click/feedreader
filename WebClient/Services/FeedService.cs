@@ -1,10 +1,10 @@
+using FeedReader.WebClient.Datas;
 using System;
 using System.Threading.Tasks;
-using FeedReader.Share.DataContracts;
 
 namespace FeedReader.WebClient.Services
 {
-    class FeedService
+    public class FeedService
     {
         private readonly ApiService _api;
 

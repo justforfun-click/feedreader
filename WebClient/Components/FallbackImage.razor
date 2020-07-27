@@ -10,8 +10,6 @@
     [Parameter]
     public string FallbackSrc { get; set; }
 
-    private ElementReference img;
-
     private void OnError()
     {
         JsRuntime.InvokeVoidAsync("imgFallback", $"img-{GetHashCode()}", FallbackSrc);
