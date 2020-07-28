@@ -28,12 +28,6 @@ steps:
   displayName: Build
 
 - task: PublishBuildArtifacts@1
-  displayName: Publish WebApi
-  inputs:
-    artifactName: 'FeedReader.WebApi'
-    pathToPublish: 'WebApi/bin/Release/netcoreapp3.1/publish'
-
-- task: PublishBuildArtifacts@1
   displayName: Publish WebClient
   inputs:
     artifactName: 'FeedReader.WebClient'

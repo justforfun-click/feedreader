@@ -14,7 +14,7 @@
 </ItemGroup>
 
 <ItemGroup>
-  <ProjectReference Include="..\Share\FeedReader.Share.csproj" />
+  <ProjectReference Include="..\Server\Share\FeedReader.Share.csproj" />
 </ItemGroup>
 
 </Project>
