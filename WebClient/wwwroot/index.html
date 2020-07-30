@@ -23,10 +23,6 @@
     </app>
     <script src="_framework/blazor.webassembly.js"></script>
     <script>
-        function openWindow(url) {
-            window.open(url, "_blank");
-        }
-
         function imgFallback(imgId, fallbackUri) {
             let img = document.getElementById(imgId);
             if (img.src != fallbackUri) {

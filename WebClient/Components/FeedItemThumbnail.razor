@@ -3,19 +3,19 @@
 
 @if (FeedItem.TopicPictureUri != null)
 {
-    <div class="feed-item-thumbnail-with-topic-picture @(FeedItem.IsReaded ? "readed" : "")" @onclick="Click">
+    <a class="feed-item-thumbnail-with-topic-picture @(FeedItem.IsReaded ? "readed" : "")" href="@FeedItem.PermentLink" target="_blank" @onclick="Click" onauxclick="@((Action)(() => Click()))">
         <img src="@FeedItem.TopicPictureUri"/>
         <div class="title">@FeedItem.Title</div>
         <div class="time-and-channel">@FeedItem.PubDate</div>
-    </div>
+    </a>
 }
 else
 {
-    <div class="feed-item-thumbnail-without-topic-picture @(FeedItem.IsReaded ? "readed" : "")" @onclick="Click">
+    <a class="feed-item-thumbnail-without-topic-picture @(FeedItem.IsReaded ? "readed" : "")" href="@FeedItem.PermentLink" target="_blank" @onclick="Click" onauxclick="@((Action)(() => Click()))">
         <div class="title">@FeedItem.Title</div>
         <div class="summary"><span>@FeedItem.Summary</span></div>
         <div class="time-and-channel">@FeedItem.PubDate</div>
-    </div>
+    </a>
 }
 
 @code
@@ -25,7 +25,6 @@ else
 
     public void Click()
     {
-        _ = JsRuntime.InvokeVoidAsync("openWindow", FeedItem.PermentLink);
         _ = FeedService.MarkAsReadedAsync(FeedItem);
     }
 }
