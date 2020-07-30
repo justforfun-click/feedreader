@@ -1,0 +1,16 @@
+﻿@inject IJSRuntime JsRuntime
+
+<div class="show-feed">
+    <div class="feed-items">
+        @foreach (var item in StaredFeedItems)
+        {
+            <FeedItemThumbnail FeedItem=@item></FeedItemThumbnail>
+        }
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public List<FeedItem> StaredFeedItems { get; set; }
+}

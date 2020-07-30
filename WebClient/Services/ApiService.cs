@@ -59,10 +59,33 @@ namespace FeedReader.WebClient.Services
             });
         }
 
+        public async Task StarFeedItemAsync(FeedItem feedItem)
+        {
+            await PosyAsync("star", feedItem);
+        }
+
+        public async Task UnstarFeedItemAsync(string feedItemUri)
+        {
+            await GetAsync("unstar", new Dictionary<string, string>
+            {
+                { "feed-item-uri", feedItemUri }
+            });
+        }
+
+        public async Task<List<FeedItem>> GetStaredFeedItems()
+        {
+            return await GetAsync<List<FeedItem>>("stars");
+        }
+
         private async Task<TResult> PostAsync<TResult>(string uri, object obj)
         {
             var res = await _http.PostAsync(uri, new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8));
             return JsonConvert.DeserializeObject<TResult>(await res.Content.ReadAsStringAsync());
+        }
+
+        private async Task PosyAsync(string uri, object obj)
+        {
+             await _http.PostAsync(uri, new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8));
         }
 
         private async Task<TResult> GetAsync<TResult>(string uri, Dictionary<string, string> args = null)

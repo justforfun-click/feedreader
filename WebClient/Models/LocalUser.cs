@@ -140,5 +140,38 @@ namespace FeedReader.WebClient.Models
                 }
             }
         }
+
+        public async Task StarFeedItemAsync(FeedItem feedItem)
+        {
+            try
+            {
+                feedItem.IsStared = true;
+                await _api.StarFeedItemAsync(feedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Star feed item failed, ex: {ex.Message}");
+                feedItem.IsStared = false;
+            }
+        }
+
+        public async Task UnstarFeedItemAsync(FeedItem feedItem)
+        {
+            try
+            {
+                feedItem.IsStared = false;
+                await _api.UnstarFeedItemAsync(feedItem.PermentLink);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Unstar feed item failed, ex: {ex.Message}");
+                feedItem.IsStared = true;
+            }
+        }
+
+        public Task<List<FeedItem>> GetStaredFeedItems()
+        {
+            return _api.GetStaredFeedItems();
+        }
     }
 }

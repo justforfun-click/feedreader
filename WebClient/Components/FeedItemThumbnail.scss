@@ -9,6 +9,13 @@
     border: 1px solid rgb(220, 227, 236);
     cursor: pointer;
 
+    .feed-item-summary {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: hidden;
+    }
+    
     .title {
         font-size: 18px;
         font-weight: 700;
@@ -16,17 +23,35 @@
         margin: 10px;
     }
 
-    .time-and-channel {
+    .time-and-toolbar {
         display: flex;
         font-size: 13px;
         line-height: 18px;
         color: gray;
         margin: 10px;
 
-        span {
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
+        .time {
+            flex: 1
+        }
+
+        .toolbar {
+            .btn {
+                svg {
+                    width: 12px;
+                    height: 12px;
+                    fill: #9f9f9f;
+
+                    &:hover {
+                        fill: black;
+                    }
+                }
+            }
+
+            .stared {
+                svg {
+                    fill: black !important;
+                }
+            }
         }
     }
 

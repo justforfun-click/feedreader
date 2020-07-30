@@ -61,7 +61,7 @@
                 }
 
                 .group {
-                    padding-bottom: 20px;
+                    padding-bottom: 10px;
                     font-size: 14px;
 
                     .header {
@@ -113,6 +113,16 @@
                                 font-weight: 700;
                             }
                         }
+                    }
+                }
+
+                .show-stars {
+                    .name, .icon {
+                        cursor: pointer !important;
+                    }
+
+                    .active {
+                        font-weight: 700;
                     }
                 }
             }

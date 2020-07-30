@@ -1,21 +1,41 @@
 @inject FeedService FeedService
 @inject IJSRuntime JsRuntime
+@inject LocalUser LocalUser
+
+@{
+RenderFragment TimeAndToolBar =
+    @<div class="time-and-toolbar">
+        <div class="time">@FeedItem.PubDate</div>
+        <div class="toolbar">
+            <div class="btn @(FeedItem.IsStared ? "stared" : "")" @onclick="StarOrUnstarFeedItem">
+                <!-- comes from open-iconic: star -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8">
+                    <path d="M4 0l-1 3h-3l2.5 2-1 3 2.5-2 2.5 2-1-3 2.5-2h-3l-1-3z" />
+                </svg>
+            </div>
+        </div>
+    </div>;
+}
 
 @if (FeedItem.TopicPictureUri != null)
 {
-    <a class="feed-item-thumbnail-with-topic-picture @(FeedItem.IsReaded ? "readed" : "")" href="@FeedItem.PermentLink" target="_blank" @onclick="Click" onauxclick="@((Action)(() => Click()))">
-        <img src="@FeedItem.TopicPictureUri"/>
-        <div class="title">@FeedItem.Title</div>
-        <div class="time-and-channel">@FeedItem.PubDate</div>
-    </a>
+    <div class="feed-item-thumbnail-with-topic-picture @(FeedItem.IsReaded ? "readed" : "")">
+        <a class="feed-item-summary" href="@FeedItem.PermentLink" target="_blank" @onclick="Click" onauxclick="@((Action)(() => Click()))">
+            <img src="@FeedItem.TopicPictureUri"/>
+            <div class="title">@FeedItem.Title</div>
+        </a>
+        @TimeAndToolBar
+    </div>
 }
 else
 {
-    <a class="feed-item-thumbnail-without-topic-picture @(FeedItem.IsReaded ? "readed" : "")" href="@FeedItem.PermentLink" target="_blank" @onclick="Click" onauxclick="@((Action)(() => Click()))">
-        <div class="title">@FeedItem.Title</div>
-        <div class="summary"><span>@FeedItem.Summary</span></div>
-        <div class="time-and-channel">@FeedItem.PubDate</div>
-    </a>
+    <div class="feed-item-thumbnail-without-topic-picture @(FeedItem.IsReaded ? "readed" : "")">
+        <a class="feed-item-summary" href="@FeedItem.PermentLink" target="_blank" @onclick="Click" onauxclick="@((Action)(() => Click()))">
+            <div class="title">@FeedItem.Title</div>
+            <div class="summary"><span>@FeedItem.Summary</span></div>
+        </a>
+        @TimeAndToolBar
+    </div>
 }
 
 @code
@@ -26,5 +46,17 @@ else
     public void Click()
     {
         _ = FeedService.MarkAsReadedAsync(FeedItem);
+    }
+
+    public void StarOrUnstarFeedItem()
+    {
+        if (FeedItem.IsStared)
+        {
+            _ = LocalUser.UnstarFeedItemAsync(FeedItem);
+        }
+        else
+        {
+            _ = LocalUser.StarFeedItemAsync(FeedItem);
+        }
     }
 }
