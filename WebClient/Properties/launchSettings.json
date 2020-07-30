@@ -1,12 +1,13 @@
 {
   "profiles": {
     "FeedReader.WebClient": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "environmentVariables": {
+    "commandName": "Project",
+    "launchBrowser": true,
+    "inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
+    "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "https://localhost"
+    },
+    "applicationUrl": "https://localhost"
     }
   }
 }

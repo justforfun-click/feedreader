@@ -1,5 +1,6 @@
 @implements IDisposable
 @inject FeedService FeedService
+@inject IJSRuntime JsRuntime
 @inject LocalUser LocalUser
 
 <MainLayout>
@@ -48,6 +49,7 @@
         <div class="right-panel">
             @RightPanelContent
         </div>
+        <div id="803822386" class="ad"/>
     </div>
 </MainLayout>
 
@@ -58,6 +60,7 @@
     protected override void OnInitialized()
     {
         FeedService.RefreshRequested += OnRefreshRequested;
+        _ = JsRuntime.InvokeVoidAsync("showAd");
         ShowFeed();
     }
 

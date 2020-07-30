@@ -8,7 +8,12 @@
     <script>
         document.getElementById("stylesheet").href = `css/feedreader-generated-.min.css?datetime=${Date.now()}`;
     </script>
-    <script data-ad-client="ca-pub-2338350216618507" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script type="text/javascript">
+        window._mNHandle = window._mNHandle || {};
+        window._mNHandle.queue = window._mNHandle.queue || [];
+        medianet_versionId = "3121199";
+    </script>
+    <script src="https://contextual.media.net/dmedianet.js?cid=8CU46FK40" async="async"></script>
 </head>
 <body>
     <app>
@@ -26,6 +31,16 @@
             let img = document.getElementById(imgId);
             if (img.src != fallbackUri) {
                 img.src = fallbackUri;
+            }
+        }
+
+        function showAd() {
+            try {
+                window._mNHandle.queue.push(function (){
+                    window._mNDetails.loadTag("803822386", "160x600", "803822386");
+                });
+            }
+            catch {
             }
         }
     </script>
