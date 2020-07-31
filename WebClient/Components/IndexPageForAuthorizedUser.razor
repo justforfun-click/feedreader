@@ -79,6 +79,14 @@
         ShowFeed();
     }
 
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _ = JsRuntime.InvokeVoidAsync("showAd");
+        }
+    }
+
     public void Dispose()
     {
         FeedService.RefreshRequested -= OnRefreshRequested;
