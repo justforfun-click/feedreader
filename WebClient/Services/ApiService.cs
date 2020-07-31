@@ -52,11 +52,9 @@ namespace FeedReader.WebClient.Services
             });
         }
 
-        public async Task MarkAsReaded(string feedItemUri)
+        public async Task MarkAsReaded(List<string> feedItemUris)
         {
-            await GetAsync("feed/mark_as_readed", new Dictionary<string, string>{
-                { "feed-item-uri", feedItemUri}
-            });
+            await PosyAsync("feed/mark_as_readed", feedItemUris);
         }
 
         public async Task StarFeedItemAsync(FeedItem feedItem)

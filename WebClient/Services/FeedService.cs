@@ -1,5 +1,7 @@
 using FeedReader.WebClient.Datas;
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FeedReader.WebClient.Services
@@ -8,11 +10,14 @@ namespace FeedReader.WebClient.Services
     {
         private readonly ApiService _api;
 
+        private readonly LogService _logger;
+
         public event Action RefreshRequested;
 
-        public FeedService(ApiService api)
+        public FeedService(ApiService api, LogService logger)
         {
             _api = api;
+            _logger = logger;
         }
 
         public async Task RefreshFeedAsync(Feed feed)
@@ -38,16 +43,20 @@ namespace FeedReader.WebClient.Services
 
         public async Task MarkAsReadedAsync(FeedItem feedItem)
         {
+            await _api.MarkAsReaded(new List<string> { feedItem.PermentLink });
             feedItem.IsReaded = true;
-            try
-            {
-                await _api.MarkAsReaded(feedItem.PermentLink);
-            }
-            catch
-            {
-                feedItem.IsReaded = false;
-            }
             RefreshRequested?.Invoke();
+        }
+
+        public async Task MarkFeedAllItemsAsReaded(Feed feed)
+        {
+            var unReadedItems = feed.Items.Where(i => !i.IsReaded).ToList();
+            if (unReadedItems.Count > 0)
+            {
+                await _api.MarkAsReaded(unReadedItems.Select(i => i.PermentLink).ToList());
+                unReadedItems.ForEach(i => i.IsReaded = true);
+                RefreshRequested?.Invoke();
+            }
         }
     }
 }

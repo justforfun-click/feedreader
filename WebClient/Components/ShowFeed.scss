@@ -36,7 +36,7 @@
             .name {
                 display: flex;
                 flex: 1;
-                font-size: 22px;
+                font-size: 20px;
                 font-weight: 700;
                 color: black;
             }
@@ -51,8 +51,6 @@
             }
 
             .toolbar {
-                height: 14px;
-
                 &, .icon {
                     display: flex;
                     text-align: center;
@@ -61,6 +59,7 @@
 
                 .icon {
                     cursor: pointer;
+                    margin-right: 10px;
 
                     &:hover {
                         svg {
@@ -72,6 +71,22 @@
                         height: 14px;
                         width: 14px;
                         fill: #9f9f9f;
+                    }
+                }
+
+                .btn {
+                    padding: 2px 5px 2px 4px;
+                    margin-right: 10px;
+                    font-size: 12px;
+                    border: 1px solid #d4d4d4;
+                    border-radius: 3px;
+                    text-shadow: 0 1px 0 #fff;
+                    color: #555;
+                    background-color: #e6e6e6;
+
+                    &:hover {
+                        background-color: rgba(0, 0, 0, 0.01);
+                        cursor: pointer;
                     }
                 }
             }

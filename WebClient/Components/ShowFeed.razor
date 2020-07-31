@@ -1,3 +1,4 @@
+@inject FeedService FeedService
 @inject IJSRuntime JsRuntime
 
 <div class="show-feed">
@@ -9,6 +10,7 @@
             <a class="name" href="@(string.IsNullOrWhiteSpace(Feed.WebsiteLink) ? Feed.Uri : Feed.WebsiteLink)" title="@(string.IsNullOrWhiteSpace(Feed.Name) ? Feed.Uri : Feed.Name)" target="_blank"><span>@(string.IsNullOrWhiteSpace(Feed.Name) ? Feed.Uri : Feed.Name)</span></a>
             <a class="description" href="@Feed.Uri" target="_blank" title="@(string.IsNullOrWhiteSpace(Feed.Description) ? Feed.Uri : Feed.Description)"><span>@(string.IsNullOrWhiteSpace(Feed.Description) ? Feed.Uri : Feed.Description)</span></a>
             <div class="toolbar">
+                <div class="btn" @onclick="MarkAllReaded">mark all as readed</div>
                 <div class="icon" title="unsubscribe" @onclick="Unsubscribe">
                     <!-- comes from open-iconic: trash -->
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8">
@@ -48,5 +50,10 @@
     private Task Unsubscribe()
     {
         return OnUnsubscribe.InvokeAsync(Feed);
+    }
+
+    private Task MarkAllReaded()
+    {
+        return FeedService.MarkFeedAllItemsAsReaded(Feed);
     }
 }
