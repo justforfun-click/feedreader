@@ -5,7 +5,7 @@
 @{
 RenderFragment TimeAndToolBar =
     @<div class="time-and-toolbar">
-        <div class="time">@FeedItem.PubDate</div>
+        <div class="time">@FeedItem.PubDate.ToClientLocalTime()</div>
         <div class="toolbar">
             <div class="btn @(FeedItem.IsStared ? "stared" : "")" @onclick="StarOrUnstarFeedItem">
                 <!-- comes from open-iconic: star -->
