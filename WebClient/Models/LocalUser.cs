@@ -81,13 +81,17 @@ namespace FeedReader.WebClient.Models
             var cancelToken = _feedRefreshCancellToken = new CancellationTokenSource();
             _ = Task.Run(async () =>
             {
-                foreach(var feed in user.Feeds)
+                while (!cancelToken.IsCancellationRequested)
                 {
-                    if (cancelToken.IsCancellationRequested)
+                    await Task.Delay(TimeSpan.FromMinutes(1), cancelToken.Token);
+                    foreach (var feed in user.Feeds)
                     {
-                        break;
+                        if (cancelToken.IsCancellationRequested)
+                        {
+                            break;
+                        }
+                        await _feedService.RefreshFeedAsync(feed);
                     }
-                    await _feedService.RefreshFeedAsync(feed);
                 }
             });
         }
