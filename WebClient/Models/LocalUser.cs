@@ -83,7 +83,6 @@ namespace FeedReader.WebClient.Models
             {
                 while (!cancelToken.IsCancellationRequested)
                 {
-                    await Task.Delay(TimeSpan.FromMinutes(1), cancelToken.Token);
                     foreach (var feed in user.Feeds)
                     {
                         if (cancelToken.IsCancellationRequested)
@@ -92,6 +91,7 @@ namespace FeedReader.WebClient.Models
                         }
                         await _feedService.RefreshFeedAsync(feed);
                     }
+                    await Task.Delay(TimeSpan.FromMinutes(10), cancelToken.Token);
                 }
             });
         }
