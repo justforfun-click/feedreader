@@ -35,6 +35,11 @@
             {
                 <FeedItemThumbnail FeedItem=@item></FeedItemThumbnail>
             }
+
+            @if (!string.IsNullOrWhiteSpace(Feed.NextRowKey))
+            {
+                <div class="feed-item-thumbnail-without-topic-picture more" @onclick="More"><div class="title">Loading more ...</div></div>
+            }
         }
     </div>
 </div>
@@ -55,5 +60,10 @@
     private Task MarkAllReaded()
     {
         return FeedService.MarkFeedAllItemsAsReadedAsync(Feed);
+    }
+
+    private Task More()
+    {
+        return FeedService.RefreshFeedAsync(Feed, true);
     }
 }

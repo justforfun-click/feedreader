@@ -45,11 +45,14 @@ namespace FeedReader.WebClient.Services
             });
         }
 
-        public async Task<Feed> RefreshFeed(string feedUri)
+        public async Task<Feed> RefreshFeed(string feedUri, string nextRowKey)
         {
-            return await GetAsync<Feed>("feed/refresh", new Dictionary<string, string>{
-                { "feed-uri", feedUri }
-            });
+            var args = new Dictionary<string, string> { { "feed-uri", feedUri } };
+            if (!string.IsNullOrWhiteSpace(nextRowKey))
+            {
+                args["next-row-key"] = nextRowKey;
+            }
+            return await GetAsync<Feed>("feed/refresh", args);
         }
 
         public async Task MarkAsReaded(List<string> feedItemUris)
