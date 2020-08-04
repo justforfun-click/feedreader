@@ -35,6 +35,9 @@
                     <a class="microsoft" href="@GoogleLoginUri">
                         <img src="/img/iconfinder_2_939729.svg"/> Login with <b>Google</b> account
                     </a>
+                    <a class="microsoft" href="@GitHubLoginUri">
+                        <img src="/img/iconfinder_github_401441.svg"/> Login with <b>GitHub</b> account
+                    </a>
                 </div>
             }
         </div>
@@ -47,6 +50,12 @@
 
     private const string GOOGLE_CLIENT_ID = "2423499784-8btrctmdul3lrcjlg9uvaoa8clrtvc0f.apps.googleusercontent.com";
 
+#if DEBUG
+    private const string GITHUB_CLIENT_ID = "3d53ca4335af4da637d1";
+#else
+    private const string GITHUB_CLIENT_ID = "01bf66de9f8979562bc6";
+#endif
+
     [Parameter]
     public string Action { get; set; }
 
@@ -57,6 +66,8 @@
     private string MicrosoftLoginUri { get; set; }
 
     private string GoogleLoginUri { get; set; }
+
+    private string GitHubLoginUri { get; set; }
 
     protected override void OnInitialized()
     {
@@ -74,6 +85,9 @@
 
         callbackUri = Navigation.ToAbsoluteUri("/login/google-callback");
         GoogleLoginUri = $"https://accounts.google.com/o/oauth2/v2/auth?client_id={GOOGLE_CLIENT_ID}&redirect_uri={callbackUri}&response_type=id_token&scope=openid+profile+email&nonce=feedreader";
+
+        callbackUri = Navigation.ToAbsoluteUri("/login/github-callback");
+        GitHubLoginUri = $"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={callbackUri}&scope=user:email";
     }
 
     protected override async Task OnInitializedAsync()
@@ -89,6 +103,10 @@
 
             case "google-callback":
                 await LoginWithGoogleCallbackAsync(Navigation.Uri);
+                break;
+
+            case "github-callback":
+                await LoginWithGitHubCallback(Navigation.Uri);
                 break;
 
             default:
@@ -154,6 +172,30 @@
         {
             Logger.Error($"Loggin with google account failed, ex: {ex.Message}");
             Error = "Login with Google account failed, pleaes try again later.";
+        }
+    }
+
+    private async Task LoginWithGitHubCallback(string callbackUri)
+    {
+        try
+        {
+            var query = callbackUri.Substring(callbackUri.IndexOf('?') + 1);
+            var queries = HttpUtility.ParseQueryString(query);
+            var code = queries["code"];
+            if (string.IsNullOrEmpty(code))
+            {
+                throw new Exception($"Unexpected github-callback, uri: {callbackUri}.");
+            }
+            else
+            {
+                await LocalUser.LoginAsync($"github:{code}");
+                Navigation.NavigateTo("/");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Error($"Login with github account failed, ex: {ex.Message}");
+            Error = "Login with GitHub account failed, please try again later.";
         }
     }
 }
