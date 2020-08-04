@@ -34,7 +34,8 @@ namespace FeedReader.WebClient.Services
             {
                 Name = feed.Name,
                 Group = feed.Group,
-                Uri = feed.Uri
+                Uri = feed.Uri,
+                OriginalUri = feed.OriginalUri
             });
         }
 

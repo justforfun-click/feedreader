@@ -70,8 +70,8 @@
 
     private async Task SaveNewFeed()
     {
-        var url = FeedURL?.Trim().ToLower();
-        if (string.IsNullOrEmpty(url))
+        var url = FeedURL?.Trim();
+        if (string.IsNullOrWhiteSpace(url))
         {
             FeedUrlError = "Feed URL is required.";
         }
@@ -79,7 +79,7 @@
         {
             FeedUrlError = "URL is invalid.";
         }
-        else if (LocalUser.Feeds.Find(f => f.Uri == url) != null)
+        else if (LocalUser.Feeds.Find(f => f.Uri == url.ToLower()) != null)
         {
             FeedUrlError = "The feed has been subscribed already.";
         }
@@ -107,7 +107,8 @@
         {
             Group = (SelectedGroup == "Create a new group" ? newGroupName : SelectedGroup),
             Name = FeedName,
-            Uri = FeedURL
+            Uri = FeedURL.Trim().ToLower(),
+            OriginalUri = FeedURL
         });
     }
 

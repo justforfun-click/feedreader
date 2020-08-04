@@ -7,8 +7,8 @@
             <FallbackImage Src="@Feed.IconUri" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(Feed.Uri).Host}")"/>
         </div>
         <div class="name-and-toolbar">
-            <a class="name" href="@(string.IsNullOrWhiteSpace(Feed.WebsiteLink) ? Feed.Uri : Feed.WebsiteLink)" title="@(string.IsNullOrWhiteSpace(Feed.Name) ? Feed.Uri : Feed.Name)" target="_blank"><span>@(string.IsNullOrWhiteSpace(Feed.Name) ? Feed.Uri : Feed.Name)</span></a>
-            <a class="description" href="@Feed.Uri" target="_blank" title="@(string.IsNullOrWhiteSpace(Feed.Description) ? Feed.Uri : Feed.Description)"><span>@(string.IsNullOrWhiteSpace(Feed.Description) ? Feed.Uri : Feed.Description)</span></a>
+            <a class="name" href="@WebsiteLink" title="@Name" target="_blank"><span>@Name</span></a>
+            <a class="description" href="@Uri" target="_blank" title="@Description"><span>@Description</span></a>
             <div class="toolbar">
                 <div class="btn" @onclick="MarkAllReaded">mark all as readed</div>
                 <div class="icon" title="unsubscribe" @onclick="Unsubscribe">
@@ -51,6 +51,38 @@
 
     [Parameter]
     public EventCallback<Feed> OnUnsubscribe { get; set; }
+
+    private string Name
+    {
+        get
+        {
+            return string.IsNullOrWhiteSpace(Feed.Name) ? Uri : Feed.Name;
+        }
+    }
+
+    private string WebsiteLink
+    {
+        get
+        {
+            return string.IsNullOrWhiteSpace(Feed.WebsiteLink) ? Name : Feed.WebsiteLink;
+        }
+    }
+
+    private string Uri
+    {
+        get
+        {
+            return string.IsNullOrWhiteSpace(Feed.OriginalUri) ? Feed.Uri : Feed.OriginalUri;
+        }
+    }
+
+    private string Description
+    {
+        get
+        {
+            return string.IsNullOrWhiteSpace(Feed.Description) ? Uri : Feed.Description;
+        }
+    }
 
     private Task Unsubscribe()
     {
