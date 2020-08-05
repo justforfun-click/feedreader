@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FeedCategory = FeedReader.Share.DataContracts.FeedCategory;
 
 namespace FeedReader.WebClient.Services
 {
@@ -70,6 +71,11 @@ namespace FeedReader.WebClient.Services
                     RefreshRequested?.Invoke();
                 }
             }
+        }
+
+        public Task<List<Feed>> GetFeedsByCategory(FeedCategory feedCategory)
+        {
+            return _api.GetFeedsByCategory(feedCategory);
         }
     }
 }

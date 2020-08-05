@@ -2,6 +2,7 @@
 @inject FeedService FeedService
 @inject IJSRuntime JsRuntime
 @inject LocalUser LocalUser
+@inject NavigationManager Navigation
 
 <MainLayout>
     <div class="authorized-user-page">
@@ -76,6 +77,28 @@
     {
         FeedService.RefreshRequested += OnRefreshRequested;
         _ = JsRuntime.InvokeVoidAsync("showAd");
+
+        var queryStart = Navigation.Uri.IndexOf('?');
+        if (queryStart > 0)
+        {
+            var queries = HttpUtility.ParseQueryString(Navigation.Uri.Substring(queryStart + 1));
+            if (queries?["action"] == "subscribe")
+            {
+                var feedOriginalUri = queries?["feed-original-uri"];
+                if (!string.IsNullOrWhiteSpace(feedOriginalUri))
+                {
+                    var feed = LocalUser.Feeds.FirstOrDefault(f => f.Uri == feedOriginalUri.Trim().ToLower());
+                    if (feed == null)
+                    {
+                        feed = new Feed() { Group = "Default", Uri = feedOriginalUri.Trim().ToLower(), OriginalUri = feedOriginalUri.Trim() };
+                        SaveNewFeed(feed);
+                    }
+                    ShowFeed(feed);
+                    Navigation.NavigateTo("/");
+                    return;
+                }
+            }
+        }
         ShowFeed();
     }
 

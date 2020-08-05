@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web;
 using FeedReader.WebClient.Datas;
 using Newtonsoft.Json;
+using FeedCategory = FeedReader.Share.DataContracts.FeedCategory;
 
 namespace FeedReader.WebClient.Services
 {
@@ -77,6 +78,14 @@ namespace FeedReader.WebClient.Services
         public async Task<List<FeedItem>> GetStaredFeedItems()
         {
             return await GetAsync<List<FeedItem>>("stars");
+        }
+
+        public async Task<List<Feed>> GetFeedsByCategory(FeedCategory feedCategory)
+        {
+            return await GetAsync<List<Feed>>("feeds", new Dictionary<string, string>
+            {
+                { "category", feedCategory.ToString() }
+            });
         }
 
         private async Task<TResult> PostAsync<TResult>(string uri, object obj)

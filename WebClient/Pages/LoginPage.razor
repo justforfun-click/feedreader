@@ -80,14 +80,25 @@
             IsLogining = false;
         }
 
+        // Get original query string.
+        var queryString = "";
+        var queryStart = Navigation.Uri.IndexOf('?');
+        if (queryStart > 0)
+        {
+            queryString = Navigation.Uri.Substring(queryStart + 1);
+            Console.WriteLine("query stirng: " + queryString);
+            Console.WriteLine("base64: " + Utils.Base64Encode(queryString));
+        }
+        queryString = Utils.Base64Encode(queryString);
+
         var callbackUri = Navigation.ToAbsoluteUri("/login/ms-callback");
-        MicrosoftLoginUri = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id={MICROSOFT_CLIENT_ID}&redirect_uri={callbackUri}&response_type=id_token&scope=openid+profile+email&nonce=feedreader";
+        MicrosoftLoginUri = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id={MICROSOFT_CLIENT_ID}&redirect_uri={callbackUri}&response_type=id_token&scope=openid+profile+email&nonce=feedreader&state={queryString}";
 
         callbackUri = Navigation.ToAbsoluteUri("/login/google-callback");
-        GoogleLoginUri = $"https://accounts.google.com/o/oauth2/v2/auth?client_id={GOOGLE_CLIENT_ID}&redirect_uri={callbackUri}&response_type=id_token&scope=openid+profile+email&nonce=feedreader";
+        GoogleLoginUri = $"https://accounts.google.com/o/oauth2/v2/auth?client_id={GOOGLE_CLIENT_ID}&redirect_uri={callbackUri}&response_type=id_token&scope=openid+profile+email&nonce=feedreader&state={queryString}";
 
         callbackUri = Navigation.ToAbsoluteUri("/login/github-callback");
-        GitHubLoginUri = $"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={callbackUri}&scope=user:email";
+        GitHubLoginUri = $"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={callbackUri}&scope=user:email&state={queryString}";
     }
 
     protected override async Task OnInitializedAsync()
@@ -141,7 +152,7 @@
             else
             {
                 await LocalUser.LoginAsync(token);
-                Navigation.NavigateTo("/");
+                PostLoginSuccess(Utils.Base64Decode(queries["state"]));
             }
         }
         catch (Exception ex)
@@ -165,7 +176,7 @@
             else
             {
                 await LocalUser.LoginAsync(token);
-                Navigation.NavigateTo("/");
+                PostLoginSuccess(Utils.Base64Decode(queries["state"]));
             }
         }
         catch (Exception ex)
@@ -189,7 +200,7 @@
             else
             {
                 await LocalUser.LoginAsync($"github:{code}");
-                Navigation.NavigateTo("/");
+                PostLoginSuccess(Utils.Base64Decode(queries["state"]));
             }
         }
         catch (Exception ex)
@@ -197,5 +208,13 @@
             Logger.Error($"Login with github account failed, ex: {ex.Message}");
             Error = "Login with GitHub account failed, please try again later.";
         }
+    }
+
+    private void PostLoginSuccess(string queryString)
+    {
+        Console.WriteLine("Receive queryString " + queryString);
+        var queries = HttpUtility.ParseQueryString(queryString);
+        Console.WriteLine("state- " + queries["redirect_uri"]);
+        Navigation.NavigateTo(string.IsNullOrWhiteSpace(queries?["redirect_uri"]) ? "/" : queries["redirect_uri"]);
     }
 }

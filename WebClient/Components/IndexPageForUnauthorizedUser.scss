@@ -1,0 +1,127 @@
+﻿.unauthorized-user-page {
+    display: flex;
+    height: 100%;
+
+    > .left-nav {
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            font-size: 12px;
+            width: 70px;
+            height: 70px;
+            justify-content: center;
+            align-items: center;
+            color: #606060;
+
+            .icon {
+                svg {
+                    width: 32px;
+                    height: 32px;
+                    fill: #606060;
+                }
+            }
+
+            &:hover {
+                color: #000;
+                cursor: pointer;
+
+                svg {
+                    fill: #000;
+                }
+            }
+        }
+
+        .nav-item.active {
+            color: #000;
+
+            svg {
+                fill: #000;
+            }
+        }
+    }
+
+    > .right-panel {
+        flex: 1;
+        overflow: auto;
+
+        .feed-list-in-category {
+            padding: 20px 10px 20px 0px;
+            display: flex;
+            flex-direction: column;
+
+            .category {
+                font-weight: 500;
+                font-size: 20px;
+                margin-bottom: 20px;
+                margin-left: 10px;
+            }
+
+            .feed-list {
+                display: flex;
+                flex-wrap: wrap;
+
+                .feed-item-thumbnail {
+                    display: flex;
+                    flex-direction: column;
+                    width: 280px;
+                    height: 250px;
+                    overflow: hidden;
+                    margin-left: 10px;
+                    margin-bottom: 40px;
+
+                    .topic {
+                        img {
+                            width: 280px;
+                            height: 150px;
+                        }
+                    }
+
+                    .icon-and-info {
+                        display: flex;
+                        padding-top: 10px;
+                        overflow: hidden;
+
+                        .icon {
+                            img {
+                                width: 64px;
+                                height: 64px;
+                                border-radius: 50%;
+                            }
+
+                            .small-btn {
+                                display: flex;
+                                justify-content: center;
+                                align-items: center;
+                                font-size: 12px;
+                                color: #c00;
+                                border: 1px solid #c00;
+                                cursor: pointer;
+                            }
+                        }
+
+                        > .info {
+                            display: flex;
+                            flex-direction: column;
+                            margin-left: 10px;
+
+                            .title {
+                                line-height: 20px;
+                                flex: 1;
+                                overflow: hidden;
+                                min-height: 0px;
+                            }
+
+                            .info {
+                                white-space: nowrap;
+                                color: #606060;
+                                font-size: 13px;
+                                font-weight: 400;
+                                margin-top: 10px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
