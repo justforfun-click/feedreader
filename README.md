@@ -19,3 +19,25 @@ and azure functions.
 - Support RSS, ATOM, Json Feed standard.
 - Free! Free! Free!
 - Maybe more ... 
+
+## Get Started
+
+1. Install [VS 2019 Preview](https://visualstudio.microsoft.com/vs/preview/). Community version is good enough.
+   Install `ASP.NET and web development` workload. Make sure `Cloud tools for web development` is also selected.
+
+1. Install [DotNet SDK 5.0 Preview 7](https://dotnet.microsoft.com/download/dotnet/5.0).
+
+1. Use the following command to clone the source code:
+
+        git clone --recursive https://github.com/feedreaderorg/feedreader.git
+
+1. Start `Microsfot Azure Storage Emulator` from start menu. Or you can run the following command directly:
+
+        C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator>AzureStorageEmulator.exe start
+
+1. Go to `feedreader/Server`, copy `local.settings.example.json` to `local.settings.json`.
+
+1. Go to `feedreader/Server`, launch `FeedReader.Server.sln`, run `FeedReader.WebApi` project.
+
+1. Go to `feedreader`, launch `FeedReader.sln`, run `FeedReader.WebClient` project. It should launch your
+   browser and navigate to `https://localhost`.
