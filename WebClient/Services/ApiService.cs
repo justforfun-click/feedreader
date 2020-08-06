@@ -19,6 +19,8 @@ namespace FeedReader.WebClient.Services
         private readonly HttpClient _http = new HttpClient() { BaseAddress = new Uri("https://feedreaderapi.azurewebsites.net/v1/") };
         #endif
 
+        public int TimezoneOffset { get; set; }
+
         public async Task<User> LoginAsync(string token)
         {
             _http.DefaultRequestHeaders.Remove("authentication");
@@ -54,7 +56,11 @@ namespace FeedReader.WebClient.Services
             {
                 args["next-row-key"] = nextRowKey;
             }
-            return await GetAsync<Feed>("feed/refresh", args);
+            var feed = await GetAsync<Feed>("feed/refresh", args);
+            foreach (var feedItem in feed.Items) {
+                feedItem.PubDate = feedItem.PubDate.AddMinutes(TimezoneOffset);
+            }
+            return feed;
         }
 
         public async Task MarkAsReaded(List<string> feedItemUris)
@@ -77,15 +83,25 @@ namespace FeedReader.WebClient.Services
 
         public async Task<List<FeedItem>> GetStaredFeedItems()
         {
-            return await GetAsync<List<FeedItem>>("stars");
+            var items = await GetAsync<List<FeedItem>>("stars");
+            foreach (var item in items) {
+                item.PubDate = item.PubDate.AddMinutes(TimezoneOffset);
+            }
+            return items;
         }
 
         public async Task<List<Feed>> GetFeedsByCategory(FeedCategory feedCategory)
         {
-            return await GetAsync<List<Feed>>("feeds", new Dictionary<string, string>
+            var feeds = await GetAsync<List<Feed>>("feeds", new Dictionary<string, string>
             {
                 { "category", feedCategory.ToString() }
             });
+            foreach (var feed in feeds) {
+                foreach (var item in feed.Items) {
+                    item.PubDate = item.PubDate.AddMinutes(TimezoneOffset);
+                }
+            }
+            return feeds;
         }
 
         private async Task<TResult> PostAsync<TResult>(string uri, object obj)

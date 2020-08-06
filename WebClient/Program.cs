@@ -23,20 +23,10 @@ namespace FeedReader.WebClient
             builder.Services.AddAuthorizationCore();
 
             var host = builder.Build();
-            DateTimeExtension.sTimezoneOffset = await host.Services.GetRequiredService<IJSRuntime>().InvokeAsync<int>("eval", "-new Date().getTimezoneOffset()");
+            host.Services.GetRequiredService<ApiService>().TimezoneOffset = await host.Services.GetRequiredService<IJSRuntime>().InvokeAsync<int>("eval", "-new Date().getTimezoneOffset()");
             var localUser = host.Services.GetRequiredService<LocalUser>();
             await localUser.InitializeAsync();
             await host.RunAsync();
-        }
-    }
-
-    static class DateTimeExtension
-    {
-        public static int sTimezoneOffset;
-
-        public static DateTime ToClientLocalTime(this DateTime datetime)
-        {
-            return datetime.AddMinutes(sTimezoneOffset);
         }
     }
 }
