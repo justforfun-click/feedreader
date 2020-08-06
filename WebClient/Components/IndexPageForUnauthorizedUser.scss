@@ -70,9 +70,16 @@
                     margin-bottom: 40px;
 
                     .topic {
-                        img {
+                        img, .summary {
                             width: 280px;
                             height: 150px;
+                        }
+
+                        .summary {
+                            font-size: 14px;
+                            overflow: hidden;
+                            line-height: 18px;
+                            padding: 2px;
                         }
                     }
 
@@ -103,12 +110,15 @@
                             display: flex;
                             flex-direction: column;
                             margin-left: 10px;
+                            flex: 1;
+                            overflow: hidden;
 
                             .title {
                                 line-height: 20px;
                                 flex: 1;
                                 overflow: hidden;
                                 min-height: 0px;
+                                font-weight: 700;
                             }
 
                             .info {
@@ -117,6 +127,8 @@
                                 font-size: 13px;
                                 font-weight: 400;
                                 margin-top: 10px;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
                             }
                         }
                     }

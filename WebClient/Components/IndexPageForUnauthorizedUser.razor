@@ -112,7 +112,14 @@
         return
             @<div class="feed-item-thumbnail">
                 <div class="topic">
-                    <img src="@feedItem.TopicPictureUri"/>
+                    @if (string.IsNullOrWhiteSpace(feedItem.TopicPictureUri))
+                    {
+                        <div class="summary">@feedItem.Summary</div>
+                    }
+                    else
+                    {
+                        <img src="@feedItem.TopicPictureUri"/>
+                    }
                 </div>
                 <div class="icon-and-info">
                     <div class="icon">
@@ -121,7 +128,7 @@
                     </div>
                     <div class="info">
                         <a class="title" href="@feedItem.PermentLink" target="_blank">@feedItem.Title</a>
-                        <div class="info">@feed.Name &nbsp; @feedItem.PubDate</div>
+                        <div class="info" title="@feed.Name @feedItem.PubDate">@feed.Name @feedItem.PubDate</div>
                     </div>
                 </div>
             </div>;
