@@ -63,9 +63,13 @@ namespace FeedReader.WebClient.Services
             return feed;
         }
 
-        public async Task MarkAsReaded(List<string> feedItemUris)
+        public async Task MarkAsReaded(string feedUri, DateTime lastReadedTime)
         {
-            await PostAsync("feed/mark_as_readed", feedItemUris);
+            await GetAsync("feed/mark_as_readed", new Dictionary<string, string>
+            {
+                { "feed-uri", feedUri },
+                { "last-readed-time", lastReadedTime.AddMinutes(-TimezoneOffset).ToString() }
+            });
         }
 
         public async Task StarFeedItemAsync(FeedItem feedItem)

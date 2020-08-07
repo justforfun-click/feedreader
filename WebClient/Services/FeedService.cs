@@ -46,30 +46,13 @@ namespace FeedReader.WebClient.Services
             RefreshRequested?.Invoke();
         }
 
-        public async Task MarkAsReadedAsync(FeedItem feedItem)
-        {
-            await _api.MarkAsReaded(new List<string> { feedItem.PermentLink });
-            feedItem.IsReaded = true;
-            RefreshRequested?.Invoke();
-        }
-
         public async Task MarkFeedAllItemsAsReadedAsync(Feed feed)
         {
-            var unReadedItems = feed.Items.Where(i => !i.IsReaded).ToList();
-            if (unReadedItems.Count > 0)
+            if (feed.Items != null && feed.Items.Count > 0)
             {
-                unReadedItems.ForEach(i => i.IsReaded = true);
+                _ = _api.MarkAsReaded(feed.Uri, feed.Items[0].PubDate);
+                feed.Items.ForEach(i => i.IsReaded = true);
                 RefreshRequested?.Invoke();
-                try
-                {
-                    await _api.MarkAsReaded(unReadedItems.Select(i => i.PermentLink).ToList());
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error($"Mark feed all items as readed feed, ex: {ex.Message}");
-                    unReadedItems.ForEach(i => i.IsReaded = false);
-                    RefreshRequested?.Invoke();
-                }
             }
         }
 

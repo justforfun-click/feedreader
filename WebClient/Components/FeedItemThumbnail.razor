@@ -20,7 +20,7 @@ RenderFragment TimeAndToolBar =
 @if (FeedItem.TopicPictureUri != null)
 {
     <div class="feed-item-thumbnail-with-topic-picture @(FeedItem.IsReaded ? "readed" : "")">
-        <a class="feed-item-summary" href="@FeedItem.PermentLink" target="_blank" @onclick="Click" onauxclick="@((Action)(() => Click()))">
+        <a class="feed-item-summary" href="@FeedItem.PermentLink" target="_blank">
             <img src="@FeedItem.TopicPictureUri"/>
             <div class="title">@FeedItem.Title</div>
         </a>
@@ -30,7 +30,7 @@ RenderFragment TimeAndToolBar =
 else
 {
     <div class="feed-item-thumbnail-without-topic-picture @(FeedItem.IsReaded ? "readed" : "")">
-        <a class="feed-item-summary" href="@FeedItem.PermentLink" target="_blank" @onclick="Click" onauxclick="@((Action)(() => Click()))">
+        <a class="feed-item-summary" href="@FeedItem.PermentLink" target="_blank">
             <div class="title">@FeedItem.Title</div>
             <div class="summary"><span>@FeedItem.Summary</span></div>
         </a>
@@ -42,11 +42,6 @@ else
 {
     [Parameter]
     public FeedItem FeedItem { get; set; }
-
-    public void Click()
-    {
-        _ = FeedService.MarkAsReadedAsync(FeedItem);
-    }
 
     public void StarOrUnstarFeedItem()
     {
