@@ -31,9 +31,9 @@ namespace FeedReader.WebClient.Services
             return user;
         }
 
-        public async Task<List<Feed>> SubscribeFeed(Feed feed)
+        public Task SubscribeFeed(Feed feed)
         {
-            return await PostAsync<List<Feed>>("feed/subscribe", new Share.DataContracts.Feed()
+            return PostAsync("feed/subscribe", new Share.DataContracts.Feed()
             {
                 Name = feed.Name,
                 Group = feed.Group,
@@ -42,9 +42,9 @@ namespace FeedReader.WebClient.Services
             });
         }
 
-        public async Task<List<Feed>> UnsubscribeFeed(string feedUri)
+        public Task UnsubscribeFeed(string feedUri)
         {
-            return await GetAsync<List<Feed>>("feed/unsubscribe", new Dictionary<string, string>{
+            return GetAsync("feed/unsubscribe", new Dictionary<string, string>{
                 { "feed-uri", feedUri }
             });
         }
@@ -65,12 +65,12 @@ namespace FeedReader.WebClient.Services
 
         public async Task MarkAsReaded(List<string> feedItemUris)
         {
-            await PosyAsync("feed/mark_as_readed", feedItemUris);
+            await PostAsync("feed/mark_as_readed", feedItemUris);
         }
 
         public async Task StarFeedItemAsync(FeedItem feedItem)
         {
-            await PosyAsync("star", feedItem);
+            await PostAsync("star", feedItem);
         }
 
         public async Task UnstarFeedItemAsync(string feedItemUri)
@@ -110,7 +110,7 @@ namespace FeedReader.WebClient.Services
             return JsonConvert.DeserializeObject<TResult>(await res.Content.ReadAsStringAsync());
         }
 
-        private async Task PosyAsync(string uri, object obj)
+        private async Task PostAsync(string uri, object obj)
         {
              await _http.PostAsync(uri, new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8));
         }

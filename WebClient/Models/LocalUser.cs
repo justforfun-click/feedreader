@@ -111,7 +111,7 @@ namespace FeedReader.WebClient.Models
             try
             {
                 Feeds.Add(feed);
-                Feeds = await _api.SubscribeFeed(feed);
+                await _api.SubscribeFeed(feed);
             }
             catch (Exception ex)
             {
@@ -132,7 +132,7 @@ namespace FeedReader.WebClient.Models
             try
             {
                 Feeds.Remove(Feeds.Find(f => f.Uri == feed.Uri));
-                Feeds = await _api.UnsubscribeFeed(feed.Uri);
+                await _api.UnsubscribeFeed(feed.Uri);
             }
             catch (Exception ex)
             {
