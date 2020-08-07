@@ -120,13 +120,24 @@
         RightPanelContent = @<AddNewFeed OnCancel="Cancel" OnSave="SaveNewFeed"/>;
     }
 
-    private void SaveNewFeed(Feed feed)
+    private async Task SaveNewFeed(Feed feed)
     {
+        RightPanelContent = @<WaitingPage Text="Loading..."/>;
+
+        try
+        {
+            // Subscribe the feed.
+            LocalUser.Feeds.ForEach(f => f.IsActive = false);
+            feed.IsActive = true;
+            await LocalUser.SubscribeFeedAsync(feed);
+        }
+        catch
+        {
+            feed.Error = "Subscribe failed. Please try it later.";
+        }
+
         // Display the feed.
         ShowFeed(feed);
-
-        // Subscribe the feed.
-        _ = LocalUser.SubscribeFeedAsync(feed);
     }
 
     private void ShowFeed(Feed feed = null)

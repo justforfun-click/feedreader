@@ -123,6 +123,7 @@ namespace FeedReader.WebClient.Models
                 {
                     Feeds.Remove(existedFeed);
                 }
+                throw;
             }
         }
 
