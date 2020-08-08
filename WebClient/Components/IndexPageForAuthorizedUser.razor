@@ -19,20 +19,36 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="feed-group-list">
-                    <div class="group">
-                        <div class="header show-stars" @onclick="ShowStars">
+                    <div class="group group-explorer clickable">
+                        <div class="header" @onclick="ShowExplorer">
+                            <div class="icon">
+                                <!-- comes from open-iconic: aperture -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8">
+                                  <path d="M4 0c-.69 0-1.34.19-1.91.5l3.22 2.34.75-2.25c-.6-.36-1.31-.59-2.06-.59zm-2.75 1.13c-.76.73-1.25 1.74-1.25 2.88 0 .25.02.48.06.72l3.09-2.22-1.91-1.38zm5.63.13l-1.22 3.75h2.19c.08-.32.16-.65.16-1 0-1.07-.44-2.03-1.13-2.75zm-4.72 3.22l-1.75 1.25c.55 1.13 1.6 1.99 2.88 2.22l-1.13-3.47zm1.56 1.53l.63 1.97c1.33-.12 2.46-.88 3.09-1.97h-3.72z"/>
+                                </svg>
+                            </div>
+                            <div class="feed">
+                                <div class="name"><span>Explorer</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="group group-stars clickable">
+                        <div class="header clickable" @onclick="ShowStars">
                             <div class="icon">
                                 <!-- comes from open-iconic: star -->
                                 <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 8 8">
                                     <path d="M4 0l-1 3h-3l2.5 2-1 3 2.5-2 2.5 2-1-3 2.5-2h-3l-1-3z" />
                                 </svg>
                             </div>
-                            <div class="feed @(IsShowStarsActive ? "active" : "")">
+                            <div class="feed">
                                 <div class="name"><span>Stars</span></div>
                             </div>
                         </div>
                     </div>
+
                     @foreach (var group in LocalUser.Feeds.GroupBy(f => f.Group))
                     {
                         <div class="group">
@@ -43,7 +59,7 @@
                                         <path d="M1 0c-.07 0-.13.01-.19.03-.39.08-.7.39-.78.78-.03.06-.03.12-.03.19v5.5c0 .83.67 1.5 1.5 1.5h5.5v-1h-5.5c-.28 0-.5-.22-.5-.5s.22-.5.5-.5h5.5v-5.5c0-.28-.22-.5-.5-.5h-.5v3l-1-1-1 1v-3h-3z" />
                                     </svg>
                                 </div>
-                                <div class="name" title="@group.Key"><span>@group.Key</span></div>
+                                <div class="name" title="Your Feeds - @group.Key"><span>Your Feeds - @group.Key</span></div>
                             </div>
                             <div class="feed-list">
                                 @foreach (var feed in group)
@@ -71,8 +87,6 @@
 {
     private RenderFragment RightPanelContent { get; set; }
 
-    private bool IsShowStarsActive { get; set; }
-
     protected override void OnInitialized()
     {
         FeedService.RefreshRequested += OnRefreshRequested;
@@ -91,7 +105,7 @@
                     if (feed == null)
                     {
                         feed = new Feed() { Group = "Default", Uri = feedOriginalUri.Trim().ToLower(), OriginalUri = feedOriginalUri.Trim() };
-                        SaveNewFeed(feed);
+                        _ = SubscribeFeed(feed);
                     }
                     ShowFeed(feed);
                     Navigation.NavigateTo("/");
@@ -99,7 +113,7 @@
                 }
             }
         }
-        ShowFeed();
+        _ = ShowExplorer();
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -117,33 +131,35 @@
 
     private void AddNewFeed()
     {
-        RightPanelContent = @<AddNewFeed OnCancel="Cancel" OnSave="SaveNewFeed"/>;
+        RightPanelContent = @<AddNewFeed OnCancel="Cancel" OnSave="SubscribeFeedAndShow"/>;
     }
 
-    private async Task SaveNewFeed(Feed feed)
+    private void SubscribeFeedAndShow(Feed feed)
     {
-        RightPanelContent = @<WaitingPage Text="Loading..."/>;
+        _ = SubscribeFeed(feed);
+        ShowFeed(feed);
+    }
 
+    private async Task SubscribeFeed(Feed feed)
+    {
         try
         {
-            // Subscribe the feed.
-            LocalUser.Feeds.ForEach(f => f.IsActive = false);
-            feed.IsActive = true;
+            if (string.IsNullOrWhiteSpace(feed.Group))
+            {
+                feed.Group = "Default";
+            }
             await LocalUser.SubscribeFeedAsync(feed);
         }
         catch
         {
             feed.Error = "Subscribe failed. Please try it later.";
         }
-
-        // Display the feed.
-        ShowFeed(feed);
     }
 
-    private void ShowFeed(Feed feed = null)
+    private async void ShowFeed(Feed feed = null)
     {
-        IsShowStarsActive = false;
-        LocalUser.Feeds.ForEach(f => f.IsActive = false);
+        await ShowActive("");
+
         feed = feed ?? LocalUser.Feeds.FirstOrDefault();
         if (feed != null)
         {
@@ -160,11 +176,16 @@
         }
     }
 
+    private async Task ShowExplorer()
+    {
+        await ShowActive("group-explorer");
+
+        RightPanelContent = @<FeedsExplorer OnSubscribe="SubscribeFeed" />;
+    }
+
     private async Task ShowStars()
     {
-        IsShowStarsActive = true;
-        
-        LocalUser.Feeds.ForEach(f => f.IsActive = false);
+        await ShowActive("group-stars");
 
         RightPanelContent = @<WaitingPage Text="Loading..."/>;
 
@@ -186,5 +207,15 @@
     private void OnRefreshRequested()
     {
         StateHasChanged();
+    }
+
+    private async Task ShowActive(string itemName)
+    {
+        LocalUser.Feeds.ForEach(f => f.IsActive = false);
+        await JsRuntime.InvokeVoidAsync("eval", $"document.querySelectorAll('.clickable').forEach(e => e.classList.remove('active'));");
+        if (itemName.StartsWith("group-"))
+        {
+            await JsRuntime.InvokeVoidAsync("eval", $"document.querySelector('.{itemName}').classList.add('active');");
+        }
     }
 }

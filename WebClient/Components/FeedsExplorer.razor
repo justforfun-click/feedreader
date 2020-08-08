@@ -1,0 +1,158 @@
+﻿@inject IJSRuntime JsRuntime
+@inject FeedService FeedService
+@inject LocalUser LocalUser
+@inject NavigationManager Navigation
+@using FeedCategory = Share.DataContracts.FeedCategory
+
+<div class="feeds-explorer">
+    <div class="nav">
+        <div class="nav-item nav-item-@FeedCategory.Recommended" onclick="@((Action)(() => _ = ShowCategory(FeedCategory.Recommended)))">
+            <div class="icon">
+                <!-- https://www.iconfinder.com/icons/211676/home_icon -->
+                <svg height="512px" id="Layer_1" style="enable-background:new 0 0 512 512;" version="1.1" viewBox="0 0 512 512" width="512px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><polygon points="448,288 256,64 64,288 112,288 112,448 208,448 208,320 304,320 304,448 400,448 400,288  "/></g></svg>
+            </div>
+            <div class="text">Home</div>
+        </div>
+            
+        <div class="nav-item nav-item-@FeedCategory.Art" onclick="@((Action)(() => _ = ShowCategory(FeedCategory.Art)))">
+            <div class="icon">
+                <!-- https://www.iconfinder.com/icons/4964030/art_brush_color_creative_design_paint_palette_icon -->
+                <svg height="24" version="1.1" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><title/><path d="M17.484 12c0.844 0 1.5-0.656 1.5-1.5s-0.656-1.5-1.5-1.5-1.5 0.656-1.5 1.5 0.656 1.5 1.5 1.5zM14.484 8.016c0.844 0 1.5-0.656 1.5-1.5s-0.656-1.5-1.5-1.5-1.5 0.656-1.5 1.5 0.656 1.5 1.5 1.5zM9.516 8.016c0.844 0 1.5-0.656 1.5-1.5s-0.656-1.5-1.5-1.5-1.5 0.656-1.5 1.5 0.656 1.5 1.5 1.5zM6.516 12c0.844 0 1.5-0.656 1.5-1.5s-0.656-1.5-1.5-1.5-1.5 0.656-1.5 1.5 0.656 1.5 1.5 1.5zM12 3c4.969 0 9 3.609 9 8.016 0 2.766-2.25 4.969-5.016 4.969h-1.734c-0.844 0-1.5 0.656-1.5 1.5 0 0.375 0.141 0.703 0.375 0.984s0.375 0.656 0.375 1.031c0 0.844-0.656 1.5-1.5 1.5-4.969 0-9-4.031-9-9s4.031-9 9-9z"/></svg>
+            </div>
+            <div class="text">Art</div>
+        </div>
+            
+        <div class="nav-item nav-item-@FeedCategory.Business" onclick="@((Action)(() => _ = ShowCategory(FeedCategory.Business)))">
+            <div class="icon">
+                <!-- https://www.iconfinder.com/icons/2639941/dollar_us_icon -->
+                <svg id="Layer_1" style="enable-background:new 0 0 30 30;" version="1.1" viewBox="0 0 30 30" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M15,3C8.373,3,3,8.373,3,15c0,6.627,5.373,12,12,12s12-5.373,12-12C27,8.373,21.627,3,15,3z M16,20.857V23h-2v-2.137  c-2.13-0.284-3.471-1.523-3.546-3.359h2.281c0.109,0.914,1.031,1.5,2.359,1.5c1.227,0,2.094-0.594,2.094-1.445  c0-0.719-0.562-1.133-1.945-1.43l-1.469-0.312c-2.055-0.43-3.062-1.5-3.062-3.219c0-1.83,1.274-3.116,3.288-3.439V7h2v2.156  c1.956,0.317,3.276,1.584,3.337,3.317h-2.219c-0.109-0.891-0.938-1.484-2.078-1.484c-1.18,0-1.961,0.547-1.961,1.406  c0,0.695,0.539,1.094,1.859,1.375l1.359,0.289c2.266,0.477,3.242,1.453,3.242,3.203C19.54,19.244,18.214,20.554,16,20.857z"/></svg>
+            </div>
+            <div class="text">Business</div>
+        </div>
+
+        <div class="nav-item nav-item-@FeedCategory.News" onclick="@((Action)(() => _ = ShowCategory(FeedCategory.News)))">
+            <div class="icon">
+                <!-- https://www.iconfinder.com/icons/2639874/news_icon -->
+                <svg id="Layer_1" style="enable-background:new 0 0 30 30;" version="1.1" viewBox="0 0 30 30" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M27,9h-2v15c0,0.553-0.448,1-1,1s-1-0.447-1-1h-1v4h2c2.209,0,4-1.791,4-4V10C28,9.448,27.552,9,27,9z"/><path d="M22,2H4C3.448,2,3,2.448,3,3v21c0,2.209,1.791,4,4,4h16V3C23,2.448,22.552,2,22,2z M12,23H6v-2h6V23z M12,19H6v-2h6V19z   M12,15H6v-2h6V15z M20,23h-6v-2h6V23z M20,19h-6v-2h6V19z M20,15h-6v-2h6V15z M20,6v3H6V6H20z"/></svg>
+            </div>
+            <div class="text">News</div>
+        </div>
+
+        <div class="nav-item nav-item-@FeedCategory.Sports" onclick="@((Action)(() => _ = ShowCategory(FeedCategory.Sports)))">
+            <div class="icon">
+                <!-- https://www.iconfinder.com/icons/809681/american_football_sports_icon -->
+                <svg enable-background="new 0 0 24 24" height="24px" id="Layer_1" version="1.1" viewBox="0 0 24 24" width="24px" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path d="M23.8,4.2c-0.2-1-0.4-2.3-0.8-3.2c-0.9-0.4-2.1-0.6-3.2-0.7C18.5,0.2,17.3,0,16,0C7.2,0,0,7.2,0,16c0,1.3-0.1,2.6,0.2,3.8   c0.2,1,0.4,2.3,0.8,3.2c0.9,0.4,2.2,0.6,3.2,0.8C5.5,23.9,6.7,24,8,24c8.8,0,16-7.2,16-16C24,6.7,24,5.5,23.8,4.2z M21.4,2.6   C22,4.2,22,6.2,22,8c0,0.3,0,0.6,0,0.9C19,7.4,16.6,5,15.1,2c0.3,0,0.6,0,0.9,0C17.8,2,19.8,2,21.4,2.6z M2.7,21.3   C2.1,19.7,2,17.8,2,16c0-0.3,0-0.6,0-0.9C5,16.6,7.4,19,8.9,22c-0.3,0-0.6,0-0.9,0C6.2,22,4.3,21.9,2.7,21.3z M10,21.8   c-1.7-3.4-4.5-6.1-7.9-7.9C3.1,7.9,7.9,3.1,14,2.2c1.7,3.4,4.5,6.1,7.9,7.9C20.9,16.1,16.1,20.9,10,21.8z"/><path d="M15.8,8.1c-0.2-0.2-0.5-0.2-0.7,0l-1.1,1.1L13,8.1c-0.2-0.2-0.5-0.2-0.7,0c-0.2,0.2-0.2,0.5,0,0.7l1.1,1.1L12,11.3   l-1.1-1.1c-0.2-0.2-0.5-0.2-0.7,0c-0.2,0.2-0.2,0.5,0,0.7l1.1,1.1l-1.4,1.4l-1.1-1.1c-0.2-0.2-0.5-0.2-0.7,0   c-0.2,0.2-0.2,0.5,0,0.7l1.1,1.1l-1.1,1.1c-0.2,0.2-0.2,0.5,0,0.7c0.2,0.2,0.5,0.2,0.7,0l1.1-1.1l1.1,1.1c0.2,0.2,0.5,0.2,0.7,0   c0.2-0.2,0.2-0.5,0-0.7l-1.1-1.1l1.4-1.4l1.1,1.1c0.2,0.2,0.5,0.2,0.7,0c0.2-0.2,0.2-0.5,0-0.7L12.7,12l1.4-1.4l1.1,1.1   c0.2,0.2,0.5,0.2,0.7,0c0.2-0.2,0.2-0.5,0-0.7l-1.1-1.1l1.1-1.1C16,8.6,16,8.3,15.8,8.1z"/></g></svg>
+            </div>
+            <div class="text">Sport</div>
+        </div>
+
+        <div class="nav-item nav-item-@FeedCategory.Technology" onclick="@((Action)(() => _ = ShowCategory(FeedCategory.Technology)))">
+            <div class="icon">
+                <!-- https://www.iconfinder.com/icons/2317789/chip_computer_cpu_microchip_pc_processor_technology_icon -->
+                <svg enable-background="new 0 0 52 52" id="Layer_1" version="1.1" viewBox="0 0 52 52" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path d="M49,14.5v-2h-6.9953003V9.9989624H39.5V3h-2v6.9989624h-3V3h-2v6.9989624h-3V3h-2v6.9989624h-3V3h-2v6.9989624h-3V3h-2   v6.9989624h-3V3h-2v6.9989624h-2.4953003v32h32V39.5H49v-2h-6.9953003v-3H49v-2h-6.9953003v-3H49v-2h-6.9953003v-3H49v-2   h-6.9953003v-3H49v-2h-6.9953003v-3H49z M13.2929688,14.7070313l1.4140625-1.4140625l1.4301758,1.4301758l-1.4140625,1.4140625   L13.2929688,14.7070313z M26,36.5h-7c-1.6542969,0-3-1.3457031-3-3v-7h2v7c0,0.5512695,0.4487305,1,1,1h7V36.5z M33,18.5h-7.293457   v-2H33c1.6542969,0,3,1.3457031,3,3v7h-2v-7C34,18.9487305,33.5512695,18.5,33,18.5z M37.2929688,38.7070313l-1.4296875-1.4296875   l1.4140625-1.4140625l1.4296875,1.4296875L37.2929688,38.7070313z"/><rect height="2" width="7" x="3" y="12.5"/><rect height="2" width="7" x="3" y="17.5"/><rect height="2" width="7" x="3" y="22.5"/><rect height="2" width="7" x="3" y="27.5"/><rect height="2" width="7" x="3" y="32.5"/><rect height="2" width="7" x="3" y="37.5"/><rect height="7" width="2" x="37.5" y="42"/><rect height="7" width="2" x="32.5" y="42"/><rect height="7" width="2" x="27.5" y="42"/><rect height="7" width="2" x="22.5" y="42"/><rect height="7" width="2" x="17.5" y="42"/><rect height="7" width="2" x="12.5" y="42"/></g></svg>
+            </div>
+            <div class="text">Technology</div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="feed-list-in-category">
+            <div class="category">
+                <div class="title">@Category</div>
+            </div>
+            <div class="feed-list">
+                @if (Feeds == null || Feeds.Count == 0)
+                {
+                    <WaitingPage Text="Loading..."/>
+                }
+                else
+                {
+                    var tuples = new List<Tuple<Feed, FeedItem>>();
+                    foreach (var feed in Feeds)
+                    {
+                        tuples.AddRange(feed.Items.Select(i => Tuple.Create(feed, i)));
+                    }
+                    foreach (var tuple in tuples.OrderByDescending(t => t.Item2.PubDate))
+                    {
+                        <div class="feed-item">@ShowFeedItem(tuple.Item1, tuple.Item2)</div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public EventCallback<Feed> OnSubscribe { get; set; }
+
+    private FeedCategory Category { get; set; } = FeedCategory.Recommended;
+
+    private List<Feed> Feeds { get; set; }
+
+    private CancellationTokenSource _cancelToken = new CancellationTokenSource();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await ShowCategory(Category);
+        }
+    }
+
+    private async Task ShowCategory(FeedCategory category)
+    {
+        Category = category;
+        _cancelToken.Cancel();
+        _cancelToken = new CancellationTokenSource();
+        var token = _cancelToken;
+        await JsRuntime.InvokeVoidAsync("eval", $"document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active')); document.querySelector('.nav-item-{category}').classList.add('active')");
+        if (token.IsCancellationRequested)
+        {
+            return;
+        }
+
+        var feeds = await FeedService.GetFeedsByCategory(category);
+        if (token.IsCancellationRequested)
+        {
+            return;
+        }
+        Feeds = feeds;
+        StateHasChanged();
+    }
+
+    RenderFragment ShowFeedItem(Feed feed, FeedItem feedItem)
+    {
+        return
+        @<div class="feed-item-thumbnail">
+            <div class="topic">
+                @if (string.IsNullOrWhiteSpace(feedItem.TopicPictureUri))
+                {
+                    <div class="summary">@feedItem.Summary</div>
+                }
+                else
+                {
+                    <img src="@feedItem.TopicPictureUri"/>
+                }
+            </div>
+            <div class="icon-and-info">
+                <div class="icon">
+                    <FallbackImage Src="@feed.IconUri" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(feed.Uri).Host}")"/>
+                    @if (LocalUser.Feeds.Find(f => f.Uri == feed.Uri) != null)
+                    {
+                        <div class="small-btn disabled">subscribed</div>
+                    }
+                    else
+                    {
+                        <div class="small-btn" onclick="@((Action)(() => OnSubscribe.InvokeAsync(feed)))">subscribe</div>
+                    }
+                </div>
+                <div class="info">
+                    <a class="title" href="@feedItem.PermentLink" target="_blank">@feedItem.Title</a>
+                    <div class="info" title="@feed.Name @feedItem.PubDate">@feed.Name @feedItem.PubDate</div>
+                </div>
+            </div>
+        </div>;
+    }
+}

@@ -46,7 +46,7 @@ namespace FeedReader.WebClient.Services
             RefreshRequested?.Invoke();
         }
 
-        public async Task MarkFeedAllItemsAsReadedAsync(Feed feed)
+        public void MarkFeedAllItemsAsReadedAsync(Feed feed)
         {
             if (feed.Items != null && feed.Items.Count > 0)
             {

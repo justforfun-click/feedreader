@@ -89,9 +89,9 @@
         return OnUnsubscribe.InvokeAsync(Feed);
     }
 
-    private Task MarkAllReaded()
+    private void MarkAllReaded()
     {
-        return FeedService.MarkFeedAllItemsAsReadedAsync(Feed);
+        FeedService.MarkFeedAllItemsAsReadedAsync(Feed);
     }
 
     private Task More()

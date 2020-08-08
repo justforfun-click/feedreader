@@ -107,23 +107,19 @@
                                 align-items: center;
                             }
                         }
-
-                        .active {
-                            .name {
-                                font-weight: 700;
-                            }
-                        }
                     }
                 }
 
-                .show-stars {
+                .clickable {
                     .name, .icon {
                         cursor: pointer !important;
                     }
+                }
+            }
 
-                    .active {
-                        font-weight: 700;
-                    }
+            .active {
+                .name {
+                    font-weight: 700;
                 }
             }
         }

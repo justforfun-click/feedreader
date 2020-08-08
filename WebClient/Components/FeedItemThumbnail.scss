@@ -15,7 +15,7 @@
         flex: 1;
         overflow: hidden;
     }
-    
+
     .title {
         font-size: 18px;
         font-weight: 700;
@@ -57,14 +57,13 @@
 
     &.readed {
         color: #9f9f9f !important;
-        background-color: rgba(0, 0, 0, 0.1);
 
         .title, .summary, .time-and-channel {
             color: #9f9f9f !important
         }
 
-        img {
-            filter: grayscale(1);
+        .title {
+            font-weight: normal !important;
         }
     }
 }
