@@ -105,9 +105,12 @@
                     if (feed == null)
                     {
                         feed = new Feed() { Group = "Default", Uri = feedOriginalUri.Trim().ToLower(), OriginalUri = feedOriginalUri.Trim() };
-                        _ = SubscribeFeed(feed);
+                        ShowFeed(feed, subscribe: true);
                     }
-                    ShowFeed(feed);
+                    else
+                    {
+                        ShowFeed(feed);
+                    }
                     Navigation.NavigateTo("/");
                     return;
                 }
@@ -131,13 +134,7 @@
 
     private void AddNewFeed()
     {
-        RightPanelContent = @<AddNewFeed OnCancel="Cancel" OnSave="SubscribeFeedAndShow"/>;
-    }
-
-    private void SubscribeFeedAndShow(Feed feed)
-    {
-        _ = SubscribeFeed(feed);
-        ShowFeed(feed);
+        RightPanelContent = @<AddNewFeed OnCancel="Cancel" OnSave="(feed) => ShowFeed(feed, subscribe: true)"/>;
     }
 
     private async Task SubscribeFeed(Feed feed)
@@ -156,7 +153,7 @@
         }
     }
 
-    private async void ShowFeed(Feed feed = null)
+    private async void ShowFeed(Feed feed = null, bool subscribe = false)
     {
         await ShowActive("");
 
@@ -167,6 +164,11 @@
 
             RightPanelContent = @<ShowFeed Feed=@feed OnUnsubscribe="Unsubscribe"/>;
 
+            if (subscribe)
+            {
+                await SubscribeFeed(feed);
+            }
+
             // Refresh the feed.
             _ = FeedService.RefreshFeedAsync(feed);
         }
@@ -174,6 +176,8 @@
         {
             AddNewFeed();
         }
+
+        StateHasChanged();
     }
 
     private async Task ShowExplorer()
