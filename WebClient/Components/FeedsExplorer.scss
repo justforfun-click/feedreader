@@ -2,6 +2,8 @@
     display: flex;
 
     > .nav {
+        overflow: auto;
+
         .nav-item {
             display: flex;
             flex-direction: column;
