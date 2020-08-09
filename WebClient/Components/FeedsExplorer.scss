@@ -63,7 +63,7 @@
                     display: flex;
                     flex-direction: column;
                     width: 280px;
-                    height: 250px;
+                    height: 256px;
                     overflow: hidden;
                     margin-left: 10px;
                     margin-bottom: 40px;
@@ -82,10 +82,11 @@
                         }
                     }
 
-                    .icon-and-info {
+                    .icon-and-title {
                         display: flex;
                         padding-top: 10px;
                         overflow: hidden;
+                        flex: 1;
 
                         .icon {
                             img {
@@ -93,48 +94,67 @@
                                 height: 64px;
                                 border-radius: 50%;
                             }
+                        }
 
-                            .small-btn {
-                                display: flex;
-                                justify-content: center;
-                                align-items: center;
-                                font-size: 12px;
-                                color: #c00;
-                                border: 1px solid #c00;
-                                cursor: pointer;
-                                margin-top: 2px;
-                            }
+                        .title {
+                            line-height: 22px;
+                            flex: 1;
+                            overflow: hidden;
+                            margin-left: 12px;
+                            min-height: 0px;
+                            font-weight: 700;
+                        }
+                    }
 
-                            .small-btn.disabled {
+                    .info-and-toolbar {
+                        display: flex;
+                        align-items: center;
+                        margin-top: 4px;
+                        height: 20px;
+
+                        .small-btn {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            font-size: 12px;
+                            color: #c00;
+                            border: 1px solid #c00;
+                            cursor: pointer;
+                            padding: 2px 4px;
+
+                            &.disabled {
                                 color: #9f9f9f;
                                 border-color: #9f9f9f;
                                 cursor: default;
                             }
                         }
 
-                        > .info {
+                        .info {
                             display: flex;
-                            flex-direction: column;
-                            margin-left: 10px;
-                            flex: 1;
+                            height: 100%;
+                            align-items: center;
+                            color: #606060;
+                            font-size: 12px;
+                            font-weight: 400;
+                            flex: 1px;
+                            padding: 0px 4px;
                             overflow: hidden;
 
-                            .title {
-                                line-height: 20px;
-                                flex: 1;
-                                overflow: hidden;
-                                min-height: 0px;
-                                font-weight: 700;
-                            }
-
-                            .info {
-                                white-space: nowrap;
-                                color: #606060;
-                                font-size: 12px;
-                                font-weight: 400;
-                                margin-top: 10px;
+                            span {
                                 overflow: hidden;
                                 text-overflow: ellipsis;
+                                white-space: nowrap;
+                            }
+                        }
+
+                        .toolbar {
+                            .btn {
+                                cursor: pointer;
+
+                                svg {
+                                    width: 20px;
+                                    height: 20px;
+                                }
                             }
                         }
                     }
