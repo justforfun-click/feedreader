@@ -38,6 +38,9 @@
                     <a class="microsoft" href="@GitHubLoginUri">
                         <img src="/img/iconfinder_github_401441.svg"/> Login with <b>GitHub</b> account
                     </a>
+                    <a class="microsoft" href="@FacebookLoginUri">
+                        <img src="/img/iconfinder_social_style_3_facebook_341099.svg"/> Login with <b>Facebook</b> account
+                    </a>
                 </div>
             }
         </div>
@@ -49,6 +52,8 @@
     private const string MICROSOFT_CLIENT_ID = "dcaaa2ba-a614-4b8c-b78e-1fb39cb8899a";
 
     private const string GOOGLE_CLIENT_ID = "2423499784-8btrctmdul3lrcjlg9uvaoa8clrtvc0f.apps.googleusercontent.com";
+
+    private const string FACEBOOK_CLIENT_ID = "324406818724681";
 
 #if DEBUG
     private const string GITHUB_CLIENT_ID = "3d53ca4335af4da637d1";
@@ -68,6 +73,8 @@
     private string GoogleLoginUri { get; set; }
 
     private string GitHubLoginUri { get; set; }
+
+    private string FacebookLoginUri { get; set; }
 
     protected override void OnInitialized()
     {
@@ -99,6 +106,10 @@
 
         callbackUri = Navigation.ToAbsoluteUri("/login/github-callback");
         GitHubLoginUri = $"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={callbackUri}&scope=user:email&state={queryString}";
+
+        callbackUri = Navigation.ToAbsoluteUri("/login/facebook-callback");
+        FacebookLoginUri = $"https://www.facebook.com/v8.0/dialog/oauth?client_id={FACEBOOK_CLIENT_ID}&redirect_uri={callbackUri}&response_type=token&scope=email&state={queryString}";
+
     }
 
     protected override async Task OnInitializedAsync()
@@ -118,6 +129,10 @@
 
             case "github-callback":
                 await LoginWithGitHubCallback(Navigation.Uri);
+                break;
+
+            case "facebook-callback":
+                await LoginWithFacebookCallback(Navigation.Uri);
                 break;
 
             default:
@@ -207,6 +222,39 @@
         {
             Logger.Error($"Login with github account failed, ex: {ex.Message}");
             Error = "Login with GitHub account failed, please try again later.";
+        }
+    }
+
+    private async Task LoginWithFacebookCallback(string callbackUri)
+    {
+        try
+        {
+            // Get jwt token from the uri.
+            var fragment = callbackUri.Substring(callbackUri.IndexOf('#') + 1);
+            var queries = HttpUtility.ParseQueryString(fragment);
+            var token = queries["access_token"];
+            if (token == null)
+            {
+                var error = queries["error_reason"];
+                if (error == null)
+                {
+                    throw new Exception($"Unexpected fackbook-callback, uri: {callbackUri}.");
+                }
+                else
+                {
+                    throw new Exception($"Get error from facebook login callbac: {error}");
+                }
+            }
+            else
+            {
+                await LocalUser.LoginAsync($"facebook:{token}");
+                PostLoginSuccess(Utils.Base64Decode(queries["state"]));
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Error($"Login with Facebook account failed, ex: {ex.Message}");
+            Error = "Login with Facebook account failed, please try again later.";
         }
     }
 
