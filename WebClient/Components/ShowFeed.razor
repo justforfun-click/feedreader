@@ -11,8 +11,11 @@
             <a class="description" href="@Uri" target="_blank" title="@Description"><span>@Description</span></a>
         </div>
         <div class="toolbar">
-            <div class="btn" @onclick="MarkAllReaded">Mark all as read</div>
-            <div class="btn" @onclick="Unsubscribe">Unsubscribe</div>
+            <DropdownButton Text="Mark all as read">
+                <MenuContent>
+                    <li @onclick="Unsubscribe">Unsubscribe</li>
+                </MenuContent>
+            </DropdownButton>
         </div>
     </div>
     <div class="feed-items">

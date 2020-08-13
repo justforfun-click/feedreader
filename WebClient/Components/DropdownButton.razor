@@ -1,0 +1,71 @@
+﻿@implements IDisposable
+@inject IJSRuntime JSRuntime
+
+<div class="dropdown-button">
+    <div class="text-and-icon">
+        <div class="text">@Text</div>
+        <div class="dropdown-icon" @onclick="ToggleDrop">
+            <!-- https://www.iconfinder.com/icons/296826/arrow_down_icon -->
+            <svg enable-background="new 0 0 100 100" id="Layer_1" version="1.1" viewBox="0 0 100 100" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><polygon fill="#010101" points="23.1,34.1 51.5,61.7 80,34.1 81.5,35 51.5,64.1 21.5,35 23.1,34.1 "/></svg>
+        </div>
+    </div>
+    <ul class="menu" style="display: @(IsDropped ? "block" : "none")">
+        @MenuContent
+    </ul>
+</div>
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public RenderFragment MenuContent { get; set; }
+
+    public bool IsDropped { get; set; }
+
+    private string Id { get; set; } = new Guid().ToString();
+
+    protected override void OnInitialized()
+    {
+        if (!_isDocumentHooked)
+        {
+            _ = JSRuntime.InvokeVoidAsync("eval", "document.addEventListener('click', () => DotNet.invokeMethod('FeedReader.WebClient', 'HidePopupMenus'))");
+            _ = JSRuntime.InvokeVoidAsync("eval", "window.addEventListener('resize', () => DotNet.invokeMethod('FeedReader.WebClient', 'HidePopupMenus'))");
+            _isDocumentHooked = true;
+        }
+        _onHide += Hide;
+    }
+
+    private void Hide()
+    {
+        IsDropped = false;
+        StateHasChanged();
+    }
+
+    private void ToggleDrop()
+    {
+        // This is a hack. Seems blazor has a bug, event propagation can't be stopped (@onclick:stopPropagation="true" doesn't work).
+        // So Hide() function will be invoked always. Here, we invoke Show() out of the call stack, so that it will be invoked later
+        // than Hide().
+        Task.Run(() =>
+        {
+            IsDropped = !IsDropped;
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        _onHide -= Hide;
+    }
+
+    private static event Action _onHide;
+
+    private static bool _isDocumentHooked;
+
+    [JSInvokable]
+    public static void HidePopupMenus()
+    {
+        _onHide?.Invoke();
+    }
+}
