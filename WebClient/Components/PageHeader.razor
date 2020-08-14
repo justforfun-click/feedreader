@@ -1,18 +1,111 @@
+@inject FeedService FeedService
 @inject LocalUser LocalUser
 @inject NavigationManager Navigation
 
 <div class="page-header">
-    <div class="title">
-        <a href="/">FeedReader</a>
-    </div>
-    <div class="action-bar">
-        @if (LocalUser.IsAuthorized)
-        {
-            <a class="btn" href="/logout">Logout</a>
-        }
-        else
-        {
-            <a class="btn" href="/login">Login</a>
-        }
-    </div>
+    @if (Feed == null)
+    {
+        <div class="feed-description">
+            <div class="icon">
+                <img src="/img/iconfinder_Flurry_Google_Reader_Alt_176646.png"/>
+            </div>
+            <div class="name-and-description">
+                <a class="name" href="/"><span>FeedReader</span></a>
+                <a class="description" href="/"><span>Read, Think, Share .... </span></a>
+            </div>
+            @if (LocalUser.IsAuthorized)
+            {
+                <div class="toolbar">
+                    <DropdownButton Text="Logout" OnClick="Logout"/>
+                </div>
+            }
+            else
+            {
+                <div class="toolbar">
+                    <DropdownButton Text="Login" OnClick="Login"/>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="feed-description">
+            <div class="icon">
+                <FallbackImage Src="@Feed.IconUri" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(Feed.Uri).Host}")"/>
+            </div>
+            <div class="name-and-description">
+                <a class="name" href="@WebsiteLink" title="@Name" target="_blank"><span>@Name</span></a>
+                <a class="description" href="@Uri" target="_blank" title="@Description"><span>@Description</span></a>
+            </div>
+            <div class="toolbar">
+                <DropdownButton Text="Mark all as read" OnClick="MarkAllReaded">
+                    <MenuContent>
+                        <li @onclick="Unsubscribe">Unsubscribe</li>
+                        <li @onclick="Logout">Logout</li>
+                    </MenuContent>
+                </DropdownButton>
+            </div>
+        </div>
+    }
 </div>
+
+@code
+{
+    [Parameter]
+    public Feed Feed { get; set; }
+
+    [Parameter]
+    public EventCallback<Feed> OnUnsubscribe { get; set; }
+
+    private string Name
+    {
+        get
+        {
+            return string.IsNullOrWhiteSpace(Feed.Name) ? Uri : Feed.Name;
+        }
+    }
+
+    private string WebsiteLink
+    {
+        get
+        {
+            return string.IsNullOrWhiteSpace(Feed.WebsiteLink) ? Name : Feed.WebsiteLink;
+        }
+    }
+
+    private string Uri
+    {
+        get
+        {
+            return string.IsNullOrWhiteSpace(Feed.OriginalUri) ? Feed.Uri : Feed.OriginalUri;
+        }
+    }
+
+    private string Description
+    {
+        get
+        {
+            return string.IsNullOrWhiteSpace(Feed.Description) ? Uri : Feed.Description;
+        }
+    }
+
+    private Task Unsubscribe()
+    {
+        return OnUnsubscribe.InvokeAsync(Feed);
+    }
+
+    private void MarkAllReaded()
+    {
+        FeedService.MarkFeedAllItemsAsReadedAsync(Feed);
+    }
+
+    private void Login()
+    {
+        Navigation.NavigateTo("/login");
+    }
+
+    private void Logout()
+    {
+        Navigation.NavigateTo("/logout");
+    }
+}

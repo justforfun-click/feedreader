@@ -1,17 +1,78 @@
 .page-header {
     display: flex;
-    height: 60px;
-    padding: 10px;
-    background-color: #232f3e;
-    color: white;
+    height: 70px;
+    padding: 15px;
+    background: white;
+    border-bottom: 1px solid #efefef;
+
+    .icon {
+        width: 40px;
+
+        img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+    }
+
 
     > .title {
         display: flex;
         align-items: center;
-        flex: 1;
+        width: 220px;
 
         a {
             font-size: 20px;
+        }
+    }
+
+    > .feed-description {
+        display: flex;
+        flex: 1;
+
+        > div {
+            height: 40px;
+        }
+
+
+
+        > .name-and-description {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            margin-left: 12px;
+
+            span {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 0;
+                flex: 1;
+            }
+
+            .name {
+                display: flex;
+                flex: 1;
+                font-size: 18px;
+                font-weight: 700;
+                color: black;
+                align-items: center;
+            }
+
+            .description {
+                display: flex;
+                flex: 1;
+                align-items: flex-end;
+                font-size: 14px;
+                color: #9f9f9f;
+                margin-top: -6px;
+            }
+        }
+
+        > .toolbar {
+            .dropdown-button {
+                height: 100%;
+            }
         }
     }
 }

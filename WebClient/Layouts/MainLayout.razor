@@ -2,7 +2,7 @@
 
 <div class="main-layout">
     <div class="header">
-        <PageHeader/>
+        @Header
     </div>
 
     <div class="body">
@@ -17,4 +17,7 @@
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment Header { get; set; } = @<PageHeader/>;
 }

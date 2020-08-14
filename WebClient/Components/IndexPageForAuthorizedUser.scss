@@ -4,123 +4,92 @@
     background-color: white;
 
     > .left-panel {
-        width: 220px;
+        width: 230px;
         border-right: 1px solid #efefef;
-        padding: 10px;
+        padding: 10px 15px;
         overflow: auto;
 
-        .section {
-            > .header {
+        > .feed-group-list {
+            .name {
                 display: flex;
-                height: 44px;
+                flex: 1px;
+                min-width: 0px;
 
-                .name {
-                    display: flex;
-                    align-items: center;
-                    color: #9f9f9f;
-                    text-transform: uppercase;
-                    font-size: 12px;
-                    flex: 1;
-                }
-
-                .toolbar {
-                    display: flex;
-                    align-items: center;
-
-                    .icon {
-                        justify-content: center;
-                        display: flex;
-                        align-items: center;
-                        width: 24px;
-                        height: 24px;
-
-                        &:hover {
-                            background-color: rgba(0, 0, 0, 0.05);
-                            cursor: pointer;
-                        }
-
-                        svg {
-                            width: 12px;
-                            height: 12px;
-                            fill: #9f9f9f;
-                        }
-                    }
+                span {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
                 }
             }
 
-            > .feed-group-list {
-                .name {
+            .group {
+                padding-top: 10px;
+                font-size: 14px;
+
+                .header {
                     display: flex;
-                    flex: 1px;
-                    min-width: 0px;
 
-                    span {
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    }
-                }
+                    .icon {
+                        width: 24px;
+                        height: 24px;
+                        justify-content: center;
 
-                .group {
-                    padding-bottom: 10px;
-                    font-size: 14px;
+                        svg {
+                            width: 16px;
+                            height: 16px;
 
-                    .header {
-                        display: flex;
-
-                        .icon {
-                            width: 24px;
-                            height: 24px;
-                            justify-content: center;
-
-                            svg {
-                                width: 16px;
-                                height: 16px;
+                            path {
                                 fill: #9f9f9f;
                             }
                         }
-
-                        .name {
-                            cursor: default;
-                        }
                     }
 
-                    .feed-list {
-                        padding-left: 20px;
-
-                        .feed {
-                            display: flex;
-                            padding-top: 10px;
-
-                            img {
-                                width: 16px;
-                                height: 16px;
-                                margin-right: 8px;
-                            }
-
-                            .name {
-                                cursor: pointer;
-                            }
-
-                            .unreaded-items-count {
-                                font-size: 12px;
-                                display: flex;
-                                align-items: center;
-                            }
-                        }
+                    .name {
+                        cursor: default;
                     }
                 }
 
-                .clickable {
-                    .name, .icon {
-                        cursor: pointer !important;
+                .feed-list {
+                    padding-left: 20px;
+
+                    .feed {
+                        display: flex;
+                        padding-top: 10px;
+
+                        img {
+                            width: 16px;
+                            height: 16px;
+                            margin-right: 8px;
+                        }
+
+                        .name {
+                            cursor: pointer;
+                        }
+
+                        .unreaded-items-count {
+                            font-size: 12px;
+                            display: flex;
+                            align-items: center;
+                        }
                     }
                 }
             }
 
-            .active {
-                .name {
-                    font-weight: 700;
+            .clickable {
+                .name, .icon {
+                    cursor: pointer !important;
+                }
+            }
+        }
+
+        .active {
+            .name {
+                font-weight: 700;
+            }
+
+            svg {
+                path {
+                    fill: #000 !important;
                 }
             }
         }
