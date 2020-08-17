@@ -129,7 +129,7 @@
             <div class="topic">
                 @if (string.IsNullOrWhiteSpace(feedItem.TopicPictureUri))
                 {
-                    <a class="title" href="@feedItem.PermentLink" target="_blank"><div class="summary">@feedItem.Summary</div></a>
+                    <a class="title" href="@feedItem.PermentLink" target="_blank"><div class="summary">@((MarkupString)feedItem.Summary)</div></a>
                 }
                 else
                 {
@@ -141,7 +141,7 @@
                 <div class="icon">
                     <FallbackImage Src="@feed.IconUri" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(feed.Uri).Host}")"/>
                 </div>
-                <a class="title" title="@feedItem.Title" href="@feedItem.PermentLink" target="_blank">@feedItem.Title</a>
+                <a class="title" title="@feedItem.Title" href="@feedItem.PermentLink" target="_blank">@((MarkupString)feedItem.Title)</a>
             </div>
 
             <div class="info-and-toolbar">

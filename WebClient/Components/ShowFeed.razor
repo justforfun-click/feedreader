@@ -2,24 +2,6 @@
 @inject IJSRuntime JsRuntime
 
 <div class="show-feed">
-    <!--
-    <div class="feed-description">
-        <div class="icon">
-            <FallbackImage Src="@Feed.IconUri" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(Feed.Uri).Host}")"/>
-        </div>
-        <div class="name-and-description">
-            <a class="name" href="@WebsiteLink" title="@Name" target="_blank"><span>@Name</span></a>
-            <a class="description" href="@Uri" target="_blank" title="@Description"><span>@Description</span></a>
-        </div>
-        <div class="toolbar">
-            <DropdownButton Text="Mark all as read" OnClick="MarkAllReaded">
-                <MenuContent>
-                    <li @onclick="Unsubscribe">Unsubscribe</li>
-                </MenuContent>
-            </DropdownButton>
-        </div>
-    </div>
-    -->
     <div class="feed-items">
         @if (!string.IsNullOrWhiteSpace(Feed.Error))
         {
