@@ -31,9 +31,6 @@
     [Parameter]
     public Feed Feed { get; set; }
 
-    [Parameter]
-    public EventCallback<Feed> OnUnsubscribe { get; set; }
-
     private string Name
     {
         get
@@ -66,15 +63,6 @@
         }
     }
 
-    private Task Unsubscribe()
-    {
-        return OnUnsubscribe.InvokeAsync(Feed);
-    }
-
-    private void MarkAllReaded()
-    {
-        FeedService.MarkFeedAllItemsAsReadedAsync(Feed);
-    }
 
     private Task More()
     {

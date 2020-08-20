@@ -94,18 +94,22 @@ namespace FeedReader.WebClient.Services
             return items;
         }
 
-        public async Task<List<Feed>> GetFeedsByCategory(FeedCategory feedCategory)
+        public async Task<List<FeedItem>> GetFeedItemsByCategory(FeedCategory feedCategory, string nextRowKey)
         {
-            var feeds = await GetAsync<List<Feed>>("feeds", new Dictionary<string, string>
+            var args = new Dictionary<string, string>
             {
                 { "category", feedCategory.ToString() }
-            });
-            foreach (var feed in feeds) {
-                foreach (var item in feed.Items) {
-                    item.PubDate = item.PubDate.AddMinutes(TimezoneOffset);
-                }
+            };
+            if (!string.IsNullOrWhiteSpace(nextRowKey))
+            {
+                args["next-row-key"] = nextRowKey;
             }
-            return feeds;
+
+            var feedItems = await GetAsync<List<FeedItem>>("v2/feeds", args);
+            foreach (var item in feedItems) {
+                item.PubDate = item.PubDate.AddMinutes(TimezoneOffset);
+            }
+            return feedItems;
         }
 
         private async Task<TResult> PostAsync<TResult>(string uri, object obj)

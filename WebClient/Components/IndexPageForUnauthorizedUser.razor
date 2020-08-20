@@ -8,9 +8,9 @@
 
 @code
 {
-    private void Subscribe(Feed feed)
+    private void Subscribe(string feedUri)
     {
-        var redirectUri = $"/?action=subscribe&feed-original-uri={(string.IsNullOrWhiteSpace(feed.OriginalUri) ? feed.Uri : feed.OriginalUri)}";
+        var redirectUri = $"/?action=subscribe&feed-original-uri={feedUri}";
         Navigation.NavigateTo($"login?redirect_uri={HttpUtility.UrlEncode(redirectUri)}");
     }
 }

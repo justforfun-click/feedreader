@@ -61,20 +61,58 @@
                 <div class="title">@Category</div>
             </div>
             <div class="feed-list">
-                @if (Feeds == null || Feeds.Count == 0)
+                @if (FeedItems == null || FeedItems.Count == 0)
                 {
                     <WaitingPage Text="Loading..."/>
                 }
                 else
                 {
-                    var tuples = new List<Tuple<Feed, FeedItem>>();
-                    foreach (var feed in Feeds)
+                    foreach (var feedItem in FeedItems)
                     {
-                        tuples.AddRange(feed.Items.Select(i => Tuple.Create(feed, i)));
+                        <div class="feed-item">
+                            <div class="topic">
+                                @if (string.IsNullOrWhiteSpace(feedItem.TopicPictureUri))
+                                {
+                                    <a class="title" href="@feedItem.PermentLink" target="_blank"><div class="summary">@((MarkupString)feedItem.Summary)</div></a>
+                                }
+                                else
+                                {
+                                    <a class="title" href="@feedItem.PermentLink" target="_blank"><img src="@feedItem.TopicPictureUri"/></a>
+                                }
+                            </div>
+
+                            <div class="icon-and-title">
+                                <div class="icon">
+                                    <FallbackImage Src="@feedItem.FeedIconUri" Title="@feedItem.FeedName" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(feedItem.FeedUri).Host}")"/>
+                                </div>
+                                <a class="title" title="@feedItem.Title" href="@feedItem.PermentLink" target="_blank">@((MarkupString)feedItem.Title)</a>
+                            </div>
+
+                            <div class="info-and-toolbar">
+                                @if (LocalUser.Feeds.Find(f => f.Uri == feedItem.FeedUri) != null)
+                                {
+                                    <div class="small-btn disabled">subscribed</div>
+                                }
+                                else
+                                {
+                                    <div class="small-btn" onclick="@((Action)(() => OnSubscribe.InvokeAsync(feedItem.FeedUri)))">subscribe</div>
+                                }
+                                <div class="info" title="@feedItem.FeedName @feedItem.PubDate"><span>@feedItem.FeedName @feedItem.PubDate</span></div>
+                                <div class="toolbar">
+                                    <div class="btn" title="open in google translate" @onclick="() => OpenInGoogleTranslate(feedItem)">
+                                        <!-- comes from https://www.iconfinder.com/icons/3669416/g_ic_translate_icon -->
+                                        <svg height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h48v48H0zm40 12H22.35L30 38l-4 4h14c1.1 0 2-.9 2-2V14c0-1.1-.9-2-2-2z" fill="none"/><path d="M40 10H21.76L20 4H8C5.8 4 4 5.8 4 8v26c0 2.2 1.8 4 4 4h14l2 6h16c2.2 0 4-1.8 4-4V14c0-2.2-1.8-4-4-4zM14.33 29.17c-4.51 0-8.17-3.67-8.17-8.17s3.67-8.17 8.17-8.17c2.08 0 3.97.74 5.47 2.13l.13.13-2.44 2.36-.12-.11c-.57-.54-1.56-1.17-3.04-1.17-2.62 0-4.75 2.17-4.75 4.84s2.13 4.84 4.75 4.84c2.74 0 3.93-1.75 4.25-2.92h-4.42v-3.1h7.9l.03.14c.08.42.11.79.11 1.21-.01 4.71-3.24 7.99-7.87 7.99zm12.07-3.4c.67 1.2 1.48 2.35 2.38 3.4l-1.07 1.06-1.31-4.46zm1.54-1.54h-1.98l-.61-2.08h7.99s-.68 2.63-3.12 5.47c-1.07-1.23-1.81-2.43-2.28-3.39zM42 40c0 1.1-.9 2-2 2H26l4-4-1.63-5.53 1.84-1.84L35.58 36l1.46-1.46-5.41-5.37c1.8-2.07 3.2-4.5 3.83-7.01H38v-2.08h-7.27V18h-2.08v2.08h-3.92L22.35 12H40c1.1 0 2 .9 2 2v26z"/></svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     }
-                    foreach (var tuple in tuples.OrderByDescending(t => t.Item2.PubDate))
+
+                    @if (!string.IsNullOrWhiteSpace(FeedItems.Last().NextRowKey))
                     {
-                        <div class="feed-item">@ShowFeedItem(tuple.Item1, tuple.Item2)</div>
+                        <div class="feed-item">
+                            <div class="more" @onclick="() => ShowCategory(Category, FeedItems.Last().NextRowKey)">Loading more ...</div>
+                        </div>
                     }
                 }
             </div>
@@ -85,13 +123,23 @@
 @code
 {
     [Parameter]
-    public EventCallback<Feed> OnSubscribe { get; set; }
+    public EventCallback<string> OnSubscribe { get; set; }
 
     private FeedCategory Category { get; set; } = FeedCategory.Recommended;
 
-    private List<Feed> Feeds { get; set; }
+    private List<FeedItem> FeedItems { get; set; }
 
     private CancellationTokenSource _cancelToken = new CancellationTokenSource();
+
+    private Dictionary<FeedCategory, List<FeedItem>> FeedItemsByCategory = new Dictionary<FeedCategory, List<FeedItem>>();
+
+    protected override void OnInitialized()
+    {
+        foreach (var category in Enum.GetValues(typeof(FeedCategory)))
+        {
+            FeedItemsByCategory.Add((FeedCategory)category, new List<FeedItem>());
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -101,67 +149,31 @@
         }
     }
 
-    private async Task ShowCategory(FeedCategory category)
+    private async Task ShowCategory(FeedCategory category, string nextRowKey = null)
     {
         Category = category;
         _cancelToken.Cancel();
         _cancelToken = new CancellationTokenSource();
         var token = _cancelToken;
         await JsRuntime.InvokeVoidAsync("eval", $"document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active')); document.querySelector('.nav-item-{category}').classList.add('active')");
+
+        var feedItems = await FeedService.GetFeedItemsByCategory(category, nextRowKey);
         if (token.IsCancellationRequested)
         {
             return;
         }
 
-        var feeds = await FeedService.GetFeedsByCategory(category);
-        if (token.IsCancellationRequested)
+        if (string.IsNullOrEmpty(nextRowKey))
         {
-            return;
+            FeedItemsByCategory[category] = feedItems;
         }
-        Feeds = feeds;
+        else
+        {
+            FeedItemsByCategory[category].AddRange(feedItems);
+        }
+
+        FeedItems = FeedItemsByCategory[category];
         StateHasChanged();
-    }
-
-    RenderFragment ShowFeedItem(Feed feed, FeedItem feedItem)
-    {
-        return
-        @<div class="feed-item-thumbnail">
-            <div class="topic">
-                @if (string.IsNullOrWhiteSpace(feedItem.TopicPictureUri))
-                {
-                    <a class="title" href="@feedItem.PermentLink" target="_blank"><div class="summary">@((MarkupString)feedItem.Summary)</div></a>
-                }
-                else
-                {
-                    <a class="title" href="@feedItem.PermentLink" target="_blank"><img src="@feedItem.TopicPictureUri"/></a>
-                }
-            </div>
-
-            <div class="icon-and-title">
-                <div class="icon">
-                    <FallbackImage Src="@feed.IconUri" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(feed.Uri).Host}")"/>
-                </div>
-                <a class="title" title="@feedItem.Title" href="@feedItem.PermentLink" target="_blank">@((MarkupString)feedItem.Title)</a>
-            </div>
-
-            <div class="info-and-toolbar">
-                @if (LocalUser.Feeds.Find(f => f.Uri == feed.Uri) != null)
-                {
-                    <div class="small-btn disabled">subscribed</div>
-                }
-                else
-                {
-                    <div class="small-btn" onclick="@((Action)(() => OnSubscribe.InvokeAsync(feed)))">subscribe</div>
-                }
-                <div class="info" title="@feed.Name @feedItem.PubDate"><span>@feed.Name @feedItem.PubDate</span></div>
-                <div class="toolbar">
-                    <div class="btn" title="open in google translate" @onclick="() => OpenInGoogleTranslate(feedItem)">
-                        <!-- comes from https://www.iconfinder.com/icons/3669416/g_ic_translate_icon -->
-                        <svg height="48" viewBox="0 0 48 48" width="48" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h48v48H0zm40 12H22.35L30 38l-4 4h14c1.1 0 2-.9 2-2V14c0-1.1-.9-2-2-2z" fill="none"/><path d="M40 10H21.76L20 4H8C5.8 4 4 5.8 4 8v26c0 2.2 1.8 4 4 4h14l2 6h16c2.2 0 4-1.8 4-4V14c0-2.2-1.8-4-4-4zM14.33 29.17c-4.51 0-8.17-3.67-8.17-8.17s3.67-8.17 8.17-8.17c2.08 0 3.97.74 5.47 2.13l.13.13-2.44 2.36-.12-.11c-.57-.54-1.56-1.17-3.04-1.17-2.62 0-4.75 2.17-4.75 4.84s2.13 4.84 4.75 4.84c2.74 0 3.93-1.75 4.25-2.92h-4.42v-3.1h7.9l.03.14c.08.42.11.79.11 1.21-.01 4.71-3.24 7.99-7.87 7.99zm12.07-3.4c.67 1.2 1.48 2.35 2.38 3.4l-1.07 1.06-1.31-4.46zm1.54-1.54h-1.98l-.61-2.08h7.99s-.68 2.63-3.12 5.47c-1.07-1.23-1.81-2.43-2.28-3.39zM42 40c0 1.1-.9 2-2 2H26l4-4-1.63-5.53 1.84-1.84L35.58 36l1.46-1.46-5.41-5.37c1.8-2.07 3.2-4.5 3.83-7.01H38v-2.08h-7.27V18h-2.08v2.08h-3.92L22.35 12H40c1.1 0 2 .9 2 2v26z"/></svg>
-                    </div>
-                </div>
-            </div>
-        </div>;
     }
 
     private void OpenInGoogleTranslate(FeedItem feedItem)

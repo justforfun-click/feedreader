@@ -6,7 +6,7 @@
 
 <MainLayout>
     <Header>
-        <PageHeader Feed="@Feed"/>
+        <PageHeader Feed="@Feed" OnUnsubscribe="Unsubscribe"/>
     </Header>
     <ChildContent>
         <div class="authorized-user-page">
@@ -145,19 +145,17 @@
         RightPanelContent = @<AddNewFeed OnCancel="Cancel" OnSave="(feed) => ShowFeed(feed, subscribe: true)"/>;
     }
 
-    private async Task SubscribeFeed(Feed feed)
+    private void SubscribeFeed(string feedUri)
     {
-        try
+        var feed = LocalUser.Feeds.FirstOrDefault(f => f.Uri == feedUri.Trim().ToLower());
+        if (feed == null)
         {
-            if (string.IsNullOrWhiteSpace(feed.Group))
-            {
-                feed.Group = "Default";
-            }
-            await LocalUser.SubscribeFeedAsync(feed);
+            feed = new Feed() { Group = "Default", Uri = feedUri.Trim().ToLower(), OriginalUri = feedUri.Trim() };
+            ShowFeed(feed, subscribe: true);
         }
-        catch
+        else
         {
-            feed.Error = "Subscribe failed. Please try it later.";
+            ShowFeed(feed);
         }
     }
 
@@ -170,11 +168,22 @@
         {
             feed.IsActive = true;
 
-            RightPanelContent = @<ShowFeed Feed=@feed OnUnsubscribe="Unsubscribe"/>;
+            RightPanelContent = @<ShowFeed Feed=@feed/>;
 
             if (subscribe)
             {
-                await SubscribeFeed(feed);
+                try
+                {
+                    if (string.IsNullOrWhiteSpace(feed.Group))
+                    {
+                        feed.Group = "Default";
+                    }
+                    await LocalUser.SubscribeFeedAsync(feed);
+                }
+                catch
+                {
+                    feed.Error = "Subscribe failed. Please try it later.";
+                }
             }
 
             // Refresh the feed.

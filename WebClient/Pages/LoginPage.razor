@@ -93,8 +93,6 @@
         if (queryStart > 0)
         {
             queryString = Navigation.Uri.Substring(queryStart + 1);
-            Console.WriteLine("query stirng: " + queryString);
-            Console.WriteLine("base64: " + Utils.Base64Encode(queryString));
         }
         queryString = Utils.Base64Encode(queryString);
 
@@ -260,9 +258,7 @@
 
     private void PostLoginSuccess(string queryString)
     {
-        Console.WriteLine("Receive queryString " + queryString);
         var queries = HttpUtility.ParseQueryString(queryString);
-        Console.WriteLine("state- " + queries["redirect_uri"]);
         Navigation.NavigateTo(string.IsNullOrWhiteSpace(queries?["redirect_uri"]) ? "/" : queries["redirect_uri"]);
     }
 }

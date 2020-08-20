@@ -1,6 +1,6 @@
 ﻿@inject IJSRuntime JsRuntime
 
-<img id="img-@GetHashCode()" src="@(string.IsNullOrWhiteSpace(Src) ? FallbackSrc : Src)" @onerror="OnError" />
+<img id="img-@GetHashCode()" src="@(string.IsNullOrWhiteSpace(Src) ? FallbackSrc : Src)" title="@Title" @onerror="OnError" />
 
 @code
 {
@@ -9,6 +9,9 @@
 
     [Parameter]
     public string FallbackSrc { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
 
     private void OnError()
     {

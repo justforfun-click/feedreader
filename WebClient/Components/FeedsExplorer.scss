@@ -61,7 +61,7 @@
                 display: flex;
                 flex-wrap: wrap;
 
-                .feed-item-thumbnail {
+                .feed-item {
                     display: flex;
                     flex-direction: column;
                     width: 280px;
@@ -159,6 +159,16 @@
                                 }
                             }
                         }
+                    }
+
+                    .more {
+                        display: flex;
+                        cursor: pointer;
+                        align-items: center;
+                        justify-content: center;
+                        height: 100%;
+                        width: 100%;
+                        font-weight: 700;
                     }
                 }
             }

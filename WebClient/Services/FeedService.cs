@@ -56,9 +56,9 @@ namespace FeedReader.WebClient.Services
             }
         }
 
-        public Task<List<Feed>> GetFeedsByCategory(FeedCategory feedCategory)
+        public Task<List<FeedItem>> GetFeedItemsByCategory(FeedCategory feedCategory, string nextRowKey)
         {
-            return _api.GetFeedsByCategory(feedCategory);
+            return _api.GetFeedItemsByCategory(feedCategory, nextRowKey);
         }
     }
 }
