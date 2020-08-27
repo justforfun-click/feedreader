@@ -165,7 +165,7 @@ namespace FeedReader.WebClient.Models
             try
             {
                 feedItem.IsStared = false;
-                await _api.UnstarFeedItemAsync(feedItem.PermentLink);
+                await _api.UnstarFeedItemAsync(feedItem.PermentLink, feedItem.PubDate);
             }
             catch (Exception ex)
             {
@@ -174,9 +174,11 @@ namespace FeedReader.WebClient.Models
             }
         }
 
-        public Task<List<FeedItem>> GetStaredFeedItems()
+        public async Task<List<FeedItem>> GetStaredFeedItems()
         {
-            return _api.GetStaredFeedItems();
+            var items = await _api.GetStaredFeedItems();
+            items.ForEach(i => i.IsStared = true);
+            return items;
         }
     }
 }

@@ -59,6 +59,12 @@ namespace FeedReader.WebClient.Services
             var feed = await GetAsync<Feed>("feed/refresh", args);
             foreach (var feedItem in feed.Items) {
                 feedItem.PubDate = feedItem.PubDate.AddMinutes(TimezoneOffset);
+                if (string.IsNullOrWhiteSpace(feedItem.FeedUri))
+                {
+                    feedItem.FeedUri = feed.Uri;
+                    feedItem.FeedIconUri = feed.IconUri;
+                    feedItem.FeedName = feed.Name;
+                }
             }
             return feed;
         }
@@ -77,11 +83,12 @@ namespace FeedReader.WebClient.Services
             await PostAsync("star", feedItem);
         }
 
-        public async Task UnstarFeedItemAsync(string feedItemUri)
+        public async Task UnstarFeedItemAsync(string feedItemUri, DateTime pubDate)
         {
             await GetAsync("unstar", new Dictionary<string, string>
             {
-                { "feed-item-uri", feedItemUri }
+                { "feed-item-uri", feedItemUri },
+                { "feed-item-pub-date", pubDate.AddMinutes(-TimezoneOffset).ToString("O") }
             });
         }
 
