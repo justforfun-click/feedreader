@@ -10,22 +10,29 @@ and azure functions.
 
 - Client is built with blazor web assembly. It's a single page application (SPA) which can be loaded by the
   browser and exected inside the browser.
-- Most of the logics are in client side. Server is very thin. It just saves the users' feeds so that users
-  can read their feeds on another machine.
 - Server cost should be the lower the better. If possible, avoid any "pay by hours" service, only select
   "pay as you go" service.
-- Support third-pary account login. E.g, Microsoft account, Google account, Facebook account. Don't handle
+- Support third-pary account login. E.g, Microsoft account, GitHub account, Google account, Facebook account. Don't handle
   user registration. It's annoying to user to register a new account again and again.
 - Support RSS, ATOM, Json Feed standard.
 - Free! Free! Free!
 - Maybe more ... 
 
+## Screen Shots
+
+Website: https://www.feedreader.org
+
+![](screenshots/screen-shot-1.png)
+![](screenshots/screen-shot-2.png)
+![](screenshots/screen-shot-3.png)
+![](screenshots/screen-shot-4.png)
+
 ## Get Started
 
-1. Install [VS 2019 Preview](https://visualstudio.microsoft.com/vs/preview/). Community version is good enough.
+1. Install [VS 2019](https://visualstudio.microsoft.com/vs/). Community version is good enough.
    Install `ASP.NET and web development` workload. Make sure `Cloud tools for web development` is also selected.
 
-1. Install [DotNet SDK 5.0 Preview 7](https://dotnet.microsoft.com/download/dotnet/5.0).
+1. Install [DotNet SDK 5.0 Preview 8](https://dotnet.microsoft.com/download/dotnet/5.0).
 
 1. Use the following command to clone the source code:
 
