@@ -6,11 +6,11 @@
 
 <MainLayout>
     <Header>
-        <PageHeader Feed="@Feed" OnUnsubscribe="Unsubscribe"/>
+        <PageHeader Feed="@Feed" SideBarBtnPressed="@LeftPanelShow" OnUnsubscribe="Unsubscribe" OnSideBarBtnClick="ToggleSideBar"/>
     </Header>
     <ChildContent>
         <div class="authorized-user-page">
-            <div class="left-panel">
+            <div class="left-panel" style="@(LeftPanelShow ? "display: block;" : "display: none;")">
                 <div class="feed-group-list">
                     <div class="group group-add-new clickable">
                         <div class="header" @onclick="AddNewFeed">
@@ -89,6 +89,8 @@
 
 @code
 {
+    private bool LeftPanelShow { get; set; } = true;
+
     private Feed Feed { get; set; }
 
     private RenderFragment RightPanelContent { get; set; }
@@ -229,6 +231,11 @@
     private void OnRefreshRequested()
     {
         StateHasChanged();
+    }
+
+    private void ToggleSideBar()
+    {
+        LeftPanelShow = !LeftPanelShow;
     }
 
     private async Task ShowActive(string itemName)
