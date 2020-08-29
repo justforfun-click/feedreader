@@ -74,7 +74,7 @@ namespace FeedReader.WebClient.Services
             await GetAsync("feed/mark_as_readed", new Dictionary<string, string>
             {
                 { "feed-uri", feedUri },
-                { "last-readed-time", lastReadedTime.AddMinutes(-TimezoneOffset).ToString() }
+                { "last-readed-time", lastReadedTime.AddMinutes(-TimezoneOffset).ToString("O") }
             });
         }
 
