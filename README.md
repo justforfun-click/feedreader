@@ -1,7 +1,7 @@
 FeedReader
 ==
 
-[![Build Status](https://dev.azure.com/feedreader/feedreader/_apis/build/status/feedreaderorg.feedreader?branchName=master)](https://dev.azure.com/feedreader/feedreader/_build/latest?definitionId=1&branchName=master)
+[![Build Status](https://dev.azure.com/protolabdev/feedreader/_apis/build/status/protolabdev.feedreader?branchName=master)](https://dev.azure.com/protolabdev/feedreader/_build/latest?definitionId=1&branchName=master)
 
 This is a learning project. The target goal is building an online web feed reader with blazor web assembly
 and azure functions.
@@ -20,7 +20,7 @@ and azure functions.
 
 ## Screen Shots
 
-Website: https://www.feedreader.org
+Website: https://feedreader.protolab.dev
 
 ![](screenshots/screen-shot-1.png)
 ![](screenshots/screen-shot-2.png)
@@ -36,7 +36,7 @@ Website: https://www.feedreader.org
 
 1. Use the following command to clone the source code:
 
-        git clone --recursive https://github.com/feedreaderorg/feedreader.git
+        git clone --recursive https://github.com/protolabdev/feedreader.git
 
 1. Start `Microsfot Azure Storage Emulator` from start menu. Or you can run the following command directly:
 
