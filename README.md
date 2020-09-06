@@ -20,7 +20,7 @@ and azure functions.
 
 ## Screen Shots
 
-Website: https://feedreader.protolab.dev
+Website: https://www.feedreader.org
 
 ![](screenshots/screen-shot-1.png)
 ![](screenshots/screen-shot-2.png)
