@@ -6,7 +6,7 @@
 
 <MainLayout>
     <Header>
-        <PageHeader Feed="@Feed" SideBarBtnPressed="@LeftPanelShow" OnUnsubscribe="Unsubscribe" OnSideBarBtnClick="ToggleSideBar"/>
+        <PageHeader Feed="@Feed" SideBarBtnPressed="@LeftPanelShow" OnUnsubscribe="Unsubscribe" OnSideBarBtnClick="ToggleSideBar" OnChangeFeedGroup="ChangeFeedGroup"/>
     </Header>
     <ChildContent>
         <div class="authorized-user-page">
@@ -247,5 +247,11 @@
             Feed = null;
             await JsRuntime.InvokeVoidAsync("eval", $"document.querySelector('.{itemName}').classList.add('active');");
         }
+    }
+
+    private async void ChangeFeedGroup(string newGroup)
+    {
+        await LocalUser.ChangeFeedGroup(Feed, newGroup);
+        StateHasChanged();
     }
 }

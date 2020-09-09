@@ -146,6 +146,23 @@ namespace FeedReader.WebClient.Models
             }
         }
 
+        public async Task ChangeFeedGroup(Feed feed, string newGroup)
+        {
+            var oldGroup = feed.Group;
+            feed.Group = newGroup;
+            try
+            {
+                await _api.UpdateFeed(feed);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error($"Update feed failed, ex: {ex.Message}");
+
+                // Restore the feed group.
+                feed.Group = oldGroup;
+            }
+        }
+
         public async Task StarFeedItemAsync(FeedItem feedItem)
         {
             try

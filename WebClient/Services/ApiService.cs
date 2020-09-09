@@ -49,6 +49,16 @@ namespace FeedReader.WebClient.Services
             });
         }
 
+        public Task UpdateFeed(Feed feed)
+        {
+            return PostAsync("feed/update", new Share.DataContracts.Feed()
+            {
+                Uri = feed.Uri,
+                Name = feed.Name,
+                Group = feed.Group,
+            });
+        }
+
         public async Task<Feed> RefreshFeed(string feedUri, string nextRowKey)
         {
             var args = new Dictionary<string, string> { { "feed-uri", feedUri } };

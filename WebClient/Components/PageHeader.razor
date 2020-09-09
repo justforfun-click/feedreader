@@ -1,4 +1,5 @@
 @inject FeedService FeedService
+@inject IJSRuntime JsRuntime
 @inject LocalUser LocalUser
 @inject NavigationManager Navigation
 
@@ -49,6 +50,7 @@
                 <DropdownButton Text="Mark all as read" OnClick="MarkAllReaded">
                     <MenuContent>
                         <li @onclick="Unsubscribe">Unsubscribe</li>
+                        <li @onclick="ChangeGroup">Change Group</li>
                         <li @onclick="Logout">Logout</li>
                     </MenuContent>
                 </DropdownButton>
@@ -67,6 +69,9 @@
 
     [Parameter]
     public EventCallback<Feed> OnUnsubscribe { get; set; }
+
+    [Parameter]
+    public Action<string> OnChangeFeedGroup { get; set; }
 
     [Parameter]
     public Action OnSideBarBtnClick { get; set; }
@@ -121,5 +126,14 @@
     private void Logout()
     {
         Navigation.NavigateTo("/logout");
+    }
+
+    private async Task ChangeGroup()
+    {
+        var newGroup = await JsRuntime.InvokeAsync<string>("prompt", "Please input the new group name", Feed.Group);
+        if (!string.IsNullOrWhiteSpace(newGroup))
+        {
+            OnChangeFeedGroup(newGroup);
+        }
     }
 }
