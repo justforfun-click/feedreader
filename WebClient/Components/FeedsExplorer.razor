@@ -2,7 +2,6 @@
 @inject FeedService FeedService
 @inject LocalUser LocalUser
 @inject NavigationManager Navigation
-@using FeedCategory = Share.DataContracts.FeedCategory
 
 <div class="feeds-explorer">
     <div class="nav">
@@ -58,7 +57,10 @@
     <div class="content">
         <div class="feed-list-in-category">
             <div class="category">
-                <div class="title">@Category</div>
+                @if (Feed == null)
+                {
+                    <div class="title">@Category</div>
+                }
             </div>
             <div class="feed-list">
                 @if (FeedItems == null || FeedItems.Count == 0)
@@ -108,7 +110,13 @@
                         </div>
                     }
 
-                    @if (!string.IsNullOrWhiteSpace(FeedItems.Last().NextRowKey))
+                    if (!string.IsNullOrWhiteSpace(Feed?.NextRowKey))
+                    {
+                        <div class="feed-item">
+                            <div class="more" @onclick="More">Loading more ...</div>
+                        </div>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(FeedItems.Last().NextRowKey))
                     {
                         <div class="feed-item">
                             <div class="more" @onclick="() => ShowCategory(Category, FeedItems.Last().NextRowKey)">Loading more ...</div>
@@ -123,7 +131,13 @@
 @code
 {
     [Parameter]
+    public Feed Feed { get; set; }
+
+    [Parameter]
     public EventCallback<string> OnSubscribe { get; set; }
+
+    [Parameter]
+    public EventCallback<FeedCategory> OnShowCategory { get; set; }
 
     private FeedCategory Category { get; set; } = FeedCategory.Recommended;
 
@@ -141,16 +155,35 @@
         }
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        if (Feed != null)
+        {
+            await FeedService.RefreshFeedAsync(Feed);
+            FeedItems = Feed.Items;
+        }
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && Feed == null)
         {
             await ShowCategory(Category);
         }
     }
 
+    private Task More()
+    {
+        return FeedService.RefreshFeedAsync(Feed, true);
+    }
+
     private async Task ShowCategory(FeedCategory category, string nextRowKey = null)
     {
+        if (OnShowCategory.HasDelegate)
+        {
+            _ = OnShowCategory.InvokeAsync(category);
+        }
+
         Category = category;
         _cancelToken.Cancel();
         _cancelToken = new CancellationTokenSource();
