@@ -149,18 +149,14 @@
 
     protected override void OnInitialized()
     {
+        if (Feed != null)
+        {
+            FeedItems = Feed.Items;
+        }
+
         foreach (var category in Enum.GetValues(typeof(FeedCategory)))
         {
             FeedItemsByCategory.Add((FeedCategory)category, new List<FeedItem>());
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (Feed != null)
-        {
-            await FeedService.RefreshFeedAsync(Feed);
-            FeedItems = Feed.Items;
         }
     }
 

@@ -47,13 +47,20 @@
                 <a class="description" href="@Uri" target="_blank" title="@Description"><span>@Description</span></a>
             </div>
             <div class="toolbar">
-                <DropdownButton Text="Mark all as read" OnClick="MarkAllReaded">
-                    <MenuContent>
-                        <li @onclick="Unsubscribe">Unsubscribe</li>
-                        <li @onclick="ChangeGroup">Change Group</li>
-                        <li @onclick="Logout">Logout</li>
-                    </MenuContent>
-                </DropdownButton>
+                @if (LocalUser.IsAuthorized)
+                {
+                    <DropdownButton Text="Mark all as read" OnClick="MarkAllReaded">
+                        <MenuContent>
+                            <li @onclick="Unsubscribe">Unsubscribe</li>
+                            <li @onclick="ChangeGroup">Change Group</li>
+                            <li @onclick="Logout">Logout</li>
+                        </MenuContent>
+                    </DropdownButton>
+                }
+                else
+                {
+                    <DropdownButton Text="Login" OnClick="Login"/>
+                }
             </div>
         </div>
     }

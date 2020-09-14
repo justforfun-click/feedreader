@@ -1,3 +1,4 @@
+@inject FeedService FeedService
 @inject NavigationManager Navigation
 
 <MainLayout>
@@ -29,6 +30,14 @@
                     Uri = feed.Trim().ToLower()
                 };
             }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Feed != null)
+        {
+            await FeedService.RefreshFeedAsync(Feed);
         }
     }
 
