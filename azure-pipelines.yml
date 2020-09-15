@@ -27,7 +27,7 @@ steps:
     command: restore
     includeNuGetOrg: true
 
-- script: dotnet publish -c Release --no-restore
+- script: dotnet publish -c Debug --no-restore
   displayName: Build
 
 - task: PublishBuildArtifacts@1
@@ -35,5 +35,5 @@ steps:
   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   inputs:
     artifactName: 'FeedReader.WebClient'
-    pathToPublish: 'WebClient/bin/Release/net5.0/browser-wasm/publish/wwwroot'
+    pathToPublish: 'WebClient/bin/Debug/net5.0/publish/wwwroot'
   
