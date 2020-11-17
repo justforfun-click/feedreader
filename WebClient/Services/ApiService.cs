@@ -13,11 +13,11 @@ namespace FeedReader.WebClient.Services
 {
     public class ApiService
     {
-        private HttpClient _http = new HttpClient() { BaseAddress = new Uri("https://feedreaderapi.azurewebsites.net/v1/") };
+        private HttpClient _http;
         public HttpClient HttpClient
         {
-            get; // => _http;
-            set; // => _http = value;
+            get => _http;
+            set => _http = value;
         }
 
         public int TimezoneOffset { get; set; }

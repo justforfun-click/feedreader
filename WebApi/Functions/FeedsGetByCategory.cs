@@ -42,7 +42,6 @@ namespace FeedReader.WebApi.Functions
         {
             return HttpFilter.RunAsync(req, async () =>
             {
-                throw new ExternalErrorExcepiton("ENV_KEY_AZURE_STORAGE: " + Environment.GetEnvironmentVariable(Consts.ENV_KEY_AZURE_STORAGE));
                 FeedCategory category;
                 if (!Enum.TryParse<FeedCategory>(req.Query["category"], out category))
                 {
