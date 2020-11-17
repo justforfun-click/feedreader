@@ -12,7 +12,7 @@
 </ItemGroup>
 
 <ItemGroup>
-  <ProjectReference Include="..\Server\Share\FeedReader.Share.csproj" />
+  <ProjectReference Include="..\Share\FeedReader.Share.csproj" />
 </ItemGroup>
 
 <Target Name="CopyContent" AfterTargets="Build">

@@ -1,6 +1,7 @@
 *.css
 *.user
 *-generated-*
+local.settings.json
 
 .vs/
 .vscode/

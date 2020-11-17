@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace FeedReader.WebClient
@@ -23,7 +24,16 @@ namespace FeedReader.WebClient
             builder.Services.AddAuthorizationCore();
 
             var host = builder.Build();
-            host.Services.GetRequiredService<ApiService>().TimezoneOffset = await host.Services.GetRequiredService<IJSRuntime>().InvokeAsync<int>("eval", "-new Date().getTimezoneOffset()");
+            var apiService = host.Services.GetRequiredService<ApiService>();
+            var uriBuilder = new UriBuilder(builder.HostEnvironment.BaseAddress);
+            if (uriBuilder.Uri.Host == "localhost")
+            {
+                uriBuilder.Scheme = "http";
+                uriBuilder.Port = 7071;
+            }
+            uriBuilder.Path += "api/";
+            apiService.HttpClient = new HttpClient() { BaseAddress = uriBuilder.Uri };
+            apiService.TimezoneOffset = await host.Services.GetRequiredService<IJSRuntime>().InvokeAsync<int>("eval", "-new Date().getTimezoneOffset()");
             var localUser = host.Services.GetRequiredService<LocalUser>();
             await localUser.InitializeAsync();
             await host.RunAsync();
