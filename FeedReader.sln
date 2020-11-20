@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.WebClient", "WebClient\FeedReader.WebClient.csproj", "{1A860895-2AC5-4C07-A3B4-E6B3BEEA140F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.Share", "Server\Share\FeedReader.Share.csproj", "{99E14E15-4398-425A-A885-B5F2D10046EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.Share", "Share\FeedReader.Share.csproj", "{99E14E15-4398-425A-A885-B5F2D10046EC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

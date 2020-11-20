@@ -32,7 +32,7 @@ Website: https://www.feedreader.org
 1. Install [VS 2019](https://visualstudio.microsoft.com/vs/). Community version is good enough.
    Install `ASP.NET and web development` workload. Make sure `Cloud tools for web development` is also selected.
 
-1. Install [DotNet SDK 5.0 Preview 8](https://dotnet.microsoft.com/download/dotnet/5.0).
+1. Install [DotNet 5.0](https://dotnet.microsoft.com/download/dotnet/5.0).
 
 1. Use the following command to clone the source code:
 
@@ -42,9 +42,7 @@ Website: https://www.feedreader.org
 
         C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator>AzureStorageEmulator.exe start
 
-1. Go to `feedreader/Server`, copy `local.settings.example.json` to `local.settings.json`.
+1. Go to `WebApi`, run `func start`.
 
-1. Go to `feedreader/Server`, launch `FeedReader.Server.sln`, run `FeedReader.WebApi` project.
-
-1. Go to `feedreader`, launch `FeedReader.sln`, run `FeedReader.WebClient` project. It should launch your
+1. Launch `FeedReader.sln`, run `FeedReader.WebClient` project. It should launch your
    browser and navigate to `https://localhost`.
