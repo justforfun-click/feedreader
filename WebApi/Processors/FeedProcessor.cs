@@ -8,9 +8,11 @@ using Microsoft.Azure.Cosmos.Table;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -180,33 +182,50 @@ namespace FeedReader.WebApi.Processors
             await SaveFeedAsync(await RefreshFeedAsync(feedOriginalUri), feedTable, feedItemTable);
         }
 
-        public async Task SubscribeFeedAsync(string feedOriginalUri, string customName, string customGroup, string userUuid, CloudTable usersFeedsTable, CloudTable feedTable)
+        public async Task<Feed> SubscribeFeedAsync(string feedOriginalUri, string customName, string customGroup, string userUuid, CloudTable usersFeedsTable, CloudTable feedTable)
         {
-            var feedUri = feedOriginalUri.Trim().ToLower();
-            var feedUriHash = Utils.Sha256(feedUri);
-
-            // Do we have this feed already?
             Feed feed = null;
-            var res = await feedTable.ExecuteAsync(TableOperation.Retrieve<FeedInfoEntity>(partitionKey: "feed_info", rowkey: feedUriHash));
-            if (res == null || res.Result == null)
+            string feedUriHash = null;
+            for (var i = 0; i < 10; ++i)
             {
-                // Get information of this feed.
-                feed = await RefreshFeedAsync(feedOriginalUri, noItems: true);
+                var feedUri = feedOriginalUri.Trim().ToLower();
+                feedUriHash = Utils.Sha256(feedUri);
 
-                // Save to feed table.
-                try
+                // Do we have this feed already?
+                var res = await feedTable.ExecuteAsync(TableOperation.Retrieve<FeedInfoEntity>(partitionKey: "feed_info", rowkey: feedUriHash));
+                if (res == null || res.Result == null)
                 {
-                    await feedTable.ExecuteAsync(TableOperation.Insert(new FeedInfoEntity(partitionKey: "feed_info", rowKey: feedUriHash, feed)));
+                    // Get information of this feed.
+                    feed = await RefreshFeedAsync(feedOriginalUri, noItems: true);
+                    if (feed.Error != null)
+                    {
+                        // This uri may not be the feed uri. It maybe the webpage, let's try to find out the potential feed uri in this webpage.
+                        feedOriginalUri = await DiscoverFeedUriAsync(feedOriginalUri);
+                        if (string.IsNullOrWhiteSpace(feedOriginalUri))
+                        {
+                            break;
+                        }
+                        continue;
+                    }
+
+                    // Save to feed table.
+                    try
+                    {
+                        await feedTable.ExecuteAsync(TableOperation.Insert(new FeedInfoEntity(partitionKey: "feed_info", rowKey: feedUriHash, feed)));
+                    }
+                    catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
+                    {
+                        // Save to ignore.
+                    }
                 }
-                catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
+                else
                 {
-                    // Save to ignore.
+                    feed = ((FeedInfoEntity)res.Result).CopyTo(new Feed());
                 }
             }
-            else
-            {
-                feed = ((FeedInfoEntity)res.Result).CopyTo(new Feed());
-            }
+
+            Debug.Assert(feed != null);
+            Debug.Assert(feedUriHash != null);
 
             // Use user customized name.
             if (!string.IsNullOrWhiteSpace(customName))
@@ -219,6 +238,9 @@ namespace FeedReader.WebApi.Processors
 
             // Save to usersfeeds table.
             await usersFeedsTable.ExecuteAsync(TableOperation.InsertOrReplace(new UserFeedEntity(partitionKey: userUuid, rowKey: feedUriHash, feed)));
+
+            // Return
+            return feed;
         }
 
         public async Task UnsubscribeFeedAsync(string feedUri, string userUuid, CloudTable usersFeedsTable)
@@ -407,5 +429,38 @@ namespace FeedReader.WebApi.Processors
                 }
             }
         }
+
+        private async Task<string> DiscoverFeedUriAsync(string uri)
+        {
+            try
+            {
+                var content = await _httpClient.GetStringAsync(uri);
+                foreach (var regex in HtmlFeedRegexes)
+                {
+                    var match = regex.Match(content);
+                    if (match.Success)
+                    {
+                        return match.Groups[1].Value;
+                    }
+                }
+                return null;
+            }
+            catch
+            {
+                // Ignore all erros.
+                return null;
+            }
+        }
+
+        private static Regex[] HtmlFeedRegexes;
+        
+        static FeedProcessor()
+        {
+            HtmlFeedRegexes = new Regex[]
+            {
+                new Regex("<link [^>]*type\\s*=\\s*['\"]application\\/rss\\+xml['\"][^>]*href\\s*=\\s*['\"]([^'\"]*)['\"]", RegexOptions.IgnoreCase | RegexOptions.Compiled),
+                new Regex("<link [^>]*href\\s*=\\s*['\"]([^'\"]*)['\"][^>]*type\\s*=\\s*['\"]application\\/rss\\+xml['\"]", RegexOptions.IgnoreCase | RegexOptions.Compiled)
+            };
+        } 
     }
 }

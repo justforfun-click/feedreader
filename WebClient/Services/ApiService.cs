@@ -32,9 +32,9 @@ namespace FeedReader.WebClient.Services
             return user;
         }
 
-        public Task SubscribeFeed(Feed feed)
+        public Task<Feed> SubscribeFeed(Feed feed)
         {
-            return PostAsync("feed/subscribe", new Share.DataContracts.Feed()
+            return PostAsync<Feed>("feed/subscribe", new Share.DataContracts.Feed()
             {
                 Name = feed.Name,
                 Group = feed.Group,

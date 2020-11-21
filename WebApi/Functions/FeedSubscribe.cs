@@ -39,8 +39,7 @@ namespace FeedReader.WebApi.Functions
 
                 var usersFeedsTable = AzureStorage.GetUsersFeedsTable();
                 var feedTable = Backend.Share.AzureStorage.GetFeedsTable();
-                await new FeedProcessor().SubscribeFeedAsync(feed.OriginalUri, feed.Name, feed.Group, user.Uuid, usersFeedsTable, feedTable);
-                return new OkResult();
+                return new ObjectResult(await new FeedProcessor().SubscribeFeedAsync(feed.OriginalUri, feed.Name, feed.Group, user.Uuid, usersFeedsTable, feedTable));
             });
         }
     }

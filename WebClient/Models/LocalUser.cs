@@ -111,7 +111,9 @@ namespace FeedReader.WebClient.Models
             try
             {
                 Feeds.Add(feed);
-                await _api.SubscribeFeed(feed);
+                var updatedFeed = await _api.SubscribeFeed(feed);
+                feed.Uri = updatedFeed.Uri;
+                feed.OriginalUri = updatedFeed.OriginalUri;
             }
             catch (Exception ex)
             {
