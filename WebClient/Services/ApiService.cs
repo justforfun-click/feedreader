@@ -123,7 +123,7 @@ namespace FeedReader.WebClient.Services
                 args["next-row-key"] = nextRowKey;
             }
 
-            var feedItems = await GetAsync<List<FeedItem>>("v2/feeds", args);
+            var feedItems = await GetAsync<List<FeedItem>>("feeds", args);
             foreach (var item in feedItems) {
                 item.PubDate = item.PubDate.AddMinutes(TimezoneOffset);
             }

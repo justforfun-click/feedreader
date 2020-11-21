@@ -9,7 +9,8 @@ namespace FeedReader.Share.DataContracts
         Technology,
         Business,
         Sports,
-        Art
+        Art,
+        Kids
     }
 
     public class Feed

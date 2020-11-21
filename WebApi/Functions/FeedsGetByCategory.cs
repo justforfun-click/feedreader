@@ -27,27 +27,6 @@ namespace FeedReader.WebApi.Functions
                     throw new ExternalErrorExcepiton("'category' is missing.");
                 }
 
-                return new OkObjectResult(await new FeedProcessor().GetFeedsByCategory(
-                    category,
-                    feedTable: Backend.Share.AzureStorage.GetFeedsTable(),
-                    feedItemTable: Backend.Share.AzureStorage.GetFeedItemsTable()
-                ));
-            });
-        }
-
-        [FunctionName("FeedsGetByCategoryV2")]
-        public static Task<IActionResult> RunV2(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "v2/feeds")] HttpRequest req,
-            ILogger log)
-        {
-            return HttpFilter.RunAsync(req, async () =>
-            {
-                FeedCategory category;
-                if (!Enum.TryParse<FeedCategory>(req.Query["category"], out category))
-                {
-                    throw new ExternalErrorExcepiton("'category' is missing.");
-                }
-
                 return new OkObjectResult(await new FeedProcessor().GetFeedItemsByCategory(category, req.Query["next-row-key"], Backend.Share.AzureStorage.GetLatestFeedItemsTable()));
             });
         }
