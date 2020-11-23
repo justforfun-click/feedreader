@@ -38,9 +38,10 @@ var data = await request(`${options.apiBase}/@admin/get-feed-uri-list`, {
 });
 
 var feedURIs = JSON.parse(data);
+var failedCount = 0;
+console.log(`Refresh start, ${feedURIs.length} feeds need be refreshed.`);
 for (var i in feedURIs) {
     var feedUri = feedURIs[i];
-    console.log(`Refresh: ${feedUri}`);
     try {
         await request(`${options.apiBase}/@admin/update-feed`, {
             headers: {
@@ -51,7 +52,9 @@ for (var i in feedURIs) {
             }
         });
     } catch (e) {
-        console.log(`failed: ${e}`);
+        ++failedCount;
+        console.log(`Refresh ${feedUri} failed: ${e}`);
     }
 }
+console.log(`Refresh finished, ${failedCount} feeds are failed to refresh.`);
 })();
