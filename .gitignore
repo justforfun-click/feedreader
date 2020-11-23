@@ -7,3 +7,4 @@ local.settings.json
 .vscode/
 obj/
 bin/
+node_modules/

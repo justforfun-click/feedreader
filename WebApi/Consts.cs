@@ -32,6 +32,8 @@ namespace FeedReader.WebApi
 
         public const string ENV_KEY_JWT_SECRET = "JwtSecret";
 
+        public const string ENV_KEY_ADMIN_KEY = "AdminKey";
+
         public const string ENV_KEY_AZURE_STORAGE = "AzureStorage";
 
         public const string ENV_KEY_GITHUB_CLIENT_ID = "GitHubClientId";

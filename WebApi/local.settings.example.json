@@ -4,7 +4,8 @@
         "JwtSecret": "feedreader.org.local.test.signing.key",
         "AzureStorage": "UseDevelopmentStorage=true",
         "GitHubClientId": "3d53ca4335af4da637d1",
-        "GitHubClientSecret": "426b04fb9338bca4dfcbed87c3ca686f166ea0ef"
+        "GitHubClientSecret": "426b04fb9338bca4dfcbed87c3ca686f166ea0ef",
+        "AdminKey": "local.test.admin.key"
     },
     "Host": {
         "CORS": "*"

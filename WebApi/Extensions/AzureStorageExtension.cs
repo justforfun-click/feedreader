@@ -6,7 +6,6 @@ using Microsoft.Azure.Cosmos.Table;
 using Azure.Storage.Blobs;
 using System.IO;
 using System.Text;
-using Azure.Storage.Blobs.Models;
 
 namespace FeedReader.WebApi.Extensions
 {
@@ -17,6 +16,8 @@ namespace FeedReader.WebApi.Extensions
         const string USERS_CONTAINER = "users";
 
         const string USERS_FEEDS_TABLE = "usersfeeds";
+
+        const string FEEDS_TABLE = "feeds";
 
         private static readonly string _conns = Environment.GetEnvironmentVariable(Consts.ENV_KEY_AZURE_STORAGE);
 
@@ -34,6 +35,11 @@ namespace FeedReader.WebApi.Extensions
         public static CloudTable GetUsersFeedsTable()
         {
             return GetStorageAccount().CreateCloudTableClient().GetTableReference(USERS_FEEDS_TABLE);
+        }
+
+        public static CloudTable GetFeedsTable()
+        {
+            return GetStorageAccount().CreateCloudTableClient().GetTableReference(FEEDS_TABLE);
         }
 
         public static BlobContainerClient GetUserContainer()
