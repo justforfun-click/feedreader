@@ -2,6 +2,7 @@
 *.user
 *-generated-*
 local.settings.json
+Task/log/*.log
 
 .vs/
 .vscode/
