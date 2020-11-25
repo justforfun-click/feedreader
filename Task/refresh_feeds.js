@@ -13,7 +13,7 @@ var log = null;
 lockfile
 .lock(`${__dirname}/refresh_feeds.lock`, {realpath: false})
 .then(() => main())
-.catch(e => { (log || console).log(e); process.exitCode = 1; });
+.catch(e => { (log || console).error(e); process.exitCode = 1; });
 
 async function main() {
     // Config log
