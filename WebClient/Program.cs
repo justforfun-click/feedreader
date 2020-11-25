@@ -31,7 +31,7 @@ namespace FeedReader.WebClient
                 uriBuilder.Scheme = "http";
                 uriBuilder.Port = 7071;
             }
-            else if (uriBuilder.Uri.Host != "www.feedreader.org")
+            else if (uriBuilder.Uri.Host == "www.feedreader.org")
             {
                 uriBuilder.Host = "api.feedreader.org";
             }
