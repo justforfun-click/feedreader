@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" media="screen" href="/~d/styles/rss2full.xsl"?>
+<?xml-stylesheet type="text/css" media="screen" href="http://feeds.foxnews.com/~d/styles/itemcontent.css"?>
+<rss xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+    <channel>
+        <title>FOX News</title>
+        <link>http://www.foxnews.com/</link>
+        <description><![CDATA[FOXNews.com - Breaking news and video. Latest Current News: U.S., World, Entertainment, Health, Business, Technology, Politics, Sports.]]></description>
+        <image>
+            <url>http://tools.foxnews.com/sites/tools.foxnews.com/files/images/fox-news-logo.png</url>
+            <title>FOX News</title>
+            <link>http://www.foxnews.com/</link>
+        </image>
+        <atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="self" type="application/rss+xml" href="http://feeds.foxnews.com/foxnews/latest" />
+        <feedburner:info xmlns:feedburner="http://rssnamespace.org/feedburner/ext/1.0" uri="foxnews/latest" />
+        <atom10:link xmlns:atom10="http://www.w3.org/2005/Atom" rel="hub" href="http://pubsubhubbub.appspot.com/" />
+        <item>
+            <guid isPermaLink="true">https://www.foxnews.com/us/coronavirus-concerns-grow-in-south-dakota-as-motorcycle-rally-expected-to-draw-hundreds-of-thousands</guid>
+            <link>https://www.foxnews.com/us/coronavirus-concerns-grow-in-south-dakota-as-motorcycle-rally-expected-to-draw-hundreds-of-thousands</link>
+            <media:group>
+                <media:content url="https://static.foxnews.com/foxnews.com/content/uploads/2018/09/75th-Sturgis-Rally-Preparations-1-1.jpg" medium="image" isDefault="true" />
+                <media:content url="http://a57.foxnews.com60/60/75th-Sturgis-Rally-Preparations-1-1.jpg" medium="image" width="60" height="60" />
+            </media:group>
+            <media:thumbnail url="http://a57.foxnews.com60/60/75th-Sturgis-Rally-Preparations-1-1.jpg" width="60" height="60" />
+            <category domain="foxnews.com/metadata/dc.identifier">d25e90ea-ec56-5b0a-b6a0-3cd522222aa2</category>
+            <category domain="foxnews.com/taxonomy">fox-news/health/infectious-disease/coronavirus</category>
+            <category domain="foxnews.com/taxonomy">fox-news/auto/style/motorcycles</category>
+            <category domain="foxnews.com/taxonomy">fox-news/us/us-regions/midwest/south-dakota</category>
+            <category domain="foxnews.com/taxonomy">fox-news/us</category>
+            <category domain="foxnews.com/metadata/prism.channel">fnc</category>
+            <category domain="foxnews.com/section-path">fnc/us</category>
+            <category domain="foxnews.com/content-type">article</category>
+            <title>Sturgis rally expecting 250K, stirring coronavirus concerns</title>
+            <description />
+            <dc:creator>Stephen Groves</dc:creator>
+            <pubDate>Mon, 03 Aug 2020 04:55:36 GMT</pubDate>
+            <category domain="foxnews.com/metadata/dc.source">Associated Press</category>
+            <category domain="foxnews.com/metadata/dc.creator">Stephen Groves</category>
+        </item>
+        <item>
+            <guid isPermaLink="true">https://www.foxnews.com/health/georgia-camp-sees-260-children-staff-test-positive-coronavirus-cdc-says</guid>
+            <link>https://www.foxnews.com/health/georgia-camp-sees-260-children-staff-test-positive-coronavirus-cdc-says</link>
+            <media:group>
+                <media:content url="https://static.foxnews.com/foxnews.com/content/uploads/2020/05/CoronavirusMoleculeGetty20.jpg" medium="image" isDefault="true" />
+                <media:content url="http://a57.foxnews.com60/60/CoronavirusMoleculeGetty20.jpg" medium="image" width="60" height="60" />
+            </media:group>
+            <media:thumbnail url="http://a57.foxnews.com60/60/CoronavirusMoleculeGetty20.jpg" width="60" height="60" />
+            <category domain="foxnews.com/metadata/dc.identifier">980ac922-ec3a-5a64-8d57-d7d4ea76e90b</category>
+            <category domain="foxnews.com/taxonomy">fox-news/us/us-regions/southeast/georgia</category>
+            <category domain="foxnews.com/taxonomy">fox-news/health/infectious-disease/coronavirus</category>
+            <category domain="foxnews.com/metadata/prism.channel">fnc</category>
+            <category domain="foxnews.com/section-path">fnc/health</category>
+            <category domain="foxnews.com/content-type">article</category>
+            <title>Hundreds infected with coronavirus at Georgia camp, raising fears about risk for children</title>
+            <description>A coronavirus outbreak at a Georgia sleepaway camp in June saw hundreds infected with the coronavirus, renewing concerns about children contracting the disease, according to the Centers for Disease Control and Prevention.</description>
+            <dc:creator>David Aaro</dc:creator>
+            <pubDate>Mon, 03 Aug 2020 04:45:20 GMT</pubDate>
+            <category domain="foxnews.com/metadata/dc.source">Fox News</category>
+            <category domain="foxnews.com/metadata/dc.creator">David Aaro</category>
+        </item>
+        <item>
+            <guid isPermaLink="true">https://www.foxnews.com/politics/joe-biden-should-not-debate-president-trump-clintons-ex-wh-spokesman-says</guid>
+            <link>https://www.foxnews.com/politics/joe-biden-should-not-debate-president-trump-clintons-ex-wh-spokesman-says</link>
+            <media:group>
+                <media:content url="https://cf-images.us-east-1.prod.boltdns.net/v1/static/694940094001/6d04d4a7-90ad-413b-97d6-386d29744de3/ed9ebf57-a754-4008-99da-ba636ae94121/1280x720/match/image.jpg" medium="image" isDefault="true" />
+                <media:content url="http://a57.foxnews.com60/60/image.jpg" medium="image" width="60" height="60" />
+            </media:group>
+            <media:thumbnail url="http://a57.foxnews.com60/60/image.jpg" width="60" height="60" />
+            <category domain="foxnews.com/metadata/dc.identifier">fb684c24-0c83-5968-8391-964b8c1a362b</category>
+            <category domain="foxnews.com/taxonomy">fox-news/politics/2020-presidential-election</category>
+            <category domain="foxnews.com/taxonomy">fox-news/person/joe-biden</category>
+            <category domain="foxnews.com/metadata/prism.channel">fnc</category>
+            <category domain="foxnews.com/section-path">fnc/politics</category>
+            <category domain="foxnews.com/content-type">article</category>
+            <title>Joe Biden should not debate President Trump, Clinton’s ex-WH spokesman says</title>
+            <description />
+            <dc:creator>Edmund DeMarche</dc:creator>
+            <pubDate>Mon, 03 Aug 2020 04:32:13 GMT</pubDate>
+            <category domain="foxnews.com/metadata/dc.source">Fox News</category>
+            <category domain="foxnews.com/metadata/dc.creator">Edmund DeMarche</category>
+        </item>
+        <item>
+            <guid isPermaLink="true">https://www.foxnews.com/us/officials-caught-off-guard-as-recreational-boaters-move-into-drop-zone-for-returning-spacex-capsule</guid>
+            <link>https://www.foxnews.com/us/officials-caught-off-guard-as-recreational-boaters-move-into-drop-zone-for-returning-spacex-capsule</link>
+            <media:group>
+                <media:content url="https://static.foxnews.com/foxnews.com/content/uploads/2020/06/14_AP20151774629690.jpg" medium="image" isDefault="true" />
+                <media:content url="http://a57.foxnews.com60/60/14_AP20151774629690.jpg" medium="image" width="60" height="60" />
+            </media:group>
+            <media:thumbnail url="http://a57.foxnews.com60/60/14_AP20151774629690.jpg" width="60" height="60" />
+            <category domain="foxnews.com/metadata/dc.identifier">6c136e45-81e9-5801-bef7-5bf761087462</category>
+            <category domain="foxnews.com/taxonomy">fox-news/science/air-and-space/nasa</category>
+            <category domain="foxnews.com/taxonomy">fox-news/person/elon-musk</category>
+            <category domain="foxnews.com/taxonomy">fox-news/health/orthopedics/technology</category>
+            <category domain="foxnews.com/taxonomy">fox-news/science</category>
+            <category domain="foxnews.com/taxonomy">fox-news/us</category>
+            <category domain="foxnews.com/taxonomy">fox-news/us/us-regions/southeast/florida</category>
+            <category domain="foxnews.com/metadata/prism.channel">fnc</category>
+            <category domain="foxnews.com/section-path">fnc/us</category>
+            <category domain="foxnews.com/content-type">article</category>
+            <title>Officials caught off guard as recreational boaters move into drop zone for returning Spacex capsule</title>
+            <description>Recreational boaters got up close and personal to the SpaceX capsule carrying two US astronauts after it landed in the Gulf of Mexico Sunday — catching NASA officials off guard.</description>
+            <dc:creator>Jorge Fitz-Gibbon</dc:creator>
+            <dc:creator>Kenneth Garger</dc:creator>
+            <pubDate>Mon, 03 Aug 2020 03:44:43 GMT</pubDate>
+            <category domain="foxnews.com/metadata/dc.source">New York Post</category>
+            <category domain="foxnews.com/metadata/dc.creator">Jorge Fitz-Gibbon</category>
+            <category domain="foxnews.com/metadata/dc.creator">Kenneth Garger</category>
+        </item>
+        <item>
+            <guid isPermaLink="true">https://www.foxnews.com/us/minneapolis-police-offer-advice-on-how-to-stay-safe-amid-crime-surge-give-up-cellphone</guid>
+            <link>https://www.foxnews.com/us/minneapolis-police-offer-advice-on-how-to-stay-safe-amid-crime-surge-give-up-cellphone</link>
+            <media:group>
+                <media:content url="https://cf-images.us-east-1.prod.boltdns.net/v1/static/694940094001/04f99267-6bd9-46fb-8f79-9f49865610e6/0e071be5-6d78-4702-98b6-d62e27e2353c/1280x720/match/image.jpg" medium="image" isDefault="true" />
+                <media:content url="http://a57.foxnews.com60/60/image.jpg" medium="image" width="60" height="60" />
+            </media:group>
+            <media:thumbnail url="http://a57.foxnews.com60/60/image.jpg" width="60" height="60" />
+            <category domain="foxnews.com/metadata/dc.identifier">44679b24-df21-5f26-ae9f-f724ce5f6d69</category>
+            <category domain="foxnews.com/taxonomy">fox-news/us/minneapolis-st-paul</category>
+            <category domain="foxnews.com/taxonomy">fox-news/person/george-floyd</category>
+            <category domain="foxnews.com/metadata/prism.channel">fnc</category>
+            <category domain="foxnews.com/section-path">fnc/us</category>
+            <category domain="foxnews.com/content-type">article</category>
+            <title>Minneapolis police offer advice on how to stay safe amid crime surge: Give up cellphone</title>
+            <description />
+            <dc:creator>Edmund DeMarche</dc:creator>
+            <pubDate>Mon, 03 Aug 2020 03:41:26 GMT</pubDate>
+            <category domain="foxnews.com/metadata/dc.source">Fox News</category>
+            <category domain="foxnews.com/metadata/dc.creator">Edmund DeMarche</category>
+        </item>
+        <item>
+            <guid isPermaLink="true">https://www.foxnews.com/us/isaias-strengthens-slightly-as-it-crawls-up-florida-coast</guid>
+            <link>https://www.foxnews.com/us/isaias-strengthens-slightly-as-it-crawls-up-florida-coast</link>
+            <media:group>
+                <media:content url="https://static.foxnews.com/foxnews.com/content/uploads/2020/08/AP20215673697323.jpg" medium="image" isDefault="true" />
+                <media:content url="http://a57.foxnews.com60/60/AP20215673697323.jpg" medium="image" width="60" height="60" />
+            </media:group>
+            <media:thumbnail url="http://a57.foxnews.com60/60/AP20215673697323.jpg" width="60" height="60" />
+            <category domain="foxnews.com/metadata/dc.identifier">76334e3f-a16c-5e6b-a6f2-33908d944aca</category>
+            <category domain="foxnews.com/taxonomy">fox-news/us/us-regions/southeast/florida</category>
+            <category domain="foxnews.com/taxonomy">fox-news/us/disasters/hurricanes-typhoons</category>
+            <category domain="foxnews.com/taxonomy">fox-news/us/disasters/tropical-storm</category>
+            <category domain="foxnews.com/metadata/prism.channel">fnc</category>
+            <category domain="foxnews.com/section-path">fnc/us</category>
+            <category domain="foxnews.com/content-type">article</category>
+            <title>Isaias strengthens slightly as it crawls up Florida coast</title>
+            <description>Bands of heavy rain from Isaias lashed Florida's east coast Sunday, with the tropical storm strengthening slightly in the evening on its way up the Eastern seabord.</description>
+            <dc:creator>Wilfredo Lee</dc:creator>
+            <dc:creator>Danica Coto</dc:creator>
+            <pubDate>Mon, 03 Aug 2020 02:25:00 GMT</pubDate>
+            <category domain="foxnews.com/metadata/dc.source">Associated Press</category>
+            <category domain="foxnews.com/metadata/dc.creator">Wilfredo Lee</category>
+            <category domain="foxnews.com/metadata/dc.creator">Danica Coto</category>
+        </item>
+        <item>
+            <guid isPermaLink="true">https://www.foxnews.com/media/steve-hilton-trump-campaign-sleepwalking-into-biden-presidency</guid>
+            <link>https://www.foxnews.com/media/steve-hilton-trump-campaign-sleepwalking-into-biden-presidency</link>
+            <media:group>
+                <media:content url="https://cf-images.us-east-1.prod.boltdns.net/v1/static/694940094001/fce49eef-44f5-4dfc-8ef9-c65488bba6e4/40aa95de-011d-4ecf-be08-dc5e80f838fc/1280x720/match/image.jpg" medium="image" isDefault="true" />
+                <media:content url="http://a57.foxnews.com60/60/image.jpg" medium="image" width="60" height="60" />
+            </media:group>
+            <media:thumbnail url="http://a57.foxnews.com60/60/image.jpg" width="60" height="60" />
+            <category domain="foxnews.com/metadata/dc.identifier">a09452af-b399-58f2-993e-75d89b2ce9c5</category>
+            <category domain="foxnews.com/taxonomy">fox-news/media/fox-news-flash</category>
+            <category domain="foxnews.com/taxonomy">fox-news/shows/the-next-revolution</category>
+            <category domain="foxnews.com/taxonomy">fox-news/politics/elections/campaigning/trump-2020-campaign</category>
+            <category domain="foxnews.com/metadata/prism.channel">fnc</category>
+            <category domain="foxnews.com/section-path">fnc/media</category>
+            <category domain="foxnews.com/content-type">article</category>
+            <title>Steve Hilton warns Trump campaign is 'sleepwalking into a Biden presidency': 'Wake Up'</title>
+            <description>"The Next Revolution" host Steve Hilton urged the Trump campaign to turn up the tempo on Sunday, expressing concerns over their "baffling complacency" that he fears will result in a Joe Biden victory this November.</description>
+            <dc:creator>Yael Halon</dc:creator>
+            <pubDate>Mon, 03 Aug 2020 02:20:34 GMT</pubDate>
+            <category domain="foxnews.com/metadata/dc.source">Fox News</category>
+            <category domain="foxnews.com/metadata/dc.creator">Yael Halon</category>
+        </item>
+        <item>
+            <guid isPermaLink="true">https://www.foxnews.com/us/navy-veteran-scaled-business-help-others-coronavirus-econoomic-turmoil</guid>
+            <link>https://www.foxnews.com/us/navy-veteran-scaled-business-help-others-coronavirus-econoomic-turmoil</link>
+            <media:group>
+                <media:content url="https://static.foxnews.com/foxnews.com/content/uploads/2020/08/Chris-Cavallini.jpg" medium="image" isDefault="true" />
+                <media:content url="http://a57.foxnews.com60/60/Chris-Cavallini.jpg" medium="image" width="60" height="60" />
+            </media:group>
+            <media:thumbnail url="http://a57.foxnews.com60/60/Chris-Cavallini.jpg" width="60" height="60" />
+            <category domain="foxnews.com/metadata/dc.identifier">3428cbb5-2a4b-5f7a-ad04-7ef513d86d42</category>
+            <category domain="foxnews.com/taxonomy">fox-news/us/personal-freedoms/proud-american</category>
+            <category domain="foxnews.com/taxonomy">fox-news/us/personal-freedoms/america-together</category>
+            <category domain="foxnews.com/taxonomy">fox-news/us/military/navy</category>
+            <category domain="foxnews.com/taxonomy">fox-news/politics/quarantine-routine</category>
+            <category domain="foxnews.com/taxonomy">fox-news/us/military/veterans</category>
+            <category domain="foxnews.com/taxonomy">fox-news/fitness-and-wellbeing</category>
+            <category domain="foxnews.com/taxonomy">fox-news/health/nutrition-and-fitness</category>
+            <category domain="foxnews.com/taxonomy">fox-news/health/nutrition-and-fitness/fitness</category>
+            <category domain="foxnews.com/taxonomy">fox-news/entertainment/genres/diet-fitness</category>
+            <category domain="foxnews.com/metadata/prism.channel">fnc</category>
+            <category domain="foxnews.com/section-path">fnc/us</category>
+            <category domain="foxnews.com/content-type">article</category>
+            <title>Navy veteran says he scaled his business to help more people despite pandemic, economic turmoil</title>
+            <description>Navy veteran Chris Cavallini is an entrepreneur and philanthropist whose hard work won’t slow down amid the coronavirus pandemic.</description>
+            <dc:creator>Frank Miles</dc:creator>
+            <pubDate>Mon, 03 Aug 2020 02:06:43 GMT</pubDate>
+            <category domain="foxnews.com/metadata/dc.source">Fox News</category>
+            <category domain="foxnews.com/metadata/dc.creator">Frank Miles</category>
+        </item>
+        <item>
+            <guid isPermaLink="true">https://www.foxnews.com/sports/eagles-doug-pederson-coronavirus</guid>
+            <link>https://www.foxnews.com/sports/eagles-doug-pederson-coronavirus</link>
+            <media:group>
+                <media:content url="https://static.foxnews.com/foxnews.com/content/uploads/2018/09/ap18157536048946.jpg" medium="image" isDefault="true" />
+                <media:content url="http://a57.foxnews.com60/60/ap18157536048946.jpg" medium="image" width="60" height="60" />
+            </media:group>
+            <media:thumbnail url="http://a57.foxnews.com60/60/ap18157536048946.jpg" width="60" height="60" />
+            <category domain="foxnews.com/metadata/dc.identifier">06294f10-6f76-5d94-829e-376c0ce29fa3</category>
+            <category domain="foxnews.com/taxonomy">fox-news/sports/nfl/philadelphia-eagles</category>
+            <category domain="foxnews.com/taxonomy">fox-news/sports/nfl</category>
+            <category domain="foxnews.com/taxonomy">fox-news/health/infectious-disease/coronavirus</category>
+            <category domain="foxnews.com/metadata/prism.channel">fnc</category>
+            <category domain="foxnews.com/section-path">fnc/sports</category>
+            <category domain="foxnews.com/content-type">article</category>
+            <title>Eagles' Doug Pederson is second NFL head coach to test positive for coronavirus</title>
+            <description>Philadelphia Eagles head coach Doug Pederson has tested positive for the coronavirus, and he told the team on Sunday night after a second positive test confirmed the news, according to ESPN.</description>
+            <dc:creator>Daniel Canova</dc:creator>
+            <pubDate>Mon, 03 Aug 2020 01:46:48 GMT</pubDate>
+            <category domain="foxnews.com/metadata/dc.source">Fox News</category>
+            <category domain="foxnews.com/metadata/dc.creator">Daniel Canova</category>
+        </item>
+        <item>
+            <guid isPermaLink="true">https://www.foxnews.com/media/hannity-compares-media-state-run-propaganda-tv</guid>
+            <link>https://www.foxnews.com/media/hannity-compares-media-state-run-propaganda-tv</link>
+            <media:group>
+                <media:content url="https://cf-images.us-east-1.prod.boltdns.net/v1/static/694940094001/1687deef-7c5a-4015-b907-77a16614eb82/eac6331d-276a-462e-9fd2-7330e158aa7a/1280x720/match/image.jpg" medium="image" isDefault="true" />
+                <media:content url="http://a57.foxnews.com60/60/image.jpg" medium="image" width="60" height="60" />
+            </media:group>
+            <media:thumbnail url="http://a57.foxnews.com60/60/image.jpg" width="60" height="60" />
+            <category domain="foxnews.com/metadata/dc.identifier">7bfa6f06-1772-5c8f-9ec2-e0d2cc2b5e4f</category>
+            <category domain="foxnews.com/taxonomy">fox-news/media/fox-news-flash</category>
+            <category domain="foxnews.com/taxonomy">fox-news/shows/life-liberty-levin</category>
+            <category domain="foxnews.com/taxonomy">fox-news/shows/hannity</category>
+            <category domain="foxnews.com/metadata/prism.channel">fnc</category>
+            <category domain="foxnews.com/section-path">fnc/media</category>
+            <category domain="foxnews.com/content-type">article</category>
+            <title>Hannity compares media to 'state-run propaganda TV': 'Lied to this country for 4 straight years'</title>
+            <description>Fox News host Sean Hannity compared the mainstream media to "state-run propaganda TV" in an interview on "Life, Liberty &amp; Levin" Sunday, striking a serious tone as he detailed for viewers the significance of the upcoming November election.</description>
+            <dc:creator>Yael Halon</dc:creator>
+            <pubDate>Mon, 03 Aug 2020 01:40:48 GMT</pubDate>
+            <category domain="foxnews.com/metadata/dc.source">Fox News</category>
+            <category domain="foxnews.com/metadata/dc.creator">Yael Halon</category>
+        </item>
+    </channel>
+</rss>

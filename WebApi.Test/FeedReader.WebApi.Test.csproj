@@ -21,11 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="TestData\NetflixTechblog.2020.07.28.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TestData\YouTube.Channel.ChineseMasterClass.2020.11.21.html">
+    <None Update="TestData\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+
 </Project>

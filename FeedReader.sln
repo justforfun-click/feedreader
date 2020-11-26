@@ -7,11 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.WebClient", "Web
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.Share", "Share\FeedReader.Share.csproj", "{99E14E15-4398-425A-A885-B5F2D10046EC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.Test", "WebApi.Test\WebApi.Test.csproj", "{FD97FFF7-F3CB-4392-919B-0356EEE1590E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.Test", "WebApi.Test\FeedReader.WebApi.Test.csproj", "{FD97FFF7-F3CB-4392-919B-0356EEE1590E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.WebApi", "WebApi\FeedReader.WebApi.csproj", "{E577D135-1B6F-48B1-BCA0-88401D05F36B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.Backend.Share", "Backend\Share\FeedReader.Backend.Share.csproj", "{A6E9A51E-D23B-4905-97A1-3E32FF67F0F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.Backend.Share", "Backend.Share\FeedReader.Backend.Share.csproj", "{A6E9A51E-D23B-4905-97A1-3E32FF67F0F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

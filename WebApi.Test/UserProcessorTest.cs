@@ -22,7 +22,7 @@ using System.Diagnostics.CodeAnalysis;
 using Azure.Storage.Blobs.Models;
 using Azure;
 
-namespace WebApi.Test
+namespace FeedReader.WebApi.Test
 {
     public class CloudTableMock : CloudTable
     {

@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace WebApi.Test
+namespace FeedReader.WebApi.Test
 {
     public class FeedProcessorTest
     {
