@@ -15,6 +15,18 @@ jobs:
         with:
           submodules: true
 
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            WebApi:
+              - 'Backend.Shared/**'
+              - 'Share/**'
+              - 'WebApi/**'
+            WebClient:
+              - 'Share/**'
+              - 'WebClient/**'
+
       - name: Setup DotNet Environment 3.1
         uses: actions/setup-dotnet@v1
         with:
@@ -41,6 +53,7 @@ jobs:
           dotnet test -c Release --no-build
 
       - name: Deploy Test Site
+        if: steps.filter.outputs.WebApi == 'true' || steps.filter.outputs.WebClient == 'true'
         uses: Azure/static-web-apps-deploy@v0.0.1-preview
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GREEN_CLIFF_0362C861E }}
