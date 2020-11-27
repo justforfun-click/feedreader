@@ -29,7 +29,8 @@ Website: https://www.feedreader.org
 
         C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator>AzureStorageEmulator.exe start
 
-1. Go to `WebApi` folder, copy `local.settings.example.json` to `local.settings.json`, run `func start`.
+1. Go to `WebApi` folder, copy `local.settings.example.json` to `local.settings.json`.
 
-1. Launch `FeedReader.sln`, run `FeedReader.WebClient` project. It should launch your
-   browser and navigate to `https://localhost`.
+1. Launch `FeedReader.sln`, right click `Solution 'FeedReader'` node, open `Properties` dialog.
+   Under `Startup Project|Multiple start projects`, set the `Action` of `FeedReader.WebApi` and `FeedReader.WebClient`
+   projects to `Start`. Prefresh `F5`. It should launch your browser and navigate to `https://localhost`.

@@ -1,0 +1,20 @@
+﻿@import "Components/IndexPageForAuthorizedUser";
+@import "Components/PageHeader";
+
+.only-for-desktop {
+    display: block;
+}
+
+.only-for-mobile {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .only-for-desktop {
+        display: none !important;
+    }
+
+    .only-for-mobile {
+        display: block;
+    }
+}

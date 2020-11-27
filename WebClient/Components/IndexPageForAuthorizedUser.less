@@ -101,3 +101,42 @@
         overflow: auto;
     }
 }
+
+@media (max-width: 600px) {
+    .left-panel {
+        width: 70px !important;
+        padding: 0px !important;
+
+        > .feed-group-list {
+            overflow-x: hidden !important;
+
+            .group {
+                padding: 0px !important;
+
+                .header {
+                    display: none !important;
+                }
+
+                .feed-list {
+                    .feed {
+                        width: 70px !important;
+                        height: 70px !important;
+
+                        img {
+                            width: 32px !important;
+                            height: 32px !important;
+                        }
+
+                        .name {
+                            display: none !important;
+                        }
+
+                        .unreaded-items-count {
+                            display: none !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

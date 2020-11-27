@@ -5,10 +5,10 @@
 </PropertyGroup>
 
 <ItemGroup>
+  <PackageReference Include="CssBuilder" Version="0.1.7" />
   <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.0" />
   <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.0" PrivateAssets="all" />
   <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-  <PackageReference Include="SassBuilder" Version="0.1.5" />
 </ItemGroup>
 
 <ItemGroup>
@@ -17,6 +17,7 @@
 
 <Target Name="CopyContent" AfterTargets="Build">
   <Copy SourceFiles="app.css" DestinationFolder="wwwroot" />
+  <Copy SourceFiles="app2.css" DestinationFolder="wwwroot" />
 </Target>
 
 </Project>

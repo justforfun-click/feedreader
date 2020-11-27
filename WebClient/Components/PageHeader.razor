@@ -24,7 +24,17 @@
             </div>
             @if (LocalUser.IsAuthorized)
             {
-                <div class="toolbar">
+                <div class="toolbar only-for-mobile">
+                    <DropdownButton Text="Add New Feed" OnClick="AddNewFeed">
+                        <MenuContent>
+                            <li @onclick="ShowExplorer">Explorer</li>
+                            <li @onclick="ShowStars">Stars</li>
+                            <li @onclick="Logout">Logout</li>
+                        </MenuContent>
+                    </DropdownButton>
+                </div>
+
+                <div class="toolbar only-for-desktop">
                     <DropdownButton Text="Logout" OnClick="Logout"/>
                 </div>
             }
@@ -53,6 +63,9 @@
                         <MenuContent>
                             <li @onclick="Unsubscribe">Unsubscribe</li>
                             <li @onclick="ChangeGroup">Change Group</li>
+                            <li class="only-for-mobile" @onclick="AddNewFeed">Add New Feed</li>
+                            <li class="only-for-mobile" @onclick="ShowExplorer">Explorer</li>
+                            <li class="only-for-mobile" @onclick="ShowStars">Stars</li>
                             <li @onclick="Logout">Logout</li>
                         </MenuContent>
                     </DropdownButton>
@@ -82,6 +95,15 @@
 
     [Parameter]
     public Action OnSideBarBtnClick { get; set; }
+
+    [Parameter]
+    public Action OnAddNewFeed { get; set; }
+
+    [Parameter]
+    public Action OnShowExplorer { get; set; }
+
+    [Parameter]
+    public Action OnShowStarts { get; set; }
 
     private string Name
     {
@@ -142,5 +164,20 @@
         {
             OnChangeFeedGroup(newGroup);
         }
+    }
+
+    private void AddNewFeed()
+    {
+        OnAddNewFeed.Invoke();
+    }
+
+    private void ShowExplorer()
+    {
+        OnShowExplorer.Invoke();
+    }
+
+    private void ShowStars()
+    {
+        OnShowStarts.Invoke();
     }
 }

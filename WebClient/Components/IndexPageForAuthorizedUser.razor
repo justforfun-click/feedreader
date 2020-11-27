@@ -6,7 +6,8 @@
 
 <MainLayout>
     <Header>
-        <PageHeader Feed="@Feed" SideBarBtnPressed="@LeftPanelShow" OnUnsubscribe="Unsubscribe" OnSideBarBtnClick="ToggleSideBar" OnChangeFeedGroup="ChangeFeedGroup"/>
+        <PageHeader Feed="@Feed" SideBarBtnPressed="@LeftPanelShow" OnUnsubscribe="Unsubscribe" OnSideBarBtnClick="ToggleSideBar" OnChangeFeedGroup="ChangeFeedGroup"
+                    OnAddNewFeed="@(() => _ = AddNewFeed())" OnShowExplorer="@(() => _ = ShowExplorer())" OnShowStarts="@(() => _ = ShowStars())"/>
     </Header>
     <ChildContent>
         <div class="authorized-user-page">
@@ -82,7 +83,6 @@
             <div class="right-panel" @onscroll="() => DropdownButton.HidePopupMenus()">
                 @RightPanelContent
             </div>
-            <div id="803822386" class="ad"/>
         </div>
     </ChildContent>
 </MainLayout>
@@ -145,6 +145,8 @@
         await ShowActive("group-add-new");
 
         RightPanelContent = @<AddNewFeed OnCancel="Cancel" OnSave="(feed) => ShowFeed(feed, subscribe: true)"/>;
+
+        StateHasChanged();
     }
 
     private void SubscribeFeed(string feedUri)
@@ -205,6 +207,8 @@
         await ShowActive("group-explorer");
 
         RightPanelContent = @<FeedsExplorer OnSubscribe="SubscribeFeed" />;
+
+        StateHasChanged();
     }
 
     private async Task ShowStars()
@@ -215,6 +219,8 @@
 
         var staredFeedItems = await LocalUser.GetStaredFeedItems();
         RightPanelContent = @<ShowStaredFeedItems StaredFeedItems="@staredFeedItems"/>;
+
+        StateHasChanged();
     }
 
     private void Cancel()
