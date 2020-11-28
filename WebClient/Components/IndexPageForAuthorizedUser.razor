@@ -71,7 +71,7 @@
                                     <div class="feed @(feed.IsActive ? "active" : "")" @onclick="() => ShowFeed(feed)">
                                         <FallbackImage Src="@feed.IconUri" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(feed.Uri).Host}")"/>
                                         <div class="name" title="@(string.IsNullOrWhiteSpace(feed.Name) ? feed.Uri : feed.Name)"><span>@(string.IsNullOrWhiteSpace(feed.Name) ? feed.Uri : feed.Name)</span></div>
-                                        <div class="unreaded-items-count">@feed.Items.Count(i => !i.IsReaded).ToStringEmptyIfZero()</div>
+                                        <div class="unreaded-items-count" style="visibility:@(feed.Items.Count(i => !i.IsReaded) == 0? "hidden":"visible")">@feed.Items.Count(i => !i.IsReaded)</div>
                                     </div>
                                 }
                             </div>

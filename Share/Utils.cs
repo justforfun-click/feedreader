@@ -23,11 +23,6 @@ namespace FeedReader.Share
             }
         }
 
-        public static string ToStringEmptyIfZero(this int i)
-        {
-            return i == 0 ? "" : i.ToString();
-        }
-
         public static string Base64Encode(string str)
         {
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(str));

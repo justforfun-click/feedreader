@@ -1,0 +1,16 @@
+[
+    {
+        "src": "app.scss",
+        "output": "wwwroot"
+    },
+    {
+        "src": "app2.less",
+        "output": "wwwroot"
+    },
+    {
+        "src": "**/*.razor.scss"
+    },
+    {
+        "src": "**/*.razor.less"
+    }
+]
