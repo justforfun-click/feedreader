@@ -27,7 +27,7 @@ RenderFragment TimeAndToolBar =
     <div class="feed-item-thumbnail-with-topic-picture @(FeedItem.IsReaded ? "readed" : "")">
         <a class="feed-item-summary" href="@FeedItem.PermentLink" target="_blank">
             <img src="@FeedItem.TopicPictureUri"/>
-            <div class="title">@((MarkupString)FeedItem.Title)</div>
+            <div class="title multiline-overflow-hidden" title="@FeedItem.Title">@((MarkupString)FeedItem.Title)</div>
         </a>
         @TimeAndToolBar
     </div>
@@ -36,7 +36,7 @@ else
 {
     <div class="feed-item-thumbnail-without-topic-picture @(FeedItem.IsReaded ? "readed" : "")">
         <a class="feed-item-summary" href="@FeedItem.PermentLink" target="_blank">
-            <div class="title">@((MarkupString)FeedItem.Title)</div>
+            <div class="title multiline-overflow-hidden" title="@FeedItem.Title">@((MarkupString)FeedItem.Title)</div>
             <div class="summary"><span>@((MarkupString)FeedItem.Summary)</span></div>
         </a>
         @TimeAndToolBar
