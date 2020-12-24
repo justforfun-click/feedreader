@@ -39,6 +39,10 @@ namespace FeedReader.WebClient
             {
                 uriBuilder.Host = "test.api.feedreader.org";
             }
+            else if (uriBuilder.Uri.Host == "beta.feedreader.org")
+            {
+                uriBuilder.Host = "beta.api.feedreader.org";
+            }
             uriBuilder.Path += "api/";
             apiService.HttpClient = new HttpClient() { BaseAddress = uriBuilder.Uri };
             apiService.TimezoneOffset = await host.Services.GetRequiredService<IJSRuntime>().InvokeAsync<int>("eval", "-new Date().getTimezoneOffset()");
