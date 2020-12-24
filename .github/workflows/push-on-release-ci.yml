@@ -1,9 +1,9 @@
-name: Push On Master CI
+name: Push On Release CI
 
 on:
   push:
     branches:
-      - master
+      - release
 
 jobs:
   build_and_deploy:
