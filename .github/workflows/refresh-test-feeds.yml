@@ -1,0 +1,15 @@
+name: Refresh Feeds
+on:
+  schedule:
+    - cron: "0 * * * *"
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "14.x"
+      - run: cd Task && npm install
+      - run: cd Task && node refresh_feeds.js --admin-key ${{ secrets.TEST_ADMINKEY }} --api-base ${{ secrets.TEST_APIBASE }}
