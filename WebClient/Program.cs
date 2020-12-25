@@ -45,7 +45,7 @@ namespace FeedReader.WebClient
             else if (uriBuilder.Uri.Host == "beta.feedreader.org")
             {
                 uriBuilder.Host = "beta.api.feedreader.org";
-                apiService.GitHubClientId = "e1889b2003a7896f241b";
+                apiService.GitHubClientId = "16914b94ba5da6047cf4";
             }
             uriBuilder.Path += "api/";
             apiService.HttpClient = new HttpClient() { BaseAddress = uriBuilder.Uri };
