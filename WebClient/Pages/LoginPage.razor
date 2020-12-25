@@ -1,6 +1,7 @@
 @page "/login"
 @page "/login/{action}"
 
+@inject ApiService ApiService
 @inject IJSRuntime JsRuntime
 @inject LocalUser LocalUser
 @inject LogService Logger
@@ -55,12 +56,6 @@
 
     private const string FACEBOOK_CLIENT_ID = "324406818724681";
 
-#if DEBUG
-    private const string GITHUB_CLIENT_ID = "3d53ca4335af4da637d1";
-#else
-    private const string GITHUB_CLIENT_ID = "01bf66de9f8979562bc6";
-#endif
-
     [Parameter]
     public string Action { get; set; }
 
@@ -103,7 +98,7 @@
         GoogleLoginUri = $"https://accounts.google.com/o/oauth2/v2/auth?client_id={GOOGLE_CLIENT_ID}&redirect_uri={callbackUri}&response_type=id_token&scope=openid+profile+email&nonce=feedreader&state={queryString}";
 
         callbackUri = Navigation.ToAbsoluteUri("/login/github-callback");
-        GitHubLoginUri = $"https://github.com/login/oauth/authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={callbackUri}&scope=user:email&state={queryString}";
+        GitHubLoginUri = $"https://github.com/login/oauth/authorize?client_id={ApiService.GitHubClientId}&redirect_uri={callbackUri}&scope=user:email&state={queryString}";
 
         callbackUri = Navigation.ToAbsoluteUri("/login/facebook-callback");
         FacebookLoginUri = $"https://www.facebook.com/v8.0/dialog/oauth?client_id={FACEBOOK_CLIENT_ID}&redirect_uri={callbackUri}&response_type=token&scope=email&state={queryString}";

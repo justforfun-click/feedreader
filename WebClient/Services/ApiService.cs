@@ -22,6 +22,8 @@ namespace FeedReader.WebClient.Services
 
         public int TimezoneOffset { get; set; }
 
+        public string GitHubClientId { get; set; }
+
         public async Task<User> LoginAsync(string token)
         {
             _http.DefaultRequestHeaders.Remove("authentication");

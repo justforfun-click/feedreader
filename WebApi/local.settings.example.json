@@ -3,8 +3,8 @@
     "Values": {
         "JwtSecret": "feedreader.org.local.test.signing.key",
         "AzureStorage": "UseDevelopmentStorage=true",
-        "GitHubClientId": "3d53ca4335af4da637d1",
-        "GitHubClientSecret": "426b04fb9338bca4dfcbed87c3ca686f166ea0ef",
+        "GitHubClientId": "9b946fa144483d9ea46c",
+        "GitHubClientSecret": "2f318350656e1f6682417de27d5ae677009a336f",
         "AdminKey": "local.test.admin.key"
     },
     "Host": {
