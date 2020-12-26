@@ -89,7 +89,7 @@
         {
             queryString = Navigation.Uri.Substring(queryStart + 1);
         }
-        queryString = Utils.Base64Encode(queryString);
+        queryString = Share.Utils.Base64Encode(queryString);
 
         var callbackUri = Navigation.ToAbsoluteUri("/login/ms-callback");
         MicrosoftLoginUri = $"https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize?client_id={MICROSOFT_CLIENT_ID}&redirect_uri={callbackUri}&response_type=id_token&scope=openid+profile+email&nonce=feedreader&state={queryString}";
@@ -160,7 +160,7 @@
             else
             {
                 await LocalUser.LoginAsync(token);
-                PostLoginSuccess(Utils.Base64Decode(queries["state"]));
+                PostLoginSuccess(Share.Utils.Base64Decode(queries["state"]));
             }
         }
         catch (Exception ex)
@@ -184,7 +184,7 @@
             else
             {
                 await LocalUser.LoginAsync(token);
-                PostLoginSuccess(Utils.Base64Decode(queries["state"]));
+                PostLoginSuccess(Share.Utils.Base64Decode(queries["state"]));
             }
         }
         catch (Exception ex)
@@ -208,7 +208,7 @@
             else
             {
                 await LocalUser.LoginAsync($"github:{code}");
-                PostLoginSuccess(Utils.Base64Decode(queries["state"]));
+                PostLoginSuccess(Share.Utils.Base64Decode(queries["state"]));
             }
         }
         catch (Exception ex)
@@ -241,7 +241,7 @@
             else
             {
                 await LocalUser.LoginAsync($"facebook:{token}");
-                PostLoginSuccess(Utils.Base64Decode(queries["state"]));
+                PostLoginSuccess(Share.Utils.Base64Decode(queries["state"]));
             }
         }
         catch (Exception ex)

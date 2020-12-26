@@ -50,7 +50,7 @@
     {
         <div class="feed-description">
             <div class="icon">
-                <FallbackImage Src="@Feed.IconUri" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(Feed.Uri).Host}")"/>
+                <FallbackImage Src="@WebClient.Utils.SafeImageUri(Feed.IconUri)" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(Feed.Uri).Host}")"/>
             </div>
             <div class="name-and-description">
                 <a class="name" href="@WebsiteLink" title="@Name" target="_blank"><span>@Name</span></a>

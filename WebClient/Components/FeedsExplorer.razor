@@ -87,13 +87,13 @@
                                 }
                                 else
                                 {
-                                    <a class="title" href="@feedItem.PermentLink" target="_blank"><img src="@feedItem.TopicPictureUri"/></a>
+                                    <a class="title" href="@feedItem.PermentLink" target="_blank"><img src="@WebClient.Utils.SafeImageUri(feedItem.TopicPictureUri)"/></a>
                                 }
                             </div>
 
                             <div class="icon-and-title">
                                 <div class="icon">
-                                    <FallbackImage Src="@feedItem.FeedIconUri" Title="@feedItem.FeedName" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(feedItem.FeedUri).Host}")"/>
+                                    <FallbackImage Src="@WebClient.Utils.SafeImageUri(feedItem.FeedIconUri)" Title="@feedItem.FeedName" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(feedItem.FeedUri).Host}")"/>
                                 </div>
                                 <a class="title multiline-overflow-hidden" title="@feedItem.Title" href="@feedItem.PermentLink" target="_blank">@((MarkupString)feedItem.Title)</a>
                             </div>
