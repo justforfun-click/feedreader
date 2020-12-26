@@ -95,7 +95,11 @@ namespace FeedReader.WebApi.Processors
             }
             else if (Uri.IsWellFormedUriString(raw, UriKind.Relative))
             {
-                if (raw.StartsWith('/'))
+                if (raw.StartsWith("//"))
+                {
+                    return new Uri(_baseUri).GetLeftPart(UriPartial.Scheme) + raw.Substring(2);
+                }
+                else if (raw.StartsWith('/'))
                 {
                     return new Uri(_baseUri).GetLeftPart(UriPartial.Authority) + raw;
                 }
