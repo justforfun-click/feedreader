@@ -10,9 +10,9 @@ namespace FeedReader.WebApi
 
         public const string FEEDREADER_UUID_PREFIX = FEEDREADER_PREFIX + "uuid:";
 
-        public const string FEEDREADER_ISS = "https://www.feedreader.org";
+        public const string FEEDREADER_ISS = "https://feedreader.org";
 
-        public const string FEEDREADER_AUD = "https://www.feedreader.org";
+        public const string FEEDREADER_AUD = "https://feedreader.org";
 
         public const string MICROSOFT_ISS = "https://login.microsoftonline.com/9188040d-6c67-4c5b-b112-36a304b66dad/v2.0";
 

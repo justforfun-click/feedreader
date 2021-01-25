@@ -7,7 +7,7 @@ Build an online web feed reader with blazor web assembly, azure functions and Gi
 
 ## Screen Shots
 
-Website: https://www.feedreader.org
+Website: https://feedreader.org
 
 ![](screenshots/screen-shot-1.png)
 ![](screenshots/screen-shot-2.png)

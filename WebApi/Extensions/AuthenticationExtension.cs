@@ -248,7 +248,7 @@ namespace FeedReader.WebApi.Extensions
             // Get user profile.
             var http = new HttpClient();
             http.DefaultRequestHeaders.Add("Authorization", $"token {accessToken}");
-            http.DefaultRequestHeaders.Add("User-Agent", "www.feedreader.org");
+            http.DefaultRequestHeaders.Add("User-Agent", "feedreader.org");
             var json = await http.GetStringAsync($"https://api.github.com/user");
             var payload = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
 
