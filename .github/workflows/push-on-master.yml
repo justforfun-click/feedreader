@@ -38,27 +38,27 @@ jobs:
         run: |
           dotnet test -c Release --no-build
 
-      - name: Publish WebApi
-        shell: bash
-        run: |
-          dotnet publish WebApi -c Release --no-build
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-      - name: Deploy WebApi
-        uses: Azure/functions-action@v1
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
         with:
-          app-name: feedreaderapi
-          package: WebApi/bin/Release/netcoreapp3.1/publish
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_MASTER_PUBLISH_PROFILE }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Deploy WebClient
-        uses: Azure/static-web-apps-deploy@v0.0.1-preview
+      - name: Build and push
+        uses: docker/build-push-action@v2
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_VICTORIOUS_FLOWER_08CE5B71E }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match you app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "WebClient" # App source code path
-          api_location: "" # Api source code path - optional
-          app_artifact_location: "wwwroot" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
+          context: .
+          file: FeedReader.Server/Dockerfile
+          tags: justforfunclick/feedreader-devtest:latest
+          push: true
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: feedreader-webserver-westus2
+          publish-profile: ${{ secrets.FEEDREADER_SERVER_PUBLISH_PROFILE }}
+          images: justforfunclick/feedreader-devtest:latest
+          slot-name: devtest

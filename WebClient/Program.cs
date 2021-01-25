@@ -32,11 +32,6 @@ namespace FeedReader.WebClient
                 uriBuilder.Port = 7071;
                 apiService.GitHubClientId = "9b946fa144483d9ea46c";
             }
-            else if (uriBuilder.Uri.Host == "www.feedreader.org")
-            {
-                uriBuilder.Host = "api.feedreader.org";
-                apiService.GitHubClientId = "e1889b2003a7896f241b";
-            }
             else if (uriBuilder.Uri.Host == "test.feedreader.org")
             {
                 uriBuilder.Host = "test.api.feedreader.org";
@@ -46,6 +41,11 @@ namespace FeedReader.WebClient
             {
                 uriBuilder.Host = "beta.api.feedreader.org";
                 apiService.GitHubClientId = "16914b94ba5da6047cf4";
+            }
+            else if (uriBuilder.Uri.Host == "feedreader.org" || uriBuilder.Uri.Host.EndsWith(".feedreader.org"))
+            {
+                uriBuilder.Host = "api.feedreader.org";
+                apiService.GitHubClientId = "e1889b2003a7896f241b";
             }
             uriBuilder.Path += "api/";
             apiService.HttpClient = new HttpClient() { BaseAddress = uriBuilder.Uri };
