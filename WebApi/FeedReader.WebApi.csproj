@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <AzureFunctionsVersion>V3</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -8,8 +8,10 @@
     <PackageReference Include="Azure.Storage.Queues" Version="12.5.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.28" />
     <PackageReference Include="JWT" Version="7.3.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Http" Version="3.0.12" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="4.0.3" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.11" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Backend.Share\FeedReader.Backend.Share.csproj" />
