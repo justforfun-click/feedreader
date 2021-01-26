@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Threading.Tasks;
 
 namespace FeedReader.Server
 {
@@ -24,6 +25,17 @@ namespace FeedReader.Server
                 app.UseDeveloperExceptionPage();
                 app.UseWebAssemblyDebugging();
             }
+
+            app.Use((context, next) =>
+            {
+                if (context.Request.Host.Value == "www.feedreader.org")
+                {
+                    context.Response.Redirect("https://feedreader.org", permanent: true);
+                    return Task.CompletedTask;
+                }
+
+                return next();
+            });
 
             app.UseStaticFiles();
 
