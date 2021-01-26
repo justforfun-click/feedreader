@@ -1,4 +1,5 @@
-﻿using FeedReader.Server.Services;
+﻿using AspNetCore.Proxy;
+using FeedReader.Server.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ namespace FeedReader.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddGrpc();
+            services.AddProxies();
             services.AddSingleton<AuthService>();
         }
 
@@ -40,6 +42,15 @@ namespace FeedReader.Server
                 }
 
                 return next();
+            });
+
+            
+            app.UseProxies(proxies =>
+            {
+                proxies.Map("_img_proxy", proxy => proxy.UseHttp((context, args) =>
+                {
+                    return context.Request.Query["url"];
+                }));
             });
 
             app.UseHttpsRedirection();

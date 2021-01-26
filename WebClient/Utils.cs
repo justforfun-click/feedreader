@@ -12,7 +12,7 @@ namespace FeedReader.WebClient
             }
             else
             {
-                return string.Format("https://proxy.feedreader.org?url={0}", HttpUtility.UrlEncode(uri));
+                return string.Format("/_img_proxy/?url={0}", HttpUtility.UrlEncode(uri));
             }
         }
     }
