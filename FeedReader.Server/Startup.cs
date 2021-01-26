@@ -25,6 +25,11 @@ namespace FeedReader.Server
                 app.UseDeveloperExceptionPage();
                 app.UseWebAssemblyDebugging();
             }
+            else
+            {
+                app.UseHsts();
+            }
+
 
             app.Use((context, next) =>
             {
@@ -36,6 +41,8 @@ namespace FeedReader.Server
 
                 return next();
             });
+
+            app.UseHttpsRedirection();
 
             app.UseStaticFiles();
 
