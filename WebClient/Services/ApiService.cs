@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using FeedReader.WebClient.Datas;
+using Grpc.Net.Client;
+using Grpc.Net.Client.Web;
 using Newtonsoft.Json;
+using static FeedReader.Protos.FeedReaderServerApi;
 using FeedCategory = FeedReader.Share.DataContracts.FeedCategory;
 
 namespace FeedReader.WebClient.Services
@@ -20,9 +24,18 @@ namespace FeedReader.WebClient.Services
             set => _http = value;
         }
 
+        private readonly string _serverAddr;
+
+        private FeedReaderServerApiClient _apiClient;
+
         public int TimezoneOffset { get; set; }
 
         public string GitHubClientId { get; set; }
+
+        public ApiService(string serverAddr)
+        {
+            _serverAddr = serverAddr;
+        }
 
         public async Task<User> LoginAsync(string token)
         {
@@ -31,6 +44,10 @@ namespace FeedReader.WebClient.Services
             var user = await GetAsync<User>("login");
             _http.DefaultRequestHeaders.Remove("authentication");
             _http.DefaultRequestHeaders.Add("authentication", user.Token);
+
+            var httpHandler = new CustomizedHttpClientHandler(user.Token);
+            var grpcHandler = new GrpcWebHandler(GrpcWebMode.GrpcWebText, httpHandler);
+            _apiClient = new FeedReaderServerApiClient(GrpcChannel.ForAddress(_serverAddr, new GrpcChannelOptions { HttpHandler = grpcHandler }));
             return user;
         }
 
@@ -84,10 +101,10 @@ namespace FeedReader.WebClient.Services
 
         public async Task MarkAsReaded(string feedUri, DateTime lastReadedTime)
         {
-            await GetAsync("feed/mark_as_readed", new Dictionary<string, string>
+            await _apiClient.MarkFeedAsReadedFromTimestampAsync(new Protos.MarkFeedAsReadedFromTimestampRequest()
             {
-                { "feed-uri", feedUri },
-                { "last-readed-time", lastReadedTime.AddMinutes(-TimezoneOffset).ToString("O") }
+                FeedUri = feedUri,
+                Timestamp = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(lastReadedTime.AddMinutes(-TimezoneOffset))
             });
         }
 
@@ -160,5 +177,29 @@ namespace FeedReader.WebClient.Services
                 return await _http.GetStringAsync($"{uri}?{string.Join("&", args.Select(arg => $"{arg.Key}={HttpUtility.UrlEncode(arg.Value)}"))}");
             }
         }
+
+        #region Customized http client handler.
+        private class CustomizedHttpClientHandler : HttpClientHandler
+        {
+            private readonly string _token;
+
+            public CustomizedHttpClientHandler(string token)
+            {
+                _token = token;
+            }
+
+            protected override HttpResponseMessage Send(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                request.Headers.Add("authentication", _token);
+                return base.Send(request, cancellationToken);
+            }
+
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                request.Headers.Add("authentication", _token);
+                return base.SendAsync(request, cancellationToken);
+            }
+        }
+        #endregion
     }
 }

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option csharp_namespace = "FeedReader.Protos";
+
+service FeedReaderServerApi
+{
+    rpc MarkFeedAsReadedFromTimestamp(MarkFeedAsReadedFromTimestampRequest) returns (google.protobuf.Empty);
+}
+
+message MarkFeedAsReadedFromTimestampRequest
+{
+    string FeedUri = 2;
+
+    google.protobuf.Timestamp Timestamp = 3; 
+}

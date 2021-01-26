@@ -4,7 +4,7 @@ using System.Text;
 
 namespace FeedReader.WebApi
 {
-    static class Consts
+    public static class Consts
     {
         public const string FEEDREADER_PREFIX = "feedreader:";
 

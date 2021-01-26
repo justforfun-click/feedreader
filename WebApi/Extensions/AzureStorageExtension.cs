@@ -9,7 +9,7 @@ using System.Text;
 
 namespace FeedReader.WebApi.Extensions
 {
-    static class AzureStorage
+    public static class AzureStorage
     {
         const string RELATED_UUID_INDEX_TABLE = "relateduuidindex";
 

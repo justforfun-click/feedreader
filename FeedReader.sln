@@ -13,7 +13,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.WebApi", "WebApi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.Backend.Share", "Backend.Share\FeedReader.Backend.Share.csproj", "{A6E9A51E-D23B-4905-97A1-3E32FF67F0F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeedReader.Server", "FeedReader.Server\FeedReader.Server.csproj", "{8497197C-78B6-4565-8FAE-29FF36294349}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.Server", "FeedReader.Server\FeedReader.Server.csproj", "{8497197C-78B6-4565-8FAE-29FF36294349}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FeedReader.Protos", "FeedReader.Protos", "{73BB06A9-0D78-4385-8D2B-92DBBC11F2FB}"
+	ProjectSection(SolutionItems) = preProject
+		FeedReader.Protos\FeedReaderServerApi.proto = FeedReader.Protos\FeedReaderServerApi.proto
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
