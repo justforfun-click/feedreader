@@ -22,7 +22,8 @@ namespace FeedReader.Server.Services
                 .Decode<IDictionary<string, string>>(jwtToken);
 
             // Validate the audience.
-            if (GetValue(payload, "aud") != WebApi.Consts.FEEDREADER_AUD)
+            var aud = GetValue(payload, "aud");
+            if (aud != WebApi.Consts.FEEDREADER_AUD && aud != WebApi.Consts.FEEDREADER_OLD_AUD)
             {
                 throw new UnauthorizedAccessException();
             }
