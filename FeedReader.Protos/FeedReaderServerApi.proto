@@ -12,6 +12,8 @@ service FeedReaderServerApi
     rpc RefreshFeed(RefreshFeedRequest) returns (RefreshFeedResponse);
 
     rpc GetFeedsByCategory(GetFeedsByCategoryRequest) returns (GetFeedsByCategoryResponse);
+
+    rpc GetStartedFeedItems(GetStartedFeedItemsRequest) returns (GetStartedFeedItemsResponse);
 }
 
 message MarkFeedAsReadedFromTimestampRequest
@@ -49,6 +51,18 @@ message GetFeedsByCategoryResponse
     repeated FeedItemMessageWithFeedInfo FeedItems = 2;
 
     string NextRowKey = 3;
+}
+
+message GetStartedFeedItemsRequest
+{
+    string NextRowKey = 1;
+}
+
+message GetStartedFeedItemsResponse
+{
+    repeated FeedItemMessageWithFeedInfo FeedItems = 1;
+
+    string NextRowKey = 2;
 }
 
 enum FeedCategory {

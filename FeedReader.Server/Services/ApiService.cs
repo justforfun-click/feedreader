@@ -82,6 +82,26 @@ namespace FeedReader.Server.Services
             return response;
         }
 
+        public override async Task<GetStartedFeedItemsResponse> GetStartedFeedItems(GetStartedFeedItemsRequest request, ServerCallContext context)
+        {
+            try
+            {
+                var user = _authService.AuthenticateToken(context.RequestHeaders.Get("authentication")?.Value);
+                var items = await new UserProcessor().GetStaredFeedItemsAsync(request.NextRowKey, user.Uuid, Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
+                var response = new GetStartedFeedItemsResponse();
+                if (items.Count > 0)
+                {
+                    response.FeedItems.AddRange(items.Select(f => GetFeedItemMessageWithFeedInfo(f)));
+                    response.NextRowKey = items.Last().NextRowKey ?? string.Empty;
+                }
+                return response;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Unauthenticated"));
+            }
+        }
+
         private Share.DataContracts.FeedCategory GetDataContractsFeedCategory(FeedCategory category)
         {
             switch (category)

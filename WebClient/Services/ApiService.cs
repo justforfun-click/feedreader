@@ -144,11 +144,18 @@ namespace FeedReader.WebClient.Services
 
         public async Task<List<FeedItem>> GetStaredFeedItems()
         {
-            var items = await GetAsync<List<FeedItem>>("stars");
-            foreach (var item in items) {
-                item.PubDate = item.PubDate.AddMinutes(TimezoneOffset);
+            var res = await _apiClient.GetStartedFeedItemsAsync(new Protos.GetStartedFeedItemsRequest
+            {
+                // TODO
+                NextRowKey = string.Empty
+            });
+
+            var feedItems = res.FeedItems.Select(f => GetFeedItem(f)).ToList();
+            if (feedItems.Count > 0)
+            {
+                feedItems.Last().NextRowKey = res.NextRowKey;
             }
-            return items;
+            return feedItems;
         }
 
         public async Task<List<FeedItem>> GetFeedItemsByCategory(FeedCategory feedCategory, string nextRowKey)
