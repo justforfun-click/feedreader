@@ -22,7 +22,7 @@ RenderFragment TimeAndToolBar =
     </div>;
 }
 
-@if (FeedItem.TopicPictureUri != null)
+@if (!string.IsNullOrEmpty(FeedItem.TopicPictureUri))
 {
     <div class="feed-item-thumbnail-with-topic-picture @(FeedItem.IsReaded ? "readed" : "")">
         <a class="feed-item-summary" href="@FeedItem.PermentLink" target="_blank">

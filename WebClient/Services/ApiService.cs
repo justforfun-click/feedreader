@@ -35,6 +35,10 @@ namespace FeedReader.WebClient.Services
         public ApiService(string serverAddr)
         {
             _serverAddr = serverAddr;
+
+            var httpHandler = new HttpClientHandler();
+            var grpcHandler = new GrpcWebHandler(GrpcWebMode.GrpcWebText, httpHandler);
+            _apiClient = new FeedReaderServerApiClient(GrpcChannel.ForAddress(_serverAddr, new GrpcChannelOptions { HttpHandler = grpcHandler }));
         }
 
         public async Task<User> LoginAsync(string token)
@@ -149,18 +153,16 @@ namespace FeedReader.WebClient.Services
 
         public async Task<List<FeedItem>> GetFeedItemsByCategory(FeedCategory feedCategory, string nextRowKey)
         {
-            var args = new Dictionary<string, string>
+            var res = await _apiClient.GetFeedsByCategoryAsync(new Protos.GetFeedsByCategoryRequest
             {
-                { "category", feedCategory.ToString() }
-            };
-            if (!string.IsNullOrWhiteSpace(nextRowKey))
-            {
-                args["next-row-key"] = nextRowKey;
-            }
+                Category = GetProtosFeedCategory(feedCategory),
+                NextRowKey = nextRowKey ?? string.Empty
+            });
 
-            var feedItems = await GetAsync<List<FeedItem>>("feeds", args);
-            foreach (var item in feedItems) {
-                item.PubDate = item.PubDate.AddMinutes(TimezoneOffset);
+            var feedItems = res.FeedItems.Select(f => GetFeedItem(f)).ToList();
+            if (feedItems.Count > 0)
+            {
+                feedItems.Last().NextRowKey = res.NextRowKey;
             }
             return feedItems;
         }
@@ -192,6 +194,58 @@ namespace FeedReader.WebClient.Services
                 string.Join("&", args.Select(arg => $"{arg.Key}={HttpUtility.UrlEncode(arg.Value)}"));
                 return await _http.GetStringAsync($"{uri}?{string.Join("&", args.Select(arg => $"{arg.Key}={HttpUtility.UrlEncode(arg.Value)}"))}");
             }
+        }
+
+        private Protos.FeedCategory GetProtosFeedCategory(FeedCategory category)
+        {
+            switch (category)
+            {
+                default:
+                case FeedCategory.Recommended:
+                    return Protos.FeedCategory.Default;
+
+                case FeedCategory.News:
+                    return Protos.FeedCategory.News;
+
+                case FeedCategory.Technology:
+                    return Protos.FeedCategory.Technology;
+
+                case FeedCategory.Business:
+                    return Protos.FeedCategory.Business;
+
+                case FeedCategory.Sports:
+                    return Protos.FeedCategory.Sport;
+
+                case FeedCategory.Art:
+                    return Protos.FeedCategory.Art;
+
+                case FeedCategory.Kids:
+                    return Protos.FeedCategory.Kids;
+            }
+        }
+
+        private FeedItem GetFeedItem(Protos.FeedItemMessage f)
+        {
+            return new FeedItem
+            {
+                Content = f.Content,
+                IsReaded = f.IsReaded,
+                IsStared = f.IsStarted,
+                PermentLink = f.PermentLink,
+                PubDate = f.PubDate.ToDateTime().AddMinutes(TimezoneOffset),
+                Summary = f.Summary,
+                Title = f.Title,
+                TopicPictureUri = f.TopicPictureUri
+            };
+        }
+
+        private FeedItem GetFeedItem(Protos.FeedItemMessageWithFeedInfo f)
+        {
+            var feedItem = GetFeedItem(f.FeedItem);
+            feedItem.FeedUri = f.FeedUri;
+            feedItem.FeedIconUri = f.FeedIconUri;
+            feedItem.FeedName = f.FeedName;
+            return feedItem;
         }
 
         #region Customized http client handler.

@@ -10,6 +10,8 @@ service FeedReaderServerApi
     rpc MarkFeedAsReadedFromTimestamp(MarkFeedAsReadedFromTimestampRequest) returns (google.protobuf.Empty);
 
     rpc RefreshFeed(RefreshFeedRequest) returns (RefreshFeedResponse);
+
+    rpc GetFeedsByCategory(GetFeedsByCategoryRequest) returns (GetFeedsByCategoryResponse);
 }
 
 message MarkFeedAsReadedFromTimestampRequest
@@ -35,6 +37,29 @@ message RefreshFeedResponse
     string NextRowKey = 3;
 }
 
+message GetFeedsByCategoryRequest
+{
+    FeedCategory Category = 1;
+
+    string NextRowKey = 3;
+}
+
+message GetFeedsByCategoryResponse
+{
+    repeated FeedItemMessageWithFeedInfo FeedItems = 2;
+
+    string NextRowKey = 3;
+}
+
+enum FeedCategory {
+    FEEDCATEGORY_DEFAULT = 0;
+    FEEDCATEGORY_ART = 1;
+    FEEDCATEGORY_BUSINESS = 2;
+    FEEDCATEGORY_NEWS = 3;
+    FEEDCATEGORY_SPORT = 4;
+    FEEDCATEGORY_Technology = 5;
+    FEEDCATEGORY_KIDS = 6;
+}
 message FeedInfo
 {
     string Uri = 1;
@@ -69,4 +94,15 @@ message FeedItemMessage
     bool IsReaded = 7;
     
     bool IsStarted = 8;
+}
+
+message FeedItemMessageWithFeedInfo
+{
+    FeedItemMessage FeedItem = 1;
+
+    string FeedUri = 2;
+
+    string FeedIconUri = 3;
+
+    string FeedName = 4;
 }

@@ -58,25 +58,82 @@ namespace FeedReader.Server.Services
                         OriginalUri = feed.OriginalUri ?? feed.Uri,
                         Uri = feed.Uri,
                         WebsiteLink = feed.WebsiteLink ?? string.Empty
-                    }
+                    },
+                    NextRowKey = feed.NextRowKey ?? string.Empty,
                 };
-                response.FeedItems.AddRange(feed.Items.Select(f => new FeedItemMessage
-                {
-                    Content = f.Content ?? string.Empty,
-                    IsReaded = f.IsReaded,
-                    IsStarted = f.IsStared,
-                    PermentLink = f.PermentLink ?? string.Empty,
-                    PubDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(f.PubDate.ToUniversalTime()),
-                    Summary = f.Summary ?? string.Empty,
-                    Title = f.Title ?? string.Empty,
-                    TopicPictureUri = f.TopicPictureUri ?? string.Empty
-                }));
+                response.FeedItems.AddRange(feed.Items.Select(f => GetFeedItemMessage(f)));
                 return response;
             }
             catch (UnauthorizedAccessException)
             {
                 throw new RpcException(new Status(StatusCode.Unauthenticated, "Unauthenticated"));
             }
+        }
+
+        public override async Task<GetFeedsByCategoryResponse> GetFeedsByCategory(GetFeedsByCategoryRequest request, ServerCallContext context)
+        {
+            var items = await new FeedProcessor().GetFeedItemsByCategory(GetDataContractsFeedCategory(request.Category), request.NextRowKey, Backend.Share.AzureStorage.GetLatestFeedItemsTable());
+            var response = new GetFeedsByCategoryResponse();
+            if (items.Count > 0)
+            {
+                response.FeedItems.AddRange(items.Select(f => GetFeedItemMessageWithFeedInfo(f)));
+                response.NextRowKey = items.Last().NextRowKey ?? string.Empty;
+            }
+            return response;
+        }
+
+        private Share.DataContracts.FeedCategory GetDataContractsFeedCategory(FeedCategory category)
+        {
+            switch (category)
+            {
+                default:
+                case FeedCategory.Default:
+                    return Share.DataContracts.FeedCategory.Recommended;
+
+                case FeedCategory.Art:
+                    return Share.DataContracts.FeedCategory.Art;
+
+                case FeedCategory.Business:
+                    return Share.DataContracts.FeedCategory.Business;
+
+                case FeedCategory.News:
+                    return Share.DataContracts.FeedCategory.News;
+
+                case FeedCategory.Sport:
+                    return Share.DataContracts.FeedCategory.Sports;
+
+                case FeedCategory.Technology:
+                    return Share.DataContracts.FeedCategory.Technology;
+
+                case FeedCategory.Kids:
+                    return Share.DataContracts.FeedCategory.Kids;
+            }
+        }
+
+        private FeedItemMessage GetFeedItemMessage(Share.DataContracts.FeedItem f)
+        {
+            return new FeedItemMessage
+            {
+                Content = f.Content ?? string.Empty,
+                IsReaded = f.IsReaded,
+                IsStarted = f.IsStared,
+                PermentLink = f.PermentLink ?? string.Empty,
+                PubDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(f.PubDate.ToUniversalTime()),
+                Summary = f.Summary ?? string.Empty,
+                Title = f.Title ?? string.Empty,
+                TopicPictureUri = f.TopicPictureUri ?? string.Empty
+            };
+        }
+
+        private FeedItemMessageWithFeedInfo GetFeedItemMessageWithFeedInfo(Share.DataContracts.FeedItem f)
+        {
+            return new FeedItemMessageWithFeedInfo
+            {
+                FeedItem = GetFeedItemMessage(f),
+                FeedUri = f.FeedUri,
+                FeedIconUri = f.FeedIconUri ?? string.Empty,
+                FeedName = f.FeedName ?? string.Empty
+            };
         }
     }
 }
