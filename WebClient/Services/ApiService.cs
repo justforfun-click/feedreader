@@ -130,21 +130,24 @@ namespace FeedReader.WebClient.Services
 
         public async Task StarFeedItemAsync(FeedItem feedItem)
         {
-            await PostAsync("star", feedItem);
+            await _apiClient.StarFeedItemAsync(new Protos.StarFeedItemRequest
+            {
+                FeedItem = GetProtosFeedItemMessageWithFeedInfo(feedItem)
+            });
         }
 
         public async Task UnstarFeedItemAsync(string feedItemUri, DateTime pubDate)
         {
-            await GetAsync("unstar", new Dictionary<string, string>
+            await _apiClient.UnstarFeedItemAsync(new Protos.UnstarFeedItemRequest
             {
-                { "feed-item-uri", feedItemUri },
-                { "feed-item-pub-date", pubDate.AddMinutes(-TimezoneOffset).ToString("O") }
+                FeedItemUri = feedItemUri,
+                FeedItemPubDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(pubDate.AddMinutes(-TimezoneOffset))
             });
         }
 
         public async Task<List<FeedItem>> GetStaredFeedItems()
         {
-            var res = await _apiClient.GetStartedFeedItemsAsync(new Protos.GetStartedFeedItemsRequest
+            var res = await _apiClient.GetStaredFeedItemsAsync(new Protos.GetStaredFeedItemsRequest
             {
                 // TODO
                 NextRowKey = string.Empty
@@ -253,6 +256,32 @@ namespace FeedReader.WebClient.Services
             feedItem.FeedIconUri = f.FeedIconUri;
             feedItem.FeedName = f.FeedName;
             return feedItem;
+        }
+
+        private Protos.FeedItemMessageWithFeedInfo GetProtosFeedItemMessageWithFeedInfo(FeedItem f)
+        {
+            return new Protos.FeedItemMessageWithFeedInfo
+            {
+                FeedItem = GetProtosFeedItemMessage(f),
+                FeedIconUri = f.FeedIconUri,
+                FeedName = f.FeedName,
+                FeedUri = f.FeedUri
+            };
+        }
+
+        private Protos.FeedItemMessage GetProtosFeedItemMessage(FeedItem f)
+        {
+            return new Protos.FeedItemMessage
+            {
+                Content = f.Content,
+                IsReaded = f.IsReaded,
+                Summary = f.Summary,
+                IsStarted = f.IsStared,
+                PermentLink = f.PermentLink,
+                PubDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(f.PubDate.AddMinutes(-TimezoneOffset)),
+                Title = f.Title,
+                TopicPictureUri = f.TopicPictureUri
+            };
         }
 
         #region Customized http client handler.

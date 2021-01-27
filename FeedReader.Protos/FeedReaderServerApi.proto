@@ -13,7 +13,11 @@ service FeedReaderServerApi
 
     rpc GetFeedsByCategory(GetFeedsByCategoryRequest) returns (GetFeedsByCategoryResponse);
 
-    rpc GetStartedFeedItems(GetStartedFeedItemsRequest) returns (GetStartedFeedItemsResponse);
+    rpc GetStaredFeedItems(GetStaredFeedItemsRequest) returns (GetStaredFeedItemsResponse);
+
+    rpc StarFeedItem(StarFeedItemRequest) returns (google.protobuf.Empty);
+
+    rpc UnstarFeedItem(UnstarFeedItemRequest) returns (google.protobuf.Empty);
 }
 
 message MarkFeedAsReadedFromTimestampRequest
@@ -53,16 +57,28 @@ message GetFeedsByCategoryResponse
     string NextRowKey = 3;
 }
 
-message GetStartedFeedItemsRequest
+message GetStaredFeedItemsRequest
 {
     string NextRowKey = 1;
 }
 
-message GetStartedFeedItemsResponse
+message GetStaredFeedItemsResponse
 {
     repeated FeedItemMessageWithFeedInfo FeedItems = 1;
 
     string NextRowKey = 2;
+}
+
+message StarFeedItemRequest
+{
+    FeedItemMessageWithFeedInfo FeedItem = 1;
+}
+
+message UnstarFeedItemRequest
+{
+    string FeedItemUri = 1;
+
+    google.protobuf.Timestamp FeedItemPubDate = 2;
 }
 
 enum FeedCategory {

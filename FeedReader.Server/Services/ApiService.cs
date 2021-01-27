@@ -82,13 +82,13 @@ namespace FeedReader.Server.Services
             return response;
         }
 
-        public override async Task<GetStartedFeedItemsResponse> GetStartedFeedItems(GetStartedFeedItemsRequest request, ServerCallContext context)
+        public override async Task<GetStaredFeedItemsResponse> GetStaredFeedItems(GetStaredFeedItemsRequest request, ServerCallContext context)
         {
             try
             {
                 var user = _authService.AuthenticateToken(context.RequestHeaders.Get("authentication")?.Value);
                 var items = await new UserProcessor().GetStaredFeedItemsAsync(request.NextRowKey, user.Uuid, Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
-                var response = new GetStartedFeedItemsResponse();
+                var response = new GetStaredFeedItemsResponse();
                 if (items.Count > 0)
                 {
                     response.FeedItems.AddRange(items.Select(f => GetFeedItemMessageWithFeedInfo(f)));
@@ -102,6 +102,48 @@ namespace FeedReader.Server.Services
             }
         }
 
+        public override async Task<Empty> StarFeedItem(StarFeedItemRequest request, ServerCallContext context)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.FeedItem.FeedItem.PermentLink))
+                {
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "'PermentLink' of feed item is missing."));
+                }
+
+                if (string.IsNullOrEmpty(request.FeedItem.FeedUri))
+                {
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "'FeedUri' of feed item is missing."));
+                }
+
+                var user = _authService.AuthenticateToken(context.RequestHeaders.Get("authentication")?.Value);
+                await new UserProcessor().StarFeedItemAsync(GetDataContractFeedItem(request.FeedItem), AzureStorage.GetUserBlob(user.Uuid), Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
+                return new Empty();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Unauthenticated"));
+            }
+        }
+
+        public override async Task<Empty> UnstarFeedItem(UnstarFeedItemRequest request, ServerCallContext context)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.FeedItemUri))
+                {
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "'FeedItemUri' is missing."));
+                }
+
+                var user = _authService.AuthenticateToken(context.RequestHeaders.Get("authentication")?.Value);
+                await new UserProcessor().UnstarFeedItemAsync(request.FeedItemUri, request.FeedItemPubDate.ToDateTime(), AzureStorage.GetUserBlob(user.Uuid), Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
+                return new Empty();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Unauthenticated"));
+            }
+        }
         private Share.DataContracts.FeedCategory GetDataContractsFeedCategory(FeedCategory category)
         {
             switch (category)
@@ -128,6 +170,30 @@ namespace FeedReader.Server.Services
                 case FeedCategory.Kids:
                     return Share.DataContracts.FeedCategory.Kids;
             }
+        }
+
+        private Share.DataContracts.FeedItem GetDataContractFeedItem(FeedItemMessage f)
+        {
+            return new Share.DataContracts.FeedItem
+            {
+                Content = f.Content,
+                IsReaded = f.IsReaded,
+                IsStared = f.IsReaded,
+                PermentLink = f.PermentLink,
+                PubDate = f.PubDate.ToDateTime(),
+                Summary = f.Summary,
+                Title = f.Title,
+                TopicPictureUri = f.TopicPictureUri
+            };
+        }
+
+        private Share.DataContracts.FeedItem GetDataContractFeedItem(FeedItemMessageWithFeedInfo f)
+        {
+            var feedItem = GetDataContractFeedItem(f.FeedItem);
+            feedItem.FeedIconUri = f.FeedIconUri;
+            feedItem.FeedName = f.FeedName;
+            feedItem.FeedUri = f.FeedUri;
+            return feedItem;
         }
 
         private FeedItemMessage GetFeedItemMessage(Share.DataContracts.FeedItem f)
