@@ -8,6 +8,8 @@ option csharp_namespace = "FeedReader.Protos";
 service FeedReaderServerApi
 {
     rpc MarkFeedAsReadedFromTimestamp(MarkFeedAsReadedFromTimestampRequest) returns (google.protobuf.Empty);
+
+    rpc RefreshFeed(RefreshFeedRequest) returns (RefreshFeedResponse);
 }
 
 message MarkFeedAsReadedFromTimestampRequest
@@ -15,4 +17,56 @@ message MarkFeedAsReadedFromTimestampRequest
     string FeedUri = 2;
 
     google.protobuf.Timestamp Timestamp = 3; 
+}
+
+message RefreshFeedRequest
+{
+    string FeedUri = 1;
+
+    string NextRowKey = 2;
+}
+
+message RefreshFeedResponse
+{
+    FeedInfo FeedInfo = 1;
+
+    repeated FeedItemMessage FeedItems = 2;
+
+    string NextRowKey = 3;
+}
+
+message FeedInfo
+{
+    string Uri = 1;
+
+    string OriginalUri = 2;
+
+    string IconUri = 3;
+
+    string Name = 4;
+
+    string Description = 5;
+
+    string WebsiteLink = 6;
+
+    string Group = 7;
+}
+
+message FeedItemMessage
+{
+    string Title = 1;
+
+    string PermentLink = 2;
+
+    string TopicPictureUri = 3;
+
+    string Summary = 4;
+
+    string Content = 5;
+
+    google.protobuf.Timestamp PubDate = 6;
+
+    bool IsReaded = 7;
+    
+    bool IsStarted = 8;
 }

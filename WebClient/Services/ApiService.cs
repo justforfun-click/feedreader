@@ -81,21 +81,37 @@ namespace FeedReader.WebClient.Services
 
         public async Task<Feed> RefreshFeed(string feedUri, string nextRowKey)
         {
-            var args = new Dictionary<string, string> { { "feed-uri", feedUri } };
-            if (!string.IsNullOrWhiteSpace(nextRowKey))
+            var response = await _apiClient.RefreshFeedAsync(new Protos.RefreshFeedRequest
             {
-                args["next-row-key"] = nextRowKey;
-            }
-            var feed = await GetAsync<Feed>("feed/refresh", args);
-            foreach (var feedItem in feed.Items) {
-                feedItem.PubDate = feedItem.PubDate.AddMinutes(TimezoneOffset);
-                if (string.IsNullOrWhiteSpace(feedItem.FeedUri))
+                FeedUri = feedUri,
+                NextRowKey = nextRowKey ?? string.Empty
+            });
+
+            var feed = new Feed
+            {
+                Description = response.FeedInfo.Description,
+                Group = response.FeedInfo.Group,
+                IconUri = response.FeedInfo.IconUri,
+                Name = response.FeedInfo.Name,
+                OriginalUri = response.FeedInfo.OriginalUri,
+                Uri = response.FeedInfo.Uri,
+                WebsiteLink = response.FeedInfo.WebsiteLink,
+                Items = response.FeedItems.Select(f => new FeedItem
                 {
-                    feedItem.FeedUri = feed.Uri;
-                    feedItem.FeedIconUri = feed.IconUri;
-                    feedItem.FeedName = feed.Name;
-                }
-            }
+                    Content = f.Content,
+                    IsReaded = f.IsReaded,
+                    IsStared = f.IsStarted,
+                    PermentLink = f.PermentLink,
+                    PubDate = f.PubDate.ToDateTime().AddMinutes(TimezoneOffset),
+                    Summary = f.Summary,
+                    Title = f.Title,
+                    TopicPictureUri = f.TopicPictureUri,
+                    FeedUri = response.FeedInfo.Uri,
+                    FeedIconUri = response.FeedInfo.IconUri,
+                    FeedName = response.FeedInfo.Name,
+                }).ToList(),
+                NextRowKey = response.NextRowKey
+            };
             return feed;
         }
 
