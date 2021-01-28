@@ -1,9 +1,9 @@
 FeedReader
 ==
 
-![Azure Static Web Apps CI/CD](https://github.com/justforfun-click/feedreader/workflows/Azure%20Static%20Web%20Apps%20CI/CD/badge.svg)
+![Master Build and Deploy](https://github.com/justforfun-click/feedreader/workflows/Push%20On%20Master%20CI/badge.svg)
 
-Build an online web feed reader with blazor web assembly, azure functions and GitHub actions.
+Build an online web feed reader with blazor web assembly.
 
 ## Screen Shots
 
@@ -29,8 +29,4 @@ Website: https://feedreader.org
 
         C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator>AzureStorageEmulator.exe start
 
-1. Go to `WebApi` folder, copy `local.settings.example.json` to `local.settings.json`.
-
-1. Launch `FeedReader.sln`, right click `Solution 'FeedReader'` node, open `Properties` dialog.
-   Under `Startup Project|Multiple start projects`, set the `Action` of `FeedReader.WebApi` and `FeedReader.WebClient`
-   projects to `Start`. Prefresh `F5`. It should launch your browser and navigate to `https://localhost`.
+1. Launch `FeedReader.Server` project. Open browser and navigate to `https://localhost`.
