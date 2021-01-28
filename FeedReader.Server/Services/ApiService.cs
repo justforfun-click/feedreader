@@ -49,16 +49,7 @@ namespace FeedReader.Server.Services
                 var feed = await new FeedProcessor().GetFeedItemsAsync(request.FeedUri, request.NextRowKey, userBlob, userFeedsTable, feedsTable, feedItemsTable);
                 var response = new RefreshFeedResponse()
                 {
-                    FeedInfo = new FeedInfo
-                    {
-                        Description = feed.Description ?? string.Empty,
-                        Group = feed.Group ?? string.Empty,
-                        IconUri = feed.IconUri ?? string.Empty,
-                        Name = feed.Name ?? string.Empty,
-                        OriginalUri = feed.OriginalUri ?? feed.Uri,
-                        Uri = feed.Uri,
-                        WebsiteLink = feed.WebsiteLink ?? string.Empty
-                    },
+                    FeedInfo = GetFeedInfo(feed),
                     NextRowKey = feed.NextRowKey ?? string.Empty,
                 };
                 response.FeedItems.AddRange(feed.Items.Select(f => GetFeedItemMessage(f)));
@@ -144,6 +135,51 @@ namespace FeedReader.Server.Services
                 throw new RpcException(new Status(StatusCode.Unauthenticated, "Unauthenticated"));
             }
         }
+
+        public override async Task<SubscribeFeedResponse> SubscribeFeed(SubscribeFeedRequest request, ServerCallContext context)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.OriginalUri))
+                {
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "'Original' is missing."));
+                }
+
+                request.OriginalUri = request.OriginalUri.Trim();
+                var user = _authService.AuthenticateToken(context.RequestHeaders.Get("authentication")?.Value);
+                var usersFeedsTable = AzureStorage.GetUsersFeedsTable();
+                var feedTable = Backend.Share.AzureStorage.GetFeedsTable();
+                var feed = await new FeedProcessor().SubscribeFeedAsync(request.OriginalUri, request.Name, request.Group, user.Uuid, usersFeedsTable, feedTable);
+                return new SubscribeFeedResponse
+                {
+                    Feed = GetFeedInfo(feed)
+                };
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Unauthenticated"));
+            }
+        }
+
+        public override async Task<Empty> UnsubscribeFeed(UnsubscribeFeedRequest request, ServerCallContext context)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.FeedUri))
+                {
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "'FeedUri' is missing."));
+                }
+
+                var user = _authService.AuthenticateToken(context.RequestHeaders.Get("authentication")?.Value);
+                await new FeedProcessor().UnsubscribeFeedAsync(request.FeedUri, user.Uuid, AzureStorage.GetUsersFeedsTable());
+                return new Empty();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Unauthenticated"));
+            }
+        }
+
         private Share.DataContracts.FeedCategory GetDataContractsFeedCategory(FeedCategory category)
         {
             switch (category)
@@ -170,6 +206,20 @@ namespace FeedReader.Server.Services
                 case FeedCategory.Kids:
                     return Share.DataContracts.FeedCategory.Kids;
             }
+        }
+
+        private FeedInfo GetFeedInfo(Share.DataContracts.Feed feed)
+        {
+            return new FeedInfo
+            {
+                Description = feed.Description ?? string.Empty,
+                Group = feed.Group ?? string.Empty,
+                IconUri = feed.IconUri ?? string.Empty,
+                Name = feed.Name ?? string.Empty,
+                OriginalUri = feed.OriginalUri ?? feed.Uri,
+                Uri = feed.Uri,
+                WebsiteLink = feed.WebsiteLink ?? string.Empty
+            };
         }
 
         private Share.DataContracts.FeedItem GetDataContractFeedItem(FeedItemMessage f)

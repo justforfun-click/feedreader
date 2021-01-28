@@ -55,21 +55,22 @@ namespace FeedReader.WebClient.Services
             return user;
         }
 
-        public Task<Feed> SubscribeFeed(Feed feed)
+        public async Task<Feed> SubscribeFeed(Feed feed)
         {
-            return PostAsync<Feed>("feed/subscribe", new Share.DataContracts.Feed()
+            var feedInfo = await _apiClient.SubscribeFeedAsync(new Protos.SubscribeFeedRequest
             {
-                Name = feed.Name,
-                Group = feed.Group,
-                Uri = feed.Uri,
-                OriginalUri = feed.OriginalUri
+                OriginalUri = feed.OriginalUri,
+                Group = feed.Group ?? string.Empty,
+                Name = feed.Name ?? string.Empty
             });
+            return GetFeed(feedInfo.Feed);
         }
 
-        public Task UnsubscribeFeed(string feedUri)
+        public async Task UnsubscribeFeed(string feedUri)
         {
-            return GetAsync("feed/unsubscribe", new Dictionary<string, string>{
-                { "feed-uri", feedUri }
+            await _apiClient.UnsubscribeFeedAsync(new Protos.UnsubscribeFeedRequest
+            {
+                FeedUri = feedUri
             });
         }
 
@@ -232,6 +233,20 @@ namespace FeedReader.WebClient.Services
                 case FeedCategory.Kids:
                     return Protos.FeedCategory.Kids;
             }
+        }
+
+        private Feed GetFeed(Protos.FeedInfo f)
+        {
+            return new Feed
+            {
+                Description = f.Description,
+                Group = f.Group,
+                IconUri = f.IconUri,
+                Name = f.Name,
+                OriginalUri = f.OriginalUri,
+                Uri = f.Uri,
+                WebsiteLink = f.WebsiteLink
+            };
         }
 
         private FeedItem GetFeedItem(Protos.FeedItemMessage f)

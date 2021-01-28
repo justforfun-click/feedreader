@@ -18,6 +18,10 @@ service FeedReaderServerApi
     rpc StarFeedItem(StarFeedItemRequest) returns (google.protobuf.Empty);
 
     rpc UnstarFeedItem(UnstarFeedItemRequest) returns (google.protobuf.Empty);
+
+    rpc SubscribeFeed(SubscribeFeedRequest) returns (SubscribeFeedResponse);
+
+    rpc UnsubscribeFeed(UnsubscribeFeedRequest) returns (google.protobuf.Empty);
 }
 
 message MarkFeedAsReadedFromTimestampRequest
@@ -79,6 +83,25 @@ message UnstarFeedItemRequest
     string FeedItemUri = 1;
 
     google.protobuf.Timestamp FeedItemPubDate = 2;
+}
+
+message SubscribeFeedRequest
+{
+    string OriginalUri = 1;
+
+    string Name = 2;
+
+    string Group = 3;
+}
+
+message SubscribeFeedResponse
+{
+    FeedInfo Feed = 1;
+}
+
+message UnsubscribeFeedRequest
+{
+    string FeedUri = 1;
 }
 
 enum FeedCategory {
