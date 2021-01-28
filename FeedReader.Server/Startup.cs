@@ -14,7 +14,10 @@ namespace FeedReader.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddGrpc();
+            services.AddGrpc(options =>
+            {
+                options.Interceptors.Add<GrpcExceptionInterceptor>();
+            });
             services.AddProxies();
             services.AddSingleton<AuthService>();
             services.AddHostedService<BackgroundServices.FeedsRefreshService>();
