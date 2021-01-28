@@ -7,6 +7,8 @@ option csharp_namespace = "FeedReader.Protos";
 
 service FeedReaderServerApi
 {
+    rpc Login(LoginRequest) returns (UserInfo);
+
     rpc MarkFeedAsReadedFromTimestamp(MarkFeedAsReadedFromTimestampRequest) returns (google.protobuf.Empty);
 
     rpc RefreshFeed(RefreshFeedRequest) returns (RefreshFeedResponse);
@@ -24,6 +26,10 @@ service FeedReaderServerApi
     rpc UnsubscribeFeed(UnsubscribeFeedRequest) returns (google.protobuf.Empty);
 
     rpc UpdateFeed(UpdateFeedRequest) returns (google.protobuf.Empty);
+}
+
+message LoginRequest
+{
 }
 
 message MarkFeedAsReadedFromTimestampRequest
@@ -124,6 +130,16 @@ enum FeedCategory {
     FEEDCATEGORY_Technology = 5;
     FEEDCATEGORY_KIDS = 6;
 }
+
+message UserInfo
+{
+    string Token = 1;
+
+    string Uuid = 2;
+
+    repeated FeedInfo Feeds = 3;
+}
+
 message FeedInfo
 {
     string Uri = 1;

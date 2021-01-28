@@ -17,13 +17,6 @@ namespace FeedReader.WebClient.Services
 {
     public class ApiService
     {
-        private HttpClient _http;
-        public HttpClient HttpClient
-        {
-            get => _http;
-            set => _http = value;
-        }
-
         private readonly string _serverAddr;
 
         private FeedReaderServerApiClient _apiClient;
@@ -43,16 +36,21 @@ namespace FeedReader.WebClient.Services
 
         public async Task<User> LoginAsync(string token)
         {
-            _http.DefaultRequestHeaders.Remove("authentication");
-            _http.DefaultRequestHeaders.Add("authentication", token);
-            var user = await GetAsync<User>("login");
-            _http.DefaultRequestHeaders.Remove("authentication");
-            _http.DefaultRequestHeaders.Add("authentication", user.Token);
-
-            var httpHandler = new CustomizedHttpClientHandler(user.Token);
+            var httpHandler = new CustomizedHttpClientHandler(token);
             var grpcHandler = new GrpcWebHandler(GrpcWebMode.GrpcWebText, httpHandler);
             _apiClient = new FeedReaderServerApiClient(GrpcChannel.ForAddress(_serverAddr, new GrpcChannelOptions { HttpHandler = grpcHandler }));
-            return user;
+            var user = await _apiClient.LoginAsync(new Protos.LoginRequest());            
+
+            // Switch the token.
+            httpHandler = new CustomizedHttpClientHandler(user.Token);
+            grpcHandler = new GrpcWebHandler(GrpcWebMode.GrpcWebText, httpHandler);
+            _apiClient = new FeedReaderServerApiClient(GrpcChannel.ForAddress(_serverAddr, new GrpcChannelOptions { HttpHandler = grpcHandler }));
+            return new User
+            {
+                Uuid = user.Uuid,
+                Token = user.Token,
+                Feeds = user.Feeds.Select(f => GetFeed(f)).ToList()
+            };
         }
 
         public async Task<Feed> SubscribeFeed(Feed feed)
@@ -176,35 +174,6 @@ namespace FeedReader.WebClient.Services
                 feedItems.Last().NextRowKey = res.NextRowKey;
             }
             return feedItems;
-        }
-
-        private async Task<TResult> PostAsync<TResult>(string uri, object obj)
-        {
-            var res = await _http.PostAsync(uri, new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8));
-            return JsonConvert.DeserializeObject<TResult>(await res.Content.ReadAsStringAsync());
-        }
-
-        private async Task PostAsync(string uri, object obj)
-        {
-             await _http.PostAsync(uri, new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8));
-        }
-
-        private async Task<TResult> GetAsync<TResult>(string uri, Dictionary<string, string> args = null)
-        {
-            return JsonConvert.DeserializeObject<TResult>(await GetAsync(uri, args));
-        }
-
-        private async Task<string> GetAsync(string uri, Dictionary<string, string> args = null)
-        {
-            if (args == null)
-            {
-                return await _http.GetStringAsync(uri);
-            }
-            else
-            {
-                string.Join("&", args.Select(arg => $"{arg.Key}={HttpUtility.UrlEncode(arg.Value)}"));
-                return await _http.GetStringAsync($"{uri}?{string.Join("&", args.Select(arg => $"{arg.Key}={HttpUtility.UrlEncode(arg.Value)}"))}");
-            }
         }
 
         private Protos.FeedCategory GetProtosFeedCategory(FeedCategory category)

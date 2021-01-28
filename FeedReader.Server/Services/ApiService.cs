@@ -19,11 +19,40 @@ namespace FeedReader.Server.Services
             _authService = sp.GetService<AuthService>();
         }
 
+        public override async Task<UserInfo> Login(LoginRequest request, ServerCallContext context)
+        {
+            try
+            {
+                var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
+                var processor = new UserProcessor();
+                var userContainer = AzureStorage.GetUserContainer();
+                var uuidIndexTable = AzureStorage.GetRelatedUuidIndexTable();
+                var usersFeedsTable = AzureStorage.GetUsersFeedsTable();
+                var userEntity = await processor.LoginAsync(new WebApi.Entities.UserEntity
+                {
+                    Uuid = user.Uuid,
+                    Email = user.Email,
+                    AvatarUrl = user.AvatarUrl
+                }, userContainer, uuidIndexTable, usersFeedsTable);
+                var res = new UserInfo
+                {
+                    Token = userEntity.Token,
+                    Uuid = userEntity.Uuid
+                };
+                res.Feeds.AddRange(userEntity.Feeds.Select(f => GetFeedInfo(f)));
+                return res;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Unauthenticated"));
+            }
+        }
+
         public override async Task<Empty> MarkFeedAsReadedFromTimestamp(MarkFeedAsReadedFromTimestampRequest request, ServerCallContext context)
         {
             try
             {
-                var user = _authService.AuthenticateToken(context.RequestHeaders.Get("authentication")?.Value);
+                var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
                 var userFeedsTable = AzureStorage.GetUsersFeedsTable();
                 var feedsTable = Backend.Share.AzureStorage.GetFeedsTable();
                 var feedRefresJobsQueue = Backend.Share.AzureStorage.GetFeedRefreshJobsQueue();
@@ -41,7 +70,7 @@ namespace FeedReader.Server.Services
             try
             {
                 var userToken = context.RequestHeaders.Get("authentication")?.Value;
-                var user = userToken == null ? null : _authService.AuthenticateToken(userToken);
+                var user = userToken == null ? null : await _authService.AuthenticateTokenAsync(userToken);
                 var userBlob = user == null ? null : AzureStorage.GetUserBlob(user.Uuid);
                 var userFeedsTable = AzureStorage.GetUsersFeedsTable();
                 var feedsTable = Backend.Share.AzureStorage.GetFeedsTable();
@@ -77,7 +106,7 @@ namespace FeedReader.Server.Services
         {
             try
             {
-                var user = _authService.AuthenticateToken(context.RequestHeaders.Get("authentication")?.Value);
+                var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
                 var items = await new UserProcessor().GetStaredFeedItemsAsync(request.NextRowKey, user.Uuid, Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
                 var response = new GetStaredFeedItemsResponse();
                 if (items.Count > 0)
@@ -107,7 +136,7 @@ namespace FeedReader.Server.Services
                     throw new RpcException(new Status(StatusCode.InvalidArgument, "'FeedUri' of feed item is missing."));
                 }
 
-                var user = _authService.AuthenticateToken(context.RequestHeaders.Get("authentication")?.Value);
+                var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
                 await new UserProcessor().StarFeedItemAsync(GetDataContractFeedItem(request.FeedItem), AzureStorage.GetUserBlob(user.Uuid), Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
                 return new Empty();
             }
@@ -126,7 +155,7 @@ namespace FeedReader.Server.Services
                     throw new RpcException(new Status(StatusCode.InvalidArgument, "'FeedItemUri' is missing."));
                 }
 
-                var user = _authService.AuthenticateToken(context.RequestHeaders.Get("authentication")?.Value);
+                var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
                 await new UserProcessor().UnstarFeedItemAsync(request.FeedItemUri, request.FeedItemPubDate.ToDateTime(), AzureStorage.GetUserBlob(user.Uuid), Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
                 return new Empty();
             }
@@ -146,7 +175,7 @@ namespace FeedReader.Server.Services
                 }
 
                 request.OriginalUri = request.OriginalUri.Trim();
-                var user = _authService.AuthenticateToken(context.RequestHeaders.Get("authentication")?.Value);
+                var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
                 var usersFeedsTable = AzureStorage.GetUsersFeedsTable();
                 var feedTable = Backend.Share.AzureStorage.GetFeedsTable();
                 var feed = await new FeedProcessor().SubscribeFeedAsync(request.OriginalUri, request.Name, request.Group, user.Uuid, usersFeedsTable, feedTable);
@@ -170,7 +199,7 @@ namespace FeedReader.Server.Services
                     throw new RpcException(new Status(StatusCode.InvalidArgument, "'FeedUri' is missing."));
                 }
 
-                var user = _authService.AuthenticateToken(context.RequestHeaders.Get("authentication")?.Value);
+                var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
                 await new FeedProcessor().UnsubscribeFeedAsync(request.FeedUri, user.Uuid, AzureStorage.GetUsersFeedsTable());
                 return new Empty();
             }
@@ -189,7 +218,7 @@ namespace FeedReader.Server.Services
                     throw new RpcException(new Status(StatusCode.InvalidArgument, "'FeedUri' is missing."));
                 }
 
-                var user = _authService.AuthenticateToken(context.RequestHeaders.Get("authentication")?.Value);
+                var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
                 await new FeedProcessor().UpdateFeedAsync(request.FeedUri, request.FeedName, request.FeedGroup, user.Uuid, AzureStorage.GetUsersFeedsTable());
                 return new Empty();
             }
