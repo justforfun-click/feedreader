@@ -103,7 +103,7 @@ namespace FeedReader.WebClient.Services
                 {
                     Content = f.Content,
                     IsReaded = f.IsReaded,
-                    IsStared = f.IsStarted,
+                    IsStared = f.IsStared,
                     PermentLink = f.PermentLink,
                     PubDate = f.PubDate.ToDateTime().AddMinutes(TimezoneOffset),
                     Summary = f.Summary,
@@ -224,7 +224,7 @@ namespace FeedReader.WebClient.Services
             {
                 Content = f.Content,
                 IsReaded = f.IsReaded,
-                IsStared = f.IsStarted,
+                IsStared = f.IsStared,
                 PermentLink = f.PermentLink,
                 PubDate = f.PubDate.ToDateTime().AddMinutes(TimezoneOffset),
                 Summary = f.Summary,
@@ -260,7 +260,7 @@ namespace FeedReader.WebClient.Services
                 Content = f.Content,
                 IsReaded = f.IsReaded,
                 Summary = f.Summary,
-                IsStarted = f.IsStared,
+                IsStared = f.IsStared,
                 PermentLink = f.PermentLink,
                 PubDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(f.PubDate.AddMinutes(-TimezoneOffset)),
                 Title = f.Title,

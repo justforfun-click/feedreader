@@ -173,7 +173,7 @@ message FeedItemMessage
 
     bool IsReaded = 7;
     
-    bool IsStarted = 8;
+    bool IsStared = 8;
 }
 
 message FeedItemMessageWithFeedInfo

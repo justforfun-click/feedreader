@@ -300,7 +300,7 @@ namespace FeedReader.Server.Services
             {
                 Content = f.Content ?? string.Empty,
                 IsReaded = f.IsReaded,
-                IsStarted = f.IsStared,
+                IsStared = f.IsStared,
                 PermentLink = f.PermentLink ?? string.Empty,
                 PubDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(f.PubDate.ToUniversalTime()),
                 Summary = f.Summary ?? string.Empty,
