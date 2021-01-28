@@ -22,6 +22,8 @@ service FeedReaderServerApi
     rpc SubscribeFeed(SubscribeFeedRequest) returns (SubscribeFeedResponse);
 
     rpc UnsubscribeFeed(UnsubscribeFeedRequest) returns (google.protobuf.Empty);
+
+    rpc UpdateFeed(UpdateFeedRequest) returns (google.protobuf.Empty);
 }
 
 message MarkFeedAsReadedFromTimestampRequest
@@ -102,6 +104,15 @@ message SubscribeFeedResponse
 message UnsubscribeFeedRequest
 {
     string FeedUri = 1;
+}
+
+message UpdateFeedRequest
+{
+    string FeedUri = 1;
+
+    string FeedName = 2;
+
+    string FeedGroup = 3;
 }
 
 enum FeedCategory {

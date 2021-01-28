@@ -74,13 +74,13 @@ namespace FeedReader.WebClient.Services
             });
         }
 
-        public Task UpdateFeed(Feed feed)
+        public async Task UpdateFeed(Feed feed)
         {
-            return PostAsync("feed/update", new Share.DataContracts.Feed()
+            await _apiClient.UpdateFeedAsync(new Protos.UpdateFeedRequest
             {
-                Uri = feed.Uri,
-                Name = feed.Name,
-                Group = feed.Group,
+                FeedUri = feed.Uri,
+                FeedName = feed.Name ?? string.Empty,
+                FeedGroup = feed.Group ?? string.Empty
             });
         }
 

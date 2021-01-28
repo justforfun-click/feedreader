@@ -180,6 +180,25 @@ namespace FeedReader.Server.Services
             }
         }
 
+        public override async Task<Empty> UpdateFeed(UpdateFeedRequest request, ServerCallContext context)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.FeedUri))
+                {
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "'FeedUri' is missing."));
+                }
+
+                var user = _authService.AuthenticateToken(context.RequestHeaders.Get("authentication")?.Value);
+                await new FeedProcessor().UpdateFeedAsync(request.FeedUri, request.FeedName, request.FeedGroup, user.Uuid, AzureStorage.GetUsersFeedsTable());
+                return new Empty();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                throw new RpcException(new Status(StatusCode.Unauthenticated, "Unauthenticated"));
+            }
+        }
+
         private Share.DataContracts.FeedCategory GetDataContractsFeedCategory(FeedCategory category)
         {
             switch (category)
