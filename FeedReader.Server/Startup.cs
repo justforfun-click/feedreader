@@ -20,7 +20,6 @@ namespace FeedReader.Server
             });
             services.AddProxies();
             services.AddSingleton<AuthService>();
-            services.AddHostedService<BackgroundServices.FeedsRefreshService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

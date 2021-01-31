@@ -9,3 +9,4 @@ Task/log/*.log
 obj/
 bin/
 node_modules/
+docker-compose.override.yml

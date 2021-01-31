@@ -1,0 +1,14 @@
+version: '3.4'
+
+services:
+  feedreader.server:
+    image: ${DOCKER_REGISTRY-}feedreaderserver
+    build:
+      context: .
+      dockerfile: FeedReader.Server/Dockerfile
+
+  feedreader.taskserver:
+    image: ${DOCKER_REGISTRY-}feedreadertaskserver
+    build:
+      context: .
+      dockerfile: FeedReader.TaskServer/Dockerfile

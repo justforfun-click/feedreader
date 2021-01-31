@@ -13,11 +13,6 @@ jobs:
         with:
           submodules: true
 
-      - name: Setup DotNet Environment 3.1
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1.x
-
       - name: Setup DotNet Environment 5.0
         uses: actions/setup-dotnet@v1
         with:
@@ -26,17 +21,17 @@ jobs:
       - name: Restore
         shell: bash
         run: |
-          dotnet restore
+          dotnet restore FeedReader.sln
 
       - name: Build
         shell: bash
         run: |
-          dotnet build -c Release --no-restore
+          dotnet build FeedReader.sln -c Release --no-restore
 
       - name: Test
         shell: bash
         run: |
-          dotnet test -c Release --no-build
+          dotnet test FeedReader.sln -c Release --no-build
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -48,7 +43,7 @@ jobs:
           username: ${{ secrets.AZURECR_USERNAME }}
           password: ${{ secrets.AZURECR_PASSWORD }}
 
-      - name: Build docker image
+      - name: Build FeedReader.Server docker image
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -56,10 +51,10 @@ jobs:
           tags: feedreader.azurecr.io/feedreader-devtest:latest
           push: true
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v2
+      - name: Build FeedReader.TaskServer docker image
+        uses: docker/build-push-action@v2
         with:
-          app-name: feedreader-webserver-westus2
-          publish-profile: ${{ secrets.FEEDREADER_SERVER_PUBLISH_PROFILE }}
-          images: justforfunclick/feedreader-devtest:latest
-          slot-name: devtest
+          context: .
+          file: FeedReader.TaskServer/Dockerfile
+          tags: feedreader.azurecr.io/feedreader-taskserver:latest
+          push: true
