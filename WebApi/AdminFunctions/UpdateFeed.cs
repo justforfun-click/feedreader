@@ -8,6 +8,7 @@ using FeedReader.Backend.Share.FeedParsers;
 using FeedReader.WebApi.Processors;
 using FeedReader.Backend.Share.Entities;
 using FeedReader.Share;
+using System.Net.Http.Headers;
 
 namespace FeedReader.WebApi.AdminFunctions
 {
@@ -31,10 +32,10 @@ namespace FeedReader.WebApi.AdminFunctions
                 var handler = new HttpClientHandler() { AutomaticDecompression = System.Net.DecompressionMethods.All, AllowAutoRedirect = true };
                 httpClient = new HttpClient(handler);
                 httpClient.DefaultRequestHeaders.Add("User-Agent", "FeedReader");
+                httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue { NoCache = true };
             }
 
-            var fetchUri = feedOriginalUri + (feedOriginalUri.IndexOf('?') > 0 ? "&" : "?") + $"_feedreader_fetch_timestamp={DateTime.Now.ToUniversalTime().Ticks}";
-            var feedContent = await httpClient.GetStringAsync(fetchUri);
+            var feedContent = await httpClient.GetStringAsync(feedOriginalUri);
 
             // Create parser.
             var parser = FeedParser.Create(feedContent);
