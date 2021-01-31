@@ -12,6 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WebApi\FeedReader.WebApi.csproj" />
+    <ProjectReference Include="..\FeedReader.ServerCore\FeedReader.ServerCore.csproj" />
   </ItemGroup>
 </Project>

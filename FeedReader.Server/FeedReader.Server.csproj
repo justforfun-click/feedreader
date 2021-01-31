@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WebApi\FeedReader.WebApi.csproj" />
-    <ProjectReference Include="..\WebClient\FeedReader.WebClient.csproj" />
+    <ProjectReference Include="..\FeedReader.ServerCore\FeedReader.ServerCore.csproj" />
+    <ProjectReference Include="..\FeedReader.WebClient\FeedReader.WebClient.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.WebClient", "WebClient\FeedReader.WebClient.csproj", "{1A860895-2AC5-4C07-A3B4-E6B3BEEA140F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.WebClient", "FeedReader.WebClient\FeedReader.WebClient.csproj", "{1A860895-2AC5-4C07-A3B4-E6B3BEEA140F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.Share", "Share\FeedReader.Share.csproj", "{99E14E15-4398-425A-A885-B5F2D10046EC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.WebApi.Test", "WebApi.Test\FeedReader.WebApi.Test.csproj", "{FD97FFF7-F3CB-4392-919B-0356EEE1590E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.ServerCore.Test", "FeedReader.ServerCore.Test\FeedReader.ServerCore.Test.csproj", "{FD97FFF7-F3CB-4392-919B-0356EEE1590E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.WebApi", "WebApi\FeedReader.WebApi.csproj", "{E577D135-1B6F-48B1-BCA0-88401D05F36B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.ServerCore", "FeedReader.ServerCore\FeedReader.ServerCore.csproj", "{E577D135-1B6F-48B1-BCA0-88401D05F36B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.Backend.Share", "Backend.Share\FeedReader.Backend.Share.csproj", "{A6E9A51E-D23B-4905-97A1-3E32FF67F0F2}"
 EndProject
