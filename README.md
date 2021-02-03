@@ -1,7 +1,7 @@
 FeedReader
 ==
 
-![Master Build and Deploy](https://github.com/justforfun-click/feedreader/workflows/Push%20On%20Master%20CI/badge.svg)
+![Master Build and Deploy](https://github.com/feedreaderorg/feedreader/workflows/Push%20On%20Master%20CI/badge.svg)
 
 Build an online web feed reader with blazor web assembly.
 
@@ -23,7 +23,7 @@ Website: https://feedreader.org
 
 1. Use the following command to clone the source code:
 
-        git clone https://github.com/justforfun-click/feedreader.git
+        git clone https://github.com/feedreaderorg/feedreader.git
 
 1. Start `Microsfot Azure Storage Emulator` from start menu. Or you can run the following command directly:
 
