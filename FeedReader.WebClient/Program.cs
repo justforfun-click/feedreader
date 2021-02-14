@@ -34,7 +34,7 @@ namespace FeedReader.WebClient
             }
             else if (uriBuilder.Uri.Host == "feedreader.org")
             {
-                apiService.GitHubClientId = "e1889b2003a7896f241b";
+                apiService.GitHubClientId = "ae3b296154140f9e2153";
             }
             apiService.TimezoneOffset = await host.Services.GetRequiredService<IJSRuntime>().InvokeAsync<int>("eval", "-new Date().getTimezoneOffset()");
             var localUser = host.Services.GetRequiredService<LocalUser>();
