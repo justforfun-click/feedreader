@@ -12,6 +12,8 @@ namespace FeedReader.WebClient
     {
         public static async Task Main(string[] args)
         {
+            Console.WriteLine($"FeedReader.WebClient: git-version: {ThisAssembly.Git.Commit}");
+
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
             builder.Services.AddSingleton<LogService>();
