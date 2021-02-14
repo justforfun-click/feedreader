@@ -1,7 +1,8 @@
 FeedReader
 ==
 
-![Master Build and Deploy](https://github.com/feedreaderorg/feedreader/workflows/Push%20On%20Master%20CI/badge.svg)
+![Master CI](https://github.com/feedreaderorg/feedreader/workflows/Master%20CI/badge.svg)
+![Release CI](https://github.com/feedreaderorg/feedreader/workflows/Release%20CI/badge.svg)
 
 Build an online web feed reader with blazor web assembly.
 

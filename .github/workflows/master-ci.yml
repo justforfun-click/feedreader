@@ -1,4 +1,4 @@
-name: Push On Master CI
+name: Master CI
 
 on:
   push:
@@ -48,7 +48,7 @@ jobs:
         with:
           context: .
           file: FeedReader.Server/Dockerfile
-          tags: feedreader.azurecr.io/feedreader-devtest:latest
+          tags: feedreader.azurecr.io/feedreader-webserver-master:latest
           push: true
 
       - name: Build FeedReader.TaskServer docker image
@@ -56,5 +56,5 @@ jobs:
         with:
           context: .
           file: FeedReader.TaskServer/Dockerfile
-          tags: feedreader.azurecr.io/feedreader-taskserver:latest
+          tags: feedreader.azurecr.io/feedreader-taskserver-master:latest
           push: true
