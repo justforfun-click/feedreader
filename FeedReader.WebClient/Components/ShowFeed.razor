@@ -20,7 +20,7 @@
 
             @if (!string.IsNullOrWhiteSpace(Feed.NextRowKey))
             {
-                <div class="feed-item-thumbnail-without-topic-picture more" @onclick="More"><div class="title">Loading more ...</div></div>
+                <FeedItemThumbnail More="More"></FeedItemThumbnail>
             }
         }
     </div>

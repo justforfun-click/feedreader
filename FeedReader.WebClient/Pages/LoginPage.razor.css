@@ -1,0 +1,44 @@
+.login-page {
+  display: flex;
+  height: 100%;
+  justify-content: center; }
+  .login-page > .wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px; }
+    .login-page > .wrapper .banner {
+      display: flex;
+      padding: 10px 20px 30px; }
+      .login-page > .wrapper .banner img {
+        margin: 20px;
+        width: 96px;
+        height: 96px; }
+    .login-page > .wrapper .error {
+      color: red;
+      padding-bottom: 20px; }
+    .login-page > .wrapper .login-providers {
+      display: flex;
+      flex-direction: column;
+      padding: 0px 30px;
+      width: 100%; }
+      .login-page > .wrapper .login-providers a {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        border-radius: 5px;
+        color: white;
+        width: 100%;
+        cursor: pointer;
+        margin-bottom: 20px; }
+        .login-page > .wrapper .login-providers a img {
+          width: 36px;
+          height: 36px;
+          margin-left: 6px;
+          margin-right: 20px; }
+        .login-page > .wrapper .login-providers a b {
+          margin: 0px 5px; }
+      .login-page > .wrapper .login-providers a.microsoft {
+        background-color: #6e64c3; }
+        .login-page > .wrapper .login-providers a.microsoft:hover {
+          background-color: #5046af; }
