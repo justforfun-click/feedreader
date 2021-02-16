@@ -43,11 +43,11 @@ jobs:
           username: ${{ secrets.AZURECR_USERNAME }}
           password: ${{ secrets.AZURECR_PASSWORD }}
 
-      - name: Build FeedReader.Server docker image
+      - name: Build FeedReader.WebServer docker image
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: FeedReader.Server/Dockerfile
+          file: src/server/FeedReader.WebServer/Dockerfile
           tags: feedreader.azurecr.io/feedreader-webserver-release:latest
           push: true
 
@@ -55,6 +55,6 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: FeedReader.TaskServer/Dockerfile
+          file: src/server/FeedReader.TaskServer/Dockerfile
           tags: feedreader.azurecr.io/feedreader-taskserver-release:latest
           push: true
