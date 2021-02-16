@@ -6,13 +6,13 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:5.0.102-1-focal AS build
 WORKDIR /src
 COPY . .
-WORKDIR /src/FeedReader.Server
-RUN dotnet build "FeedReader.Server.csproj" -c Release -o /app/build
+WORKDIR /src/src/server/FeedReader.WebServer
+RUN dotnet build "FeedReader.WebServer.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "FeedReader.Server.csproj" -c Release -o /app/publish
+RUN dotnet publish "FeedReader.WebServer.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "FeedReader.Server.dll"]
+ENTRYPOINT ["dotnet", "FeedReader.WebServer.dll"]

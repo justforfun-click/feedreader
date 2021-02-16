@@ -6,7 +6,7 @@ WORKDIR /app
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
 COPY . .
-WORKDIR /src/FeedReader.TaskServer
+WORKDIR /src/src/server/FeedReader.TaskServer
 RUN dotnet build "FeedReader.TaskServer.csproj" -c Release -o /app/build
 
 FROM build AS publish

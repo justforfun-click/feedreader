@@ -18,12 +18,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\client\FeedReader.WebClient\FeedReader.WebClient.csproj" />
     <ProjectReference Include="..\FeedReader.ServerCore\FeedReader.ServerCore.csproj" />
-    <ProjectReference Include="..\FeedReader.WebClient\FeedReader.WebClient.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\FeedReader.Protos\FeedReaderServerApi.proto" GrpcServices="Server">
+    <Protobuf Include="..\..\..\FeedReader.Protos\FeedReaderServerApi.proto" GrpcServices="Server">
       <Link>Protos\FeedReaderServerApi.proto</Link>
     </Protobuf>
   </ItemGroup>

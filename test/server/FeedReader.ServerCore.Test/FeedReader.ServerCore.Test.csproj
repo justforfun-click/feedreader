@@ -16,8 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Share\FeedReader.Share.csproj" />
-    <ProjectReference Include="..\FeedReader.ServerCore\FeedReader.ServerCore.csproj" />
+    <ProjectReference Include="..\..\..\src\server\FeedReader.ServerCore\FeedReader.ServerCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

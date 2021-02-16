@@ -23,11 +23,11 @@
 </ItemGroup>
 
 <ItemGroup>
-  <ProjectReference Include="..\Share\FeedReader.Share.csproj" />
+  <ProjectReference Include="..\..\share\FeedReader.Share\FeedReader.Share.csproj" />
 </ItemGroup>
 
 <ItemGroup>
-  <Protobuf Include="..\FeedReader.Protos\FeedReaderServerApi.proto" GrpcServices="Client">
+  <Protobuf Include="..\..\..\FeedReader.Protos\FeedReaderServerApi.proto" GrpcServices="Client">
     <Link>Protos\FeedReaderServerApi.proto</Link>
   </Protobuf>
 </ItemGroup>

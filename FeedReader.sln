@@ -3,17 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.WebClient", "FeedReader.WebClient\FeedReader.WebClient.csproj", "{1A860895-2AC5-4C07-A3B4-E6B3BEEA140F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.WebClient", "src\client\FeedReader.WebClient\FeedReader.WebClient.csproj", "{1A860895-2AC5-4C07-A3B4-E6B3BEEA140F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.Share", "Share\FeedReader.Share.csproj", "{99E14E15-4398-425A-A885-B5F2D10046EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.ServerCore.Test", "test\server\FeedReader.ServerCore.Test\FeedReader.ServerCore.Test.csproj", "{FD97FFF7-F3CB-4392-919B-0356EEE1590E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.ServerCore.Test", "FeedReader.ServerCore.Test\FeedReader.ServerCore.Test.csproj", "{FD97FFF7-F3CB-4392-919B-0356EEE1590E}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.ServerCore", "FeedReader.ServerCore\FeedReader.ServerCore.csproj", "{E577D135-1B6F-48B1-BCA0-88401D05F36B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.ServerCore", "src\server\FeedReader.ServerCore\FeedReader.ServerCore.csproj", "{E577D135-1B6F-48B1-BCA0-88401D05F36B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.Backend.Share", "Backend.Share\FeedReader.Backend.Share.csproj", "{A6E9A51E-D23B-4905-97A1-3E32FF67F0F2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.Server", "FeedReader.Server\FeedReader.Server.csproj", "{8497197C-78B6-4565-8FAE-29FF36294349}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.WebServer", "src\server\FeedReader.WebServer\FeedReader.WebServer.csproj", "{8497197C-78B6-4565-8FAE-29FF36294349}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FeedReader.Protos", "FeedReader.Protos", "{73BB06A9-0D78-4385-8D2B-92DBBC11F2FB}"
 	ProjectSection(SolutionItems) = preProject
@@ -22,7 +20,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FeedReader.Protos", "FeedRe
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{2B8ECEA1-5195-48D9-A4FC-96B939E63116}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeedReader.TaskServer", "FeedReader.TaskServer\FeedReader.TaskServer.csproj", "{56569D12-4DF0-4D10-ACE3-D0990F9AB847}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.TaskServer", "src\server\FeedReader.TaskServer\FeedReader.TaskServer.csproj", "{56569D12-4DF0-4D10-ACE3-D0990F9AB847}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{63D936EB-2B77-48B8-BF22-2887759CB067}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "server", "server", "{1087B0C3-3E88-4252-AB60-4BAFD4D52F10}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "client", "client", "{D83B5B35-CACA-40F6-824F-DD47C04A7779}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "share", "share", "{A19482A8-0A9F-4294-AB2E-57879B770704}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.Share", "src\share\FeedReader.Share\FeedReader.Share.csproj", "{194BF62B-62EB-4AD6-BF66-F9C81FDB0B8C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{4EFE659A-D9E1-405A-A956-FA17BE2F2F60}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "server", "server", "{51877A4E-42F6-4DD1-8310-2773E977B512}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,18 +58,6 @@ Global
 		{1A860895-2AC5-4C07-A3B4-E6B3BEEA140F}.Release|x64.Build.0 = Release|Any CPU
 		{1A860895-2AC5-4C07-A3B4-E6B3BEEA140F}.Release|x86.ActiveCfg = Release|Any CPU
 		{1A860895-2AC5-4C07-A3B4-E6B3BEEA140F}.Release|x86.Build.0 = Release|Any CPU
-		{99E14E15-4398-425A-A885-B5F2D10046EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{99E14E15-4398-425A-A885-B5F2D10046EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{99E14E15-4398-425A-A885-B5F2D10046EC}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{99E14E15-4398-425A-A885-B5F2D10046EC}.Debug|x64.Build.0 = Debug|Any CPU
-		{99E14E15-4398-425A-A885-B5F2D10046EC}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{99E14E15-4398-425A-A885-B5F2D10046EC}.Debug|x86.Build.0 = Debug|Any CPU
-		{99E14E15-4398-425A-A885-B5F2D10046EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{99E14E15-4398-425A-A885-B5F2D10046EC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{99E14E15-4398-425A-A885-B5F2D10046EC}.Release|x64.ActiveCfg = Release|Any CPU
-		{99E14E15-4398-425A-A885-B5F2D10046EC}.Release|x64.Build.0 = Release|Any CPU
-		{99E14E15-4398-425A-A885-B5F2D10046EC}.Release|x86.ActiveCfg = Release|Any CPU
-		{99E14E15-4398-425A-A885-B5F2D10046EC}.Release|x86.Build.0 = Release|Any CPU
 		{FD97FFF7-F3CB-4392-919B-0356EEE1590E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FD97FFF7-F3CB-4392-919B-0356EEE1590E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD97FFF7-F3CB-4392-919B-0356EEE1590E}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -130,9 +130,33 @@ Global
 		{56569D12-4DF0-4D10-ACE3-D0990F9AB847}.Release|x64.Build.0 = Release|Any CPU
 		{56569D12-4DF0-4D10-ACE3-D0990F9AB847}.Release|x86.ActiveCfg = Release|Any CPU
 		{56569D12-4DF0-4D10-ACE3-D0990F9AB847}.Release|x86.Build.0 = Release|Any CPU
+		{194BF62B-62EB-4AD6-BF66-F9C81FDB0B8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{194BF62B-62EB-4AD6-BF66-F9C81FDB0B8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{194BF62B-62EB-4AD6-BF66-F9C81FDB0B8C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{194BF62B-62EB-4AD6-BF66-F9C81FDB0B8C}.Debug|x64.Build.0 = Debug|Any CPU
+		{194BF62B-62EB-4AD6-BF66-F9C81FDB0B8C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{194BF62B-62EB-4AD6-BF66-F9C81FDB0B8C}.Debug|x86.Build.0 = Debug|Any CPU
+		{194BF62B-62EB-4AD6-BF66-F9C81FDB0B8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{194BF62B-62EB-4AD6-BF66-F9C81FDB0B8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{194BF62B-62EB-4AD6-BF66-F9C81FDB0B8C}.Release|x64.ActiveCfg = Release|Any CPU
+		{194BF62B-62EB-4AD6-BF66-F9C81FDB0B8C}.Release|x64.Build.0 = Release|Any CPU
+		{194BF62B-62EB-4AD6-BF66-F9C81FDB0B8C}.Release|x86.ActiveCfg = Release|Any CPU
+		{194BF62B-62EB-4AD6-BF66-F9C81FDB0B8C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1A860895-2AC5-4C07-A3B4-E6B3BEEA140F} = {D83B5B35-CACA-40F6-824F-DD47C04A7779}
+		{FD97FFF7-F3CB-4392-919B-0356EEE1590E} = {51877A4E-42F6-4DD1-8310-2773E977B512}
+		{E577D135-1B6F-48B1-BCA0-88401D05F36B} = {1087B0C3-3E88-4252-AB60-4BAFD4D52F10}
+		{8497197C-78B6-4565-8FAE-29FF36294349} = {1087B0C3-3E88-4252-AB60-4BAFD4D52F10}
+		{56569D12-4DF0-4D10-ACE3-D0990F9AB847} = {1087B0C3-3E88-4252-AB60-4BAFD4D52F10}
+		{1087B0C3-3E88-4252-AB60-4BAFD4D52F10} = {63D936EB-2B77-48B8-BF22-2887759CB067}
+		{D83B5B35-CACA-40F6-824F-DD47C04A7779} = {63D936EB-2B77-48B8-BF22-2887759CB067}
+		{A19482A8-0A9F-4294-AB2E-57879B770704} = {63D936EB-2B77-48B8-BF22-2887759CB067}
+		{194BF62B-62EB-4AD6-BF66-F9C81FDB0B8C} = {A19482A8-0A9F-4294-AB2E-57879B770704}
+		{51877A4E-42F6-4DD1-8310-2773E977B512} = {4EFE659A-D9E1-405A-A956-FA17BE2F2F60}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DB9FBE01-AC4A-423B-991B-B67738428F3B}

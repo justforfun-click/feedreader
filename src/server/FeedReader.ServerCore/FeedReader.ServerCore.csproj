@@ -14,8 +14,8 @@
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="4.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Backend.Share\FeedReader.Backend.Share.csproj" />
-    <ProjectReference Include="..\Share\FeedReader.Share.csproj" />
+    <ProjectReference Include="..\..\..\Backend.Share\FeedReader.Backend.Share.csproj" />
+    <ProjectReference Include="..\..\share\FeedReader.Share\FeedReader.Share.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
