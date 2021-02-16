@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -125,6 +126,19 @@ namespace FeedReader.WebApi.Extensions
                 }
             }
             throw new FormatException();
+        }
+
+        public static string Sha256(this string input)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                return string.Join("", from b in sha256.ComputeHash(Encoding.UTF8.GetBytes(input)) select b.ToString("x2"));
+            }
+        }
+
+        public static string Base64(this string input)
+        {
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(input));
         }
     }
 }

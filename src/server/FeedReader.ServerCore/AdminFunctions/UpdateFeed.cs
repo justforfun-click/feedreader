@@ -3,12 +3,12 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.Cosmos.Table;
 using System.Net.Http;
-using FeedReader.Backend.Share;
 using FeedReader.Backend.Share.FeedParsers;
 using FeedReader.WebApi.Processors;
 using FeedReader.Backend.Share.Entities;
 using FeedReader.Share;
 using System.Net.Http.Headers;
+using FeedReader.WebApi.Extensions;
 
 namespace FeedReader.WebApi.AdminFunctions
 {

@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Queues;
+using FeedReader.WebApi;
 using Microsoft.Azure.Cosmos.Table;
 using System;
 
