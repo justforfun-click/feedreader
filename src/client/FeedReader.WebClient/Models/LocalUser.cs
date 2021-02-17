@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FeedReader.WebClient.Services;
 using System;
-using FeedReader.WebClient.Datas;
 using System.Threading;
+using FeedReader.ClientCore.Models;
 
 namespace FeedReader.WebClient.Models
 {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FeedReader.WebClient.Datas
+namespace FeedReader.ClientCore.Models
 {
     public class Feed : Share.DataContracts.Feed
     {

@@ -2,14 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
-using FeedReader.WebClient.Datas;
+using FeedReader.ClientCore.Models;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
-using Newtonsoft.Json;
 using static FeedReader.Protos.FeedReaderServerApi;
 using FeedCategory = FeedReader.Share.DataContracts.FeedCategory;
 

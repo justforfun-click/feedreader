@@ -1,9 +1,8 @@
-using FeedReader.WebClient.Datas;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FeedCategory = FeedReader.Share.DataContracts.FeedCategory;
+using FeedReader.ClientCore.Models;
 
 namespace FeedReader.WebClient.Services
 {
