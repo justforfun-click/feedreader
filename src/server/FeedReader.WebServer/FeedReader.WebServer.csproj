@@ -22,10 +22,4 @@
     <ProjectReference Include="..\FeedReader.ServerCore\FeedReader.ServerCore.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Protobuf Include="..\..\..\FeedReader.Protos\FeedReaderServerApi.proto" GrpcServices="Server">
-      <Link>Protos\FeedReaderServerApi.proto</Link>
-    </Protobuf>
-  </ItemGroup>
-
 </Project>

@@ -11,11 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.ServerCore", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.WebServer", "src\server\FeedReader.WebServer\FeedReader.WebServer.csproj", "{8497197C-78B6-4565-8FAE-29FF36294349}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FeedReader.Protos", "FeedReader.Protos", "{73BB06A9-0D78-4385-8D2B-92DBBC11F2FB}"
-	ProjectSection(SolutionItems) = preProject
-		FeedReader.Protos\FeedReaderServerApi.proto = FeedReader.Protos\FeedReaderServerApi.proto
-	EndProjectSection
-EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{2B8ECEA1-5195-48D9-A4FC-96B939E63116}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FeedReader.TaskServer", "src\server\FeedReader.TaskServer\FeedReader.TaskServer.csproj", "{56569D12-4DF0-4D10-ACE3-D0990F9AB847}"
