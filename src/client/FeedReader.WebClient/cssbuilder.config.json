@@ -1,0 +1,9 @@
+[
+    {
+        "src": [ "app.scss", "app2.less" ],
+        "output": "wwwroot/app.css"
+    },
+    {
+        "src": [ "**/*.razor.scss", "**/*.razor.less", "**/*.less", "**/*.scss" ]
+    }
+]

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>       
+<head>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FeedReader</title>
+    <link rel="icon" href="img/iconfinder_Flurry_Google_Reader_Alt_176646.png"/>
+    <link id="stylesheet" rel="stylesheet"/>
+    <link href="css/waiting-page.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
+    <link href="FeedReader.WebClient.styles.css" rel="stylesheet" />
+</head>
+<body>
+    <app>
+        <div class="waiting-page">
+            <div class="loader">Loading...</div>
+        </div>
+    </app>
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script>
+        function imgFallback(imgId, fallbackUri) {
+            let img = document.getElementById(imgId);
+            if (img.src != fallbackUri) {
+                img.src = fallbackUri;
+            }
+        }
+    </script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-4BC5RRZQXP"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-4BC5RRZQXP');
+    </script>
+</body>
+</html>

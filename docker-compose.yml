@@ -1,14 +1,41 @@
 version: '3.4'
 
 services:
-  feedreader.server:
-    image: ${DOCKER_REGISTRY-}feedreaderserver
+  webserver:
+    image: ${DOCKER_REGISTRY-}feedreaderwebserver
     build:
       context: .
-      dockerfile: FeedReader.Server/Dockerfile
+      dockerfile: src/server/FeedReader.WebServer/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - AzureStorage=AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://host.docker.internal:10000/devstoreaccount1;QueueEndpoint=http://host.docker.internal:10001/devstoreaccount1;TableEndpoint=http://host.docker.internal:10002/devstoreaccount1
+      - JwtSecret=feedreader.org.local.test.signing.key
+      - GitHubClientId=9b946fa144483d9ea46c
+      - GitHubClientSecret=2f318350656e1f6682417de27d5ae677009a336f
+      - FeedreaderDbConnectionString=Server=db;Port=5432;Database=feedreader;User Id=feedreader;Password=feedreader;
+    ports:
+      - 80:80
+    links:
+      - db
 
-  feedreader.taskserver:
+  taskserver:
     image: ${DOCKER_REGISTRY-}feedreadertaskserver
     build:
       context: .
-      dockerfile: FeedReader.TaskServer/Dockerfile
+      dockerfile: src/server/FeedReader.TaskServer/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - AzureStorage=AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;DefaultEndpointsProtocol=http;BlobEndpoint=http://host.docker.internal:10000/devstoreaccount1;QueueEndpoint=http://host.docker.internal:10001/devstoreaccount1;TableEndpoint=http://host.docker.internal:10002/devstoreaccount1
+
+  db:
+    image: postgres:13.1
+    environment:
+      - POSTGRES_DB=feedreader
+      - POSTGRES_USER=feedreader
+      - POSTGRES_PASSWORD=feedreader
+      - PGDATA=/var/lib/postgresql/data/feedreaderdb
+    volumes:
+      - ${APPDATA}/feedreader/db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432

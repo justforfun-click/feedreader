@@ -1,0 +1,50 @@
+.add-new-feed {
+  padding: 20px 100px; }
+  .add-new-feed .title {
+    font-size: 34px;
+    font-weight: 700; }
+  .add-new-feed .form {
+    padding-top: 40px; }
+    .add-new-feed .form .field {
+      margin-bottom: 30px; }
+      .add-new-feed .form .field .label {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 12px; }
+        .add-new-feed .form .field .label a, .add-new-feed .form .field .label span {
+          font-size: 12px;
+          color: #9e9e9e; }
+        .add-new-feed .form .field .label a {
+          text-decoration: underline; }
+      .add-new-feed .form .field .error {
+        color: red;
+        font-size: 12px;
+        padding: 4px 2px 0px; }
+      .add-new-feed .form .field input, .add-new-feed .form .field select {
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-size: 16px; }
+      .add-new-feed .form .field input {
+        width: 100%; }
+      .add-new-feed .form .field select {
+        width: auto; }
+      .add-new-feed .form .field .group-selection {
+        display: flex; }
+        .add-new-feed .form .field .group-selection input {
+          margin-left: 4px; }
+    .add-new-feed .form .buttons {
+      display: flex; }
+      .add-new-feed .form .buttons .button {
+        padding: 12px 20px;
+        border-radius: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        margin-right: 20px; }
+      .add-new-feed .form .buttons .button.primary {
+        background-color: #2bb24c;
+        color: white;
+        border: 1px solid transparent; }

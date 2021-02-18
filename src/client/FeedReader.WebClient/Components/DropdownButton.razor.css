@@ -1,0 +1,56 @@
+.dropdown-button {
+     border: 1px solid #d4d4d4;
+     border-radius: 3px;
+     color: #555;
+     position: relative;
+     font-size: 14px;
+     text-shadow: 0 1px 0 #fff;
+     height: 100%;
+}
+
+ .dropdown-button .text-and-icon {
+     display: flex;
+     height: 100%;
+}
+ .dropdown-button .text-and-icon .text, .dropdown-button .text-and-icon .dropdown-icon {
+     display: flex;
+     height: 100%;
+     justify-content: center;
+     align-items: center;
+}
+ .dropdown-button .text-and-icon .text:hover, .dropdown-button .text-and-icon .dropdown-icon:hover {
+     background-color: #e6e6e6;
+     cursor: pointer;
+}
+ .dropdown-button .text-and-icon .text {
+     padding: 0px 10px;
+     border-right: 1px solid #e6e6e6;
+}
+ .dropdown-button .text-and-icon .dropdown-icon {
+     padding: 0px 6px;
+}
+ .dropdown-button .text-and-icon .dropdown-icon svg {
+     width: 24px;
+     height: 24px;
+}
+ .dropdown-button .menu {
+     list-style: none;
+     position: absolute;
+     border-radius: 3px;
+     z-index: 1;
+     min-width: 100%;
+     left: 0px;
+     right: 0px;
+     margin-top: 2px;
+     background-color: white;
+     box-shadow: 0 14px 20px rgba(0, 0, 0, 0.11);
+     border: 1px solid #d4d4d4;
+}
+ .dropdown-button .menu ::deep li {
+     padding: 15px;
+}
+ .dropdown-button .menu ::deep li:hover {
+     cursor: pointer;
+     background-color: #e6e6e6;
+}
+ 
