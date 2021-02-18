@@ -1,3 +1,13 @@
-﻿.feed-items {
+﻿.show-feed {
     display: flex;
+    flex-flow: column;
+    width: 100%;
+    height: 100%;
+}
+
+.feed-items {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 22px;
 }
