@@ -19,6 +19,7 @@ using System.Text;
 using FeedReader.WebApi.Entities;
 using FeedReader.Share.DataContracts;
 using System.Web;
+using User = FeedReader.ServerCore.Models.User;
 
 namespace FeedReader.WebApi.Extensions
 {
@@ -52,7 +53,7 @@ namespace FeedReader.WebApi.Extensions
 
         private readonly AuthenticationAttribute _attr;
 
-        public Type Type => typeof(UserEntity);
+        public Type Type => typeof(User);
 
         public AuthenticationValueProvider(HttpRequest req, AuthenticationAttribute attr)
         {
@@ -140,7 +141,7 @@ namespace FeedReader.WebApi.Extensions
             return null;
         }
 
-        private static UserEntity AuthenticateFeedReaderToken(string token)
+        private static User AuthenticateFeedReaderToken(string token)
         {
             // Validate the signature.
             var payload = new JwtBuilder()
@@ -156,13 +157,13 @@ namespace FeedReader.WebApi.Extensions
             }
 
             // Return user
-            return new UserEntity()
+            return new User()
             {
-                Uuid = GetRequiredField(payload, "uuid"),
+                Id = GetRequiredField(payload, "uid")
             };
         }
 
-        private static async Task<UserEntity> AuthenticateMsTokenAsync(string token)
+        private static async Task<User> AuthenticateMsTokenAsync(string token)
         {
             // Decode header to get kid
             var header = new JwtBuilder().DecodeHeader<IDictionary<string, string>>(token);
@@ -188,16 +189,14 @@ namespace FeedReader.WebApi.Extensions
                 }
 
                 // Return user.
-                return new UserEntity()
+                return new User()
                 {
-                    Uuid = "ms:oid:" + GetRequiredField(payload, "oid"),
-                    Name = GetRequiredField(payload, "name"),
-                    Email = GetRequiredField(payload, "email").ToLower(),
+                    ThirdPartyId = "ms:oid:" + GetRequiredField(payload, "oid"),
                 };
             }
         }
 
-        private static async Task<UserEntity> AuthenticateGoogleTokenAsync(string token)
+        private static async Task<User> AuthenticateGoogleTokenAsync(string token)
         {
             // Decode header to get kid
             var header = new JwtBuilder().DecodeHeader<IDictionary<string, string>>(token);
@@ -228,17 +227,14 @@ namespace FeedReader.WebApi.Extensions
                 }
 
                 // Return user.
-                return new UserEntity()
+                return new User()
                 {
-                    Uuid = "google:sub:" + GetRequiredField(payload, "sub"),
-                    Name = GetRequiredField(payload, "name"),
-                    Email = GetRequiredField(payload, "email").ToLower(),
-                    AvatarUrl = GetOptionalField(payload, "picture"),
+                    ThirdPartyId = "google:sub:" + GetRequiredField(payload, "sub"),
                 };
             }
         }
 
-        private static async Task<UserEntity> AuthenticateGitHubAccessCodeAsync(string accessCode)
+        private static async Task<User> AuthenticateGitHubAccessCodeAsync(string accessCode)
         {
             // Exchange access code to acess token.
             var uri = $"https://github.com/login/oauth/access_token?client_id={Environment.GetEnvironmentVariable(Consts.ENV_KEY_GITHUB_CLIENT_ID)}&client_secret={Environment.GetEnvironmentVariable(Consts.ENV_KEY_GITHUB_CLIENT_SECRET)}&code={accessCode}";
@@ -253,28 +249,22 @@ namespace FeedReader.WebApi.Extensions
             var payload = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
 
             // Return user.
-            return new UserEntity()
+            return new User()
             {
-                Uuid = "github:node_id:" + GetRequiredField(payload, "node_id"),
-                Name = GetRequiredField(payload, "name"),
-                Email = GetOptionalField(payload, "email"),
-                AvatarUrl = GetOptionalField(payload, "avatar_url"),
+                ThirdPartyId = "github:node_id:" + GetRequiredField(payload, "node_id"),
             };
         }
 
-        private static async Task<UserEntity> AuthenticateFacebookAccessTokenAsync(string accessToken)
+        private static async Task<User> AuthenticateFacebookAccessTokenAsync(string accessToken)
         {
             // Get user profile.
             var uri = $"https://graph.facebook.com/me?access_token={accessToken}&fields=name,email";
             var json = await new HttpClient().GetStringAsync(uri);
             var payload = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
 
-            return new UserEntity()
+            return new User()
             {
-                Uuid = "facebook:id:" + GetRequiredField(payload, "id"),
-                Name = GetRequiredField(payload, "name"),
-                Email = GetOptionalField(payload, "email"),
-                AvatarUrl = $"http://graph.facebook.com/{GetRequiredField(payload, "id")}/picture?height=256&width=256"
+                ThirdPartyId = "facebook:id:" + GetRequiredField(payload, "id"),
             };
         }
 

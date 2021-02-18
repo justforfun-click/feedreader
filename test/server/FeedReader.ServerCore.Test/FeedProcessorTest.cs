@@ -15,6 +15,7 @@ namespace FeedReader.WebApi.Test
 {
     public class FeedProcessorTest
     {
+        /*
         [Fact]
         public async void SubscribeNewFeed()
         {
@@ -144,5 +145,6 @@ namespace FeedReader.WebApi.Test
         {
             return File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestData", testFilename), Encoding.UTF8);
         }
+        */
     }
 }

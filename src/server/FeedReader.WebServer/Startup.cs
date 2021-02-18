@@ -1,9 +1,12 @@
 ﻿using AspNetCore.Proxy;
 using FeedReader.Server.Services;
+using FeedReader.WebApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.Threading.Tasks;
 
 namespace FeedReader.Server
@@ -20,6 +23,9 @@ namespace FeedReader.Server
             });
             services.AddProxies();
             services.AddSingleton<AuthService>();
+
+            var dbConns = Environment.GetEnvironmentVariable(Consts.ENV_KEY_FEEDREADER_DB_CONNECTION_STRING);
+            services.AddDbContextFactory<ServerCore.Datas.FeedReaderDbContext>(options => options.UseNpgsql(dbConns));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -72,6 +78,8 @@ namespace FeedReader.Server
 
                 endpoints.MapFallbackToFile("index.html");
             });
+
+            WebApi.MigrationTools.MoveUserTableFromAzureToDb();
         }
     }
 }

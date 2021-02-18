@@ -1,8 +1,11 @@
 ﻿using FeedReader.Protos;
+using FeedReader.ServerCore.Datas;
+using FeedReader.WebApi;
 using FeedReader.WebApi.Extensions;
 using FeedReader.WebApi.Processors;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -13,10 +16,12 @@ namespace FeedReader.Server.Services
     public class ApiService : FeedReaderServerApi.FeedReaderServerApiBase
     {
         private readonly AuthService _authService;
+        private readonly IDbContextFactory<FeedReaderDbContext> _dbContext;
 
         public ApiService(IServiceProvider sp)
         {
             _authService = sp.GetService<AuthService>();
+            _dbContext = sp.GetService<IDbContextFactory<FeedReaderDbContext>>();
         }
 
         public override async Task<UserInfo> Login(LoginRequest request, ServerCallContext context)
@@ -24,16 +29,11 @@ namespace FeedReader.Server.Services
             try
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                var processor = new UserProcessor();
+                var processor = new UserProcessor(_dbContext);
                 var userContainer = AzureStorage.GetUserContainer();
                 var uuidIndexTable = AzureStorage.GetRelatedUuidIndexTable();
                 var usersFeedsTable = AzureStorage.GetUsersFeedsTable();
-                var userEntity = await processor.LoginAsync(new WebApi.Entities.UserEntity
-                {
-                    Uuid = user.Uuid,
-                    Email = user.Email,
-                    AvatarUrl = user.AvatarUrl
-                }, userContainer, uuidIndexTable, usersFeedsTable);
+                var userEntity = await processor.LoginAsync(user, usersFeedsTable);
                 var res = new UserInfo
                 {
                     Token = userEntity.Token,
@@ -56,7 +56,7 @@ namespace FeedReader.Server.Services
                 var userFeedsTable = AzureStorage.GetUsersFeedsTable();
                 var feedsTable = Backend.Share.AzureStorage.GetFeedsTable();
                 var feedRefresJobsQueue = Backend.Share.AzureStorage.GetFeedRefreshJobsQueue();
-                await new UserProcessor(null).MarkItemsAsReaded(user.Uuid, request.FeedUri, request.Timestamp.ToDateTime(), userFeedsTable, feedsTable, feedRefresJobsQueue);
+                await new UserProcessor(_dbContext).MarkItemsAsReaded(user, request.FeedUri, request.Timestamp.ToDateTime(), userFeedsTable, feedsTable, feedRefresJobsQueue);
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -71,11 +71,11 @@ namespace FeedReader.Server.Services
             {
                 var userToken = context.RequestHeaders.Get("authentication")?.Value;
                 var user = userToken == null ? null : await _authService.AuthenticateTokenAsync(userToken);
-                var userBlob = user == null ? null : AzureStorage.GetUserBlob(user.Uuid);
+                var userBlob = user == null ? null : AzureStorage.GetUserBlob(Consts.FEEDREADER_UUID_PREFIX + user.Id);
                 var userFeedsTable = AzureStorage.GetUsersFeedsTable();
                 var feedsTable = Backend.Share.AzureStorage.GetFeedsTable();
                 var feedItemsTable = Backend.Share.AzureStorage.GetFeedItemsTable();
-                var feed = await new FeedProcessor().GetFeedItemsAsync(request.FeedUri, request.NextRowKey, userBlob, userFeedsTable, feedsTable, feedItemsTable);
+                var feed = await new FeedProcessor(_dbContext).GetFeedItemsAsync(request.FeedUri, request.NextRowKey, user, userFeedsTable, feedsTable, feedItemsTable);
                 var response = new RefreshFeedResponse()
                 {
                     FeedInfo = GetFeedInfo(feed),
@@ -92,7 +92,7 @@ namespace FeedReader.Server.Services
 
         public override async Task<GetFeedsByCategoryResponse> GetFeedsByCategory(GetFeedsByCategoryRequest request, ServerCallContext context)
         {
-            var items = await new FeedProcessor().GetFeedItemsByCategory(GetDataContractsFeedCategory(request.Category), request.NextRowKey, Backend.Share.AzureStorage.GetLatestFeedItemsTable());
+            var items = await new FeedProcessor(_dbContext).GetFeedItemsByCategory(GetDataContractsFeedCategory(request.Category), request.NextRowKey, Backend.Share.AzureStorage.GetLatestFeedItemsTable());
             var response = new GetFeedsByCategoryResponse();
             if (items.Count > 0)
             {
@@ -107,7 +107,7 @@ namespace FeedReader.Server.Services
             try
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                var items = await new UserProcessor().GetStaredFeedItemsAsync(request.NextRowKey, user.Uuid, Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
+                var items = await new UserProcessor(_dbContext).GetStaredFeedItemsAsync(request.NextRowKey, user, Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
                 var response = new GetStaredFeedItemsResponse();
                 if (items.Count > 0)
                 {
@@ -137,7 +137,7 @@ namespace FeedReader.Server.Services
                 }
 
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new UserProcessor().StarFeedItemAsync(GetDataContractFeedItem(request.FeedItem), AzureStorage.GetUserBlob(user.Uuid), Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
+                await new UserProcessor(_dbContext).StarFeedItemAsync(GetDataContractFeedItem(request.FeedItem), user, Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -156,7 +156,7 @@ namespace FeedReader.Server.Services
                 }
 
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new UserProcessor().UnstarFeedItemAsync(request.FeedItemUri, request.FeedItemPubDate.ToDateTime(), AzureStorage.GetUserBlob(user.Uuid), Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
+                await new UserProcessor(_dbContext).UnstarFeedItemAsync(request.FeedItemUri, request.FeedItemPubDate.ToDateTime(), user, Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -178,7 +178,7 @@ namespace FeedReader.Server.Services
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
                 var usersFeedsTable = AzureStorage.GetUsersFeedsTable();
                 var feedTable = Backend.Share.AzureStorage.GetFeedsTable();
-                var feed = await new FeedProcessor().SubscribeFeedAsync(request.OriginalUri, request.Name, request.Group, user.Uuid, usersFeedsTable, feedTable);
+                var feed = await new FeedProcessor(_dbContext).SubscribeFeedAsync(request.OriginalUri, request.Name, request.Group, Consts.FEEDREADER_UUID_PREFIX + user.Id, usersFeedsTable, feedTable);
                 return new SubscribeFeedResponse
                 {
                     Feed = GetFeedInfo(feed)
@@ -200,7 +200,7 @@ namespace FeedReader.Server.Services
                 }
 
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new FeedProcessor().UnsubscribeFeedAsync(request.FeedUri, user.Uuid, AzureStorage.GetUsersFeedsTable());
+                await new FeedProcessor(_dbContext).UnsubscribeFeedAsync(request.FeedUri, Consts.FEEDREADER_UUID_PREFIX + user.Id, AzureStorage.GetUsersFeedsTable());
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -219,7 +219,7 @@ namespace FeedReader.Server.Services
                 }
 
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new FeedProcessor().UpdateFeedAsync(request.FeedUri, request.FeedName, request.FeedGroup, user.Uuid, AzureStorage.GetUsersFeedsTable());
+                await new FeedProcessor(_dbContext).UpdateFeedAsync(request.FeedUri, request.FeedName, request.FeedGroup, Consts.FEEDREADER_UUID_PREFIX + user.Id, AzureStorage.GetUsersFeedsTable());
                 return new Empty();
             }
             catch (UnauthorizedAccessException)

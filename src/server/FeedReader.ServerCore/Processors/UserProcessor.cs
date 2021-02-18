@@ -3,19 +3,17 @@ using FeedReader.WebApi.Entities;
 using FeedReader.WebApi.Extensions;
 using JWT.Algorithms;
 using JWT.Builder;
-using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FeedReader.Share;
-using System.Text;
 using Microsoft.Extensions.Logging;
-using Microsoft.Azure.Storage.Queue;
-using FeedReader.Backend.Share;
-using Azure.Storage.Blobs;
 using Microsoft.Azure.Cosmos.Table;
 using Azure.Storage.Queues;
+using User = FeedReader.ServerCore.Models.User;
+using Microsoft.EntityFrameworkCore;
+using FeedReader.ServerCore.Datas;
 
 namespace FeedReader.WebApi.Processors
 {
@@ -23,22 +21,18 @@ namespace FeedReader.WebApi.Processors
     {
         const int MAX_RETURN_COUNT = 50;
 
-        public UserProcessor(ILogger logger = null)
+        private IDbContextFactory<FeedReaderDbContext> _dbFactory;
+
+        public UserProcessor(IDbContextFactory<FeedReaderDbContext> dbFactory, ILogger logger = null)
             : base(logger)
         {
+            _dbFactory = dbFactory;
         }
 
-        public async Task<User> LoginAsync(UserEntity user, BlobContainerClient userContainer, CloudTable uuidIndexTable, CloudTable usersFeedsTable)
+        public async Task<Share.DataContracts.User> LoginAsync(User user, CloudTable usersFeedsTable)
         {
-            // Get feedreader uuid?
-            var uuid = await GetFeedReaderUuid(user, userContainer, uuidIndexTable);
-
-            // Login, reget the user data.
-            var userEntity = await userContainer.GetBlobClient(uuid).GetAsync<UserEntity>();
-            if (userEntity == null)
-            {
-                throw new ExternalErrorExceptionUnauthentication();
-            }
+            // Get feedreader user.
+            user = await GetFeedReaderUser(user);
 
             // Generate our jwt token.
             var now = DateTimeOffset.UtcNow;
@@ -47,7 +41,7 @@ namespace FeedReader.WebApi.Processors
                 .WithSecret(Environment.GetEnvironmentVariable(Consts.ENV_KEY_JWT_SECRET))
                 .AddClaim("iss", Consts.FEEDREADER_ISS)
                 .AddClaim("aud", Consts.FEEDREADER_AUD)
-                .AddClaim("uuid", userEntity.Uuid)
+                .AddClaim("uid", user.Id)
                 .AddClaim("iat", now.ToUnixTimeSeconds())
                 .AddClaim("exp", now.AddDays(7).ToUnixTimeSeconds())
                 .Encode();
@@ -55,36 +49,24 @@ namespace FeedReader.WebApi.Processors
             // Get users feeds table.
             var res = await usersFeedsTable.ExecuteQuerySegmentedAsync(new TableQuery<UserFeedEntity>()
             {
-                FilterString = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userEntity.Uuid)
+                FilterString = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, Consts.FEEDREADER_UUID_PREFIX + user.Id)
             }, null);
 
             // Return user info
-            return new User
+            return new Share.DataContracts.User
             {
                 Token = token,
-                Uuid = userEntity.Uuid,
+                Uuid = user.Id,
                 Feeds = (res != null && res.Results != null) ? res.Results.Select(f => f.CopyTo(new Feed())).ToList() : new List<Feed>(),
             };
         }
 
-        public async Task StarFeedItemAsync(FeedItem feedItem, BlobClient userBlob, Microsoft.Azure.Cosmos.Table.CloudTable userFeedItemStartsTable)
+        public async Task StarFeedItemAsync(FeedItem feedItem, User user, Microsoft.Azure.Cosmos.Table.CloudTable userFeedItemStartsTable)
         {
-            // Get the hash set.
-            SortedSet<string> staredHashs;
-            var userEntity = await userBlob.GetAsync<UserEntity>();
-            if (!string.IsNullOrWhiteSpace(userEntity.StaredHashs))
-            {
-                staredHashs = JsonConvert.DeserializeObject<SortedSet<string>>(userEntity.StaredHashs);
-            }
-            else
-            {
-                staredHashs = new SortedSet<string>();
-            }
-
             // Insert to the stared-feed-items table.
             await userFeedItemStartsTable.ExecuteAsync(Microsoft.Azure.Cosmos.Table.TableOperation.InsertOrReplace(new Backend.Share.Entities.FeedItemExEntity()
             {
-                PartitionKey = userEntity.Uuid,
+                PartitionKey = Consts.FEEDREADER_UUID_PREFIX + user.Id,
                 RowKey = $"{string.Format("{0:D19}", DateTime.MaxValue.Ticks - feedItem.PubDate.ToUniversalTime().Ticks)}-{feedItem.PermentLink.Sha256()}",
                 PermentLink = feedItem.PermentLink,
                 Content = feedItem.Content,
@@ -98,21 +80,27 @@ namespace FeedReader.WebApi.Processors
             }));
 
             // Update the hash set.
+            var db = _dbFactory.CreateDbContext();
             var linkMd5 = feedItem.PermentLink.Md5();
-            if (!staredHashs.Contains(linkMd5) && staredHashs.Add(linkMd5))
+            try
             {
-                userEntity.StaredHashs = JsonConvert.SerializeObject(staredHashs);
-                await userBlob.SaveAsync(userEntity);
+                db.UserFavorites.Add(new ServerCore.Models.UserFavorites
+                {
+                    UserId = user.Id,
+                    FavoriteItemIdHash = linkMd5
+                });
+                await db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                LogError($"Add item to UserFavorites table failed: {ex.Message}");
             }
         }
 
-        public async Task UnstarFeedItemAsync(string feedItemPermentLink, DateTime pubDate, BlobClient userBlob, Microsoft.Azure.Cosmos.Table.CloudTable userFeedItemStartsTable)
+        public async Task UnstarFeedItemAsync(string feedItemPermentLink, DateTime pubDate, User user, Microsoft.Azure.Cosmos.Table.CloudTable userFeedItemStartsTable)
         {
-            // Get the hash set.
-            var userEntity = await userBlob.GetAsync<UserEntity>();
-
             // Remove from the star items table.
-            var partitionKey = userEntity.Uuid;
+            var partitionKey = Consts.FEEDREADER_UUID_PREFIX + user.Id;
             var rowKey = $"{string.Format("{0:D19}", DateTime.MaxValue.Ticks - pubDate.ToUniversalTime().Ticks)}-{feedItemPermentLink.Sha256()}";
             var res = await userFeedItemStartsTable.ExecuteAsync(Microsoft.Azure.Cosmos.Table.TableOperation.Retrieve<Backend.Share.Entities.FeedItemExEntity>(partitionKey: partitionKey, rowkey: rowKey));
             if (res?.Result != null)
@@ -122,25 +110,32 @@ namespace FeedReader.WebApi.Processors
 
             // Remove from the hash set.
             var linkMd5 = feedItemPermentLink.Md5();
-            if (!string.IsNullOrWhiteSpace(userEntity.StaredHashs))
+            var db = _dbFactory.CreateDbContext();
+            try
             {
-                var staredHashs = JsonConvert.DeserializeObject<SortedSet<string>>(userEntity.StaredHashs);
-                if (staredHashs.Contains(linkMd5) && staredHashs.Remove(linkMd5))
+                var favorite = new FeedReader.ServerCore.Models.UserFavorites
                 {
-                    userEntity.StaredHashs = JsonConvert.SerializeObject(staredHashs);
-                    await userBlob.SaveAsync(userEntity);
-                }
+                    UserId = user.Id,
+                    FavoriteItemIdHash = linkMd5
+                };
+                db.UserFavorites.Attach(favorite);
+                db.UserFavorites.Remove(favorite);
+                await db.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                LogError($"Remove item from UserFavorites table failed: {ex.Message}");
             }
         }
 
-        public async Task<List<FeedItem>> GetStaredFeedItemsAsync(string nextRowKey, string userUuid, Microsoft.Azure.Cosmos.Table.CloudTable userFeedItemStartsTable)
+        public async Task<List<FeedItem>> GetStaredFeedItemsAsync(string nextRowKey, User user, Microsoft.Azure.Cosmos.Table.CloudTable userFeedItemStartsTable)
         {
             Microsoft.Azure.Cosmos.Table.TableContinuationToken token = null;
             if (!string.IsNullOrWhiteSpace(nextRowKey))
             {
                 token = new Microsoft.Azure.Cosmos.Table.TableContinuationToken()
                 {
-                    NextPartitionKey = userUuid,
+                    NextPartitionKey = Consts.FEEDREADER_UUID_PREFIX + user.Id,
                     NextRowKey = nextRowKey
                 };
             }
@@ -148,7 +143,7 @@ namespace FeedReader.WebApi.Processors
             var queryRes = await userFeedItemStartsTable.ExecuteQuerySegmentedAsync(new Microsoft.Azure.Cosmos.Table.TableQuery<Backend.Share.Entities.FeedItemExEntity>()
             {
                 TakeCount = MAX_RETURN_COUNT * 2,
-                FilterString = Microsoft.Azure.Cosmos.Table.TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, userUuid)
+                FilterString = Microsoft.Azure.Cosmos.Table.TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, Consts.FEEDREADER_UUID_PREFIX + user.Id)
             }, token);
 
             List<FeedItem> feedItems;
@@ -173,10 +168,10 @@ namespace FeedReader.WebApi.Processors
             return feedItems;
         }
 
-        public async Task MarkItemsAsReaded(string userUuid, string feedUri, DateTime lastReadedTime, CloudTable usersFeedsTable, CloudTable feedsTable, QueueClient feedRefreshJobs)
+        public async Task MarkItemsAsReaded(User user, string feedUri, DateTime lastReadedTime, CloudTable usersFeedsTable, CloudTable feedsTable, QueueClient feedRefreshJobs)
         {
             var feedUriHash = Utils.Sha256(feedUri);
-            var res = await usersFeedsTable.ExecuteAsync(TableOperation.Retrieve<UserFeedEntity>(partitionKey: userUuid, rowkey: feedUriHash, new List<string>() { "ETag" }));
+            var res = await usersFeedsTable.ExecuteAsync(TableOperation.Retrieve<UserFeedEntity>(partitionKey: Consts.FEEDREADER_UUID_PREFIX + user.Id, rowkey: feedUriHash, new List<string>() { "ETag" }));
             if (res?.Result == null)
             {
                 throw new ExternalErrorExcepiton("'feedUri' is not found.");
@@ -205,55 +200,30 @@ namespace FeedReader.WebApi.Processors
             await usersFeedsTable.ExecuteAsync(TableOperation.Merge(userFeed));
         }
 
-        private static async Task<string> GetFeedReaderUuid(UserEntity user, BlobContainerClient userContainer, CloudTable uuidIndexTable)
+        private async Task<User> GetFeedReaderUser(User user)
         {
-            // If it is feedshub uuid, return directly.
-            if (user.Uuid.StartsWith(Consts.FEEDREADER_UUID_PREFIX))
+            // If it is feedreader user already (has id property), return directly.
+            if (!string.IsNullOrEmpty(user.Id))
             {
-                return user.Uuid;
+                return user;
             }
 
             // Not feedreader uuid, try to find from the related uuid index.
-            var res = await uuidIndexTable.ExecuteAsync(TableOperation.Retrieve<RelatedUuidEntity>(partitionKey: user.Uuid, rowkey: user.Uuid));
-            if (res?.Result != null)
+            var db = _dbFactory.CreateDbContext();
+            var dbUser = await db.Users.FirstOrDefaultAsync(u => u.ThirdPartyId == user.ThirdPartyId);
+            if (dbUser != null)
             {
-                return ((RelatedUuidEntity)res.Result).FeedReaderUuid;
+                return dbUser;
             }
 
             // Not found, let's register it.
-            var feedshubUuid = Consts.FEEDREADER_UUID_PREFIX + Guid.NewGuid().ToString("N").ToLower();
-            await uuidIndexTable.ExecuteAsync(TableOperation.Insert(new RelatedUuidEntity()
-            {
-                PartitionKey = user.Uuid,
-                RowKey = user.Uuid,
-                ThirdPartyUUid = user.Uuid,
-                FeedReaderUuid = feedshubUuid
-            }));
+            user.Id = Guid.NewGuid().ToString("N").ToLower();
+            user.RegistrationTimeInUtc = DateTime.UtcNow;
+            db.Users.Add(user);
+            await db.SaveChangesAsync();
 
-            // Create user.
-            var userEntity = new UserEntity()
-            {
-                PartitionKey = feedshubUuid,
-                RowKey = feedshubUuid,
-                Uuid = feedshubUuid,
-                Email = user.Email,
-                Name = user.Name,
-                RegistrationTime = DateTime.Now,
-                AvatarUrl = user.AvatarUrl
-            };
-            if (string.IsNullOrWhiteSpace(userEntity.AvatarUrl))
-            {
-                if (!string.IsNullOrWhiteSpace(userEntity.Email))
-                {
-                    userEntity.AvatarUrl = $"https://s.gravatar.com/avatar/{user.Email.Md5()}?s=256";
-                }
-                else
-                {
-                    userEntity.AvatarUrl = $"https://s.gravatar.com/avatar/?s=256";
-                }
-            }
-            await userContainer.GetBlobClient(feedshubUuid).SaveAsync(userEntity);
-            return feedshubUuid;
+            // Return this user.
+            return user;
         }
     }
 }

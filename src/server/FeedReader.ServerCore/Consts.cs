@@ -42,5 +42,7 @@ namespace FeedReader.WebApi
         public const string ENV_KEY_GITHUB_CLIENT_ID = "GitHubClientId";
 
         public const string ENV_KEY_GITHUB_CLIENT_SECRET = "GitHubClientSecret";
+
+        public const string ENV_KEY_FEEDREADER_DB_CONNECTION_STRING = "FeedreaderDbConnectionString";
     }
 }

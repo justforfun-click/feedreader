@@ -10,12 +10,13 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using User = FeedReader.ServerCore.Models.User;
 
 namespace FeedReader.Server.Services
 {
     public class AuthService
     {
-        public async Task<Models.User> AuthenticateTokenAsync(string token)
+        public async Task<User> AuthenticateTokenAsync(string token)
         {
             if (string.IsNullOrWhiteSpace(token))
             {
@@ -51,7 +52,7 @@ namespace FeedReader.Server.Services
             }
         }
 
-        private static Models.User AuthenticateFeedReaderToken(string token)
+        private static User AuthenticateFeedReaderToken(string token)
         {
             // Validate the signature.
             var payload = new JwtBuilder()
@@ -68,20 +69,20 @@ namespace FeedReader.Server.Services
             }
 
             // Get uuid which is required.
-            var uuid = GetValue(payload, "uuid");
-            if (string.IsNullOrWhiteSpace(uuid))
+            var uid = GetValue(payload, "uid");
+            if (string.IsNullOrWhiteSpace(uid))
             {
                 throw new UnauthorizedAccessException();
             }
 
             // Token is valid.
-            return new Models.User
+            return new User
             {
-                Uuid = uuid
+                Id = uid
             };
         }
 
-        private static async Task<Models.User> AuthenticateMsTokenAsync(string token)
+        private static async Task<User> AuthenticateMsTokenAsync(string token)
         {
             // Decode header to get kid
             var header = new JwtBuilder().DecodeHeader<IDictionary<string, string>>(token);
@@ -119,16 +120,14 @@ namespace FeedReader.Server.Services
                 }
 
                 // Return user.
-                return new Models.User()
+                return new User()
                 {
-                    Uuid = $"ms:oid:{oid}",
-                    Name = GetValue(payload, "name") ?? string.Empty,
-                    Email = (GetValue(payload, "email") ?? string.Empty).ToLower().Trim()
+                    ThirdPartyId = $"ms:oid:{oid}",
                 };
             }
         }
 
-        private static async Task<Models.User> AuthenticateGoogleTokenAsync(string token)
+        private static async Task<User> AuthenticateGoogleTokenAsync(string token)
         {
             // Decode header to get kid
             var header = new JwtBuilder().DecodeHeader<IDictionary<string, string>>(token);
@@ -172,17 +171,14 @@ namespace FeedReader.Server.Services
                 }
 
                 // Return user.
-                return new Models.User()
+                return new User()
                 {
-                    Uuid = $"google:sub:{sub}",
-                    Name = GetValue(payload, "name") ?? string.Empty,
-                    Email = (GetValue(payload, "email") ?? string.Empty).ToLower().Trim(),
-                    AvatarUrl = GetValue(payload, "picture") ?? string.Empty
+                    ThirdPartyId = $"google:sub:{sub}",
                 };
             }
         }
 
-        private static async Task<Models.User> AuthenticateGitHubAccessCodeAsync(string accessCode)
+        private static async Task<User> AuthenticateGitHubAccessCodeAsync(string accessCode)
         {
             // Exchange access code to acess token.
             var uri = $"https://github.com/login/oauth/access_token?client_id={Environment.GetEnvironmentVariable(WebApi.Consts.ENV_KEY_GITHUB_CLIENT_ID)}&client_secret={Environment.GetEnvironmentVariable(WebApi.Consts.ENV_KEY_GITHUB_CLIENT_SECRET)}&code={accessCode}";
@@ -204,16 +200,13 @@ namespace FeedReader.Server.Services
             }
 
             // Return user.
-            return new Models.User()
+            return new User()
             {
-                Uuid = $"github:node_id:{nodeId}",
-                Name = GetValue(payload, "name") ?? string.Empty,
-                Email = (GetValue(payload, "email") ?? string.Empty).ToLower().Trim(),
-                AvatarUrl = GetValue(payload, "avatar_url") ?? string.Empty
+                ThirdPartyId = $"github:node_id:{nodeId}",
             };
         }
 
-        private static async Task<Models.User> AuthenticateFacebookAccessTokenAsync(string accessToken)
+        private static async Task<User> AuthenticateFacebookAccessTokenAsync(string accessToken)
         {
             // Get user profile.
             var uri = $"https://graph.facebook.com/me?access_token={accessToken}&fields=name,email";
@@ -227,12 +220,9 @@ namespace FeedReader.Server.Services
                 throw new UnauthorizedAccessException();
             }
 
-            return new Models.User()
+            return new User()
             {
-                Uuid = $"facebook:id:{id}",
-                Name = GetValue(payload, "name") ?? string.Empty,
-                Email = (GetValue(payload, "email") ?? string.Empty).ToLower().Trim(),
-                AvatarUrl = $"http://graph.facebook.com/{id}/picture?height=256&width=256"
+                ThirdPartyId = $"facebook:id:{id}",
             };
         }
 

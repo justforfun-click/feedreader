@@ -100,6 +100,7 @@ namespace FeedReader.WebApi.Test
 
     public class UserProcessorTest
     {
+        /*
         [Fact]
         public async void LoginWithNewRegisteredUser()
         {
@@ -310,5 +311,6 @@ namespace FeedReader.WebApi.Test
             Assert.NotNull(userUpdatedEntity);
             Assert.Equal("[]", userUpdatedEntity.StaredHashs);
         }
+        */
     }
 }

@@ -1,10 +1,12 @@
 ﻿using Azure.Storage.Blobs;
 using FeedReader.Backend.Share.FeedParsers;
+using FeedReader.ServerCore.Datas;
 using FeedReader.Share;
 using FeedReader.Share.DataContracts;
 using FeedReader.WebApi.Entities;
 using FeedReader.WebApi.Extensions;
 using Microsoft.Azure.Cosmos.Table;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,6 +17,7 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
+using User = FeedReader.ServerCore.Models.User;
 
 namespace FeedReader.WebApi.Processors
 {
@@ -22,10 +25,12 @@ namespace FeedReader.WebApi.Processors
     {
         const int MAX_RETURN_COUNT = 50;
 
+        private IDbContextFactory<FeedReaderDbContext> _dbFactory;
         private readonly HttpClient _httpClient;
 
-        public FeedProcessor(HttpClient httpClient = null)
+        public FeedProcessor(IDbContextFactory<FeedReaderDbContext> dbFactory, HttpClient httpClient = null)
         {
+            _dbFactory = dbFactory;
             _httpClient = httpClient ?? new HttpClient();
         }
 
@@ -61,7 +66,7 @@ namespace FeedReader.WebApi.Processors
             return feed;
         }
 
-        public async Task<Feed> GetFeedItemsAsync(string feedUri, string nextRowKey, BlobClient userBlob, CloudTable usersFeedsTable, CloudTable feedsTable, CloudTable feedItemsTable)
+        public async Task<Feed> GetFeedItemsAsync(string feedUri, string nextRowKey, User user, CloudTable usersFeedsTable, CloudTable feedsTable, CloudTable feedItemsTable)
         {
             var originalUri = feedUri;
             feedUri = feedUri.Trim().ToLower();
@@ -71,9 +76,9 @@ namespace FeedReader.WebApi.Processors
             // If the user blob is not null, we will get the feed from the user blob because user might customize the group and name on this feed.
             UserFeedEntity userFeedEntity = null;
             Feed feed = null;
-            if (userBlob != null)
+            if (user != null)
             {
-                var res = await usersFeedsTable.ExecuteAsync(TableOperation.Retrieve<UserFeedEntity>(partitionKey: userBlob.Name, rowkey: feedUriHash));
+                var res = await usersFeedsTable.ExecuteAsync(TableOperation.Retrieve<UserFeedEntity>(partitionKey: Consts.FEEDREADER_UUID_PREFIX + user.Id, rowkey: feedUriHash));
                 if (res?.Result != null)
                 {
                     userFeedEntity = (UserFeedEntity)res.Result;
@@ -154,20 +159,17 @@ namespace FeedReader.WebApi.Processors
             }
 
             // Mark stared or not.
-            if (userBlob != null)
+            if (user != null)
             {
-                var userEntity = await userBlob.GetAsync<UserEntity>();
-                if (!string.IsNullOrWhiteSpace(userEntity.StaredHashs))
+                var db = _dbFactory.CreateDbContext();
+                var staredHashs = db.UserFavorites.Where(f => f.UserId == user.Id).Select(f => f.FavoriteItemIdHash).ToList();
+                if (staredHashs.Count > 0)
                 {
-                    var staredHashs = JsonConvert.DeserializeObject<SortedSet<string>>(userEntity.StaredHashs);
-                    if (staredHashs.Count > 0)
+                    foreach (var feedItem in feed.Items)
                     {
-                        foreach (var feedItem in feed.Items)
+                        if (staredHashs.Contains(Share.Utils.Md5(feedItem.PermentLink)))
                         {
-                            if (staredHashs.Contains(Share.Utils.Md5(feedItem.PermentLink)))
-                            {
-                                feedItem.IsStared = true;
-                            }
+                            feedItem.IsStared = true;
                         }
                     }
                 }
