@@ -71,8 +71,6 @@ namespace FeedReader.WebApi.AdminFunctions
 
             // Parse feed info.
             var feedInfo = parser.ParseFeedInfo();
-            feedInfo.Uri = feedOriginalUri;
-            feedInfo.OriginalUri = feedOriginalUri;
 
             // Parse html content to get icon uri.
             if (string.IsNullOrWhiteSpace(feedInfo.IconUri))
@@ -155,9 +153,9 @@ namespace FeedReader.WebApi.AdminFunctions
             batch.Clear();
             foreach (var item in feedItems)
             {
-                batch.Add(TableOperation.InsertOrMerge(new FeedItemExEntity(item, feedInfo)
+                batch.Add(TableOperation.InsertOrMerge(new FeedItemExEntity(item, feed)
                 {
-                    PartitionKey = feedInfo.Category ?? "Default",
+                    PartitionKey = feed.Category ?? "Default",
                     RowKey = item.RowKey,
                 }));
                 if (batch.Count == 100)

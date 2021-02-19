@@ -66,13 +66,13 @@ namespace FeedReader.Backend.Share.Entities
         {
         }
 
-        public FeedItemExEntity(FeedItemEntity feedItem, FeedInfoEntity feedInfo)
+        public FeedItemExEntity(FeedItemEntity feedItem, ServerCore.Models.Feed feed)
             : base(feedItem)
         {
-            FeedUri = feedInfo.Uri;
-            FeedIconUri = feedInfo.IconUri;
-            FeedName = feedInfo.Name;
-            FeedCategory = feedInfo.Category;
+            FeedUri = feed.Uri;
+            FeedIconUri = feed.IconUri;
+            FeedName = feed.Name;
+            FeedCategory = feed.Category;
         }
     }
 }
