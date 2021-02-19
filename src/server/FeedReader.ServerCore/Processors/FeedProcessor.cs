@@ -1,4 +1,5 @@
 ﻿using FeedReader.Backend.Share.FeedParsers;
+using FeedReader.ServerCore;
 using FeedReader.ServerCore.Datas;
 using FeedReader.Share;
 using FeedReader.Share.DataContracts;
@@ -64,7 +65,7 @@ namespace FeedReader.WebApi.Processors
             return feed;
         }
 
-        public async Task<Feed> GetFeedItemsAsync(string feedUri, string nextRowKey, User user, CloudTable usersFeedsTable, CloudTable feedsTable, CloudTable feedItemsTable)
+        public async Task<Feed> GetFeedItemsAsync(string feedUri, string nextRowKey, User user, CloudTable usersFeedsTable, CloudTable feedItemsTable)
         {
             var originalUri = feedUri;
             feedUri = feedUri.Trim().ToLower();
@@ -90,10 +91,19 @@ namespace FeedReader.WebApi.Processors
             // No matter for which case, we will try to get the feed info from feed info table directly.
             if (feed == null)
             {
-                var res = await feedsTable.ExecuteAsync(TableOperation.Retrieve<FeedInfoEntity>(partitionKey: "feed_info", rowkey: feedUriHash));
-                if (res?.Result != null)
+                var db = _dbFactory.CreateDbContext();
+                var feedInDb = await db.Feeds.FindAsync(feedUriHash);
+                if (feedInDb != null)
                 {
-                    feed = ((FeedInfoEntity)res.Result).CopyTo(new Feed());
+                    feed = new Feed
+                    {
+                        Description = feed.Description,
+                        IconUri = feed.IconUri,
+                        Name = feed.Name,
+                        OriginalUri = feed.Uri,
+                        Uri = feedUri,
+                        WebsiteLink = feed.WebsiteLink,
+                    };
                 }
                 else
                 {
@@ -182,18 +192,19 @@ namespace FeedReader.WebApi.Processors
             await SaveFeedAsync(await RefreshFeedAsync(feedOriginalUri), feedTable, feedItemTable);
         }
 
-        public async Task<Feed> SubscribeFeedAsync(string feedOriginalUri, string customName, string customGroup, string userUuid, CloudTable usersFeedsTable, CloudTable feedTable)
+        public async Task<Feed> SubscribeFeedAsync(string feedOriginalUri, string customName, string customGroup, string userUuid, CloudTable usersFeedsTable)
         {
             Feed feed = null;
             string feedUriHash = null;
+            var db = _dbFactory.CreateDbContext();
             for (var i = 0; i < 10; ++i)
             {
                 var feedUri = feedOriginalUri.Trim().ToLower();
                 feedUriHash = Utils.Sha256(feedUri);
 
                 // Do we have this feed already?
-                var res = await feedTable.ExecuteAsync(TableOperation.Retrieve<FeedInfoEntity>(partitionKey: "feed_info", rowkey: feedUriHash));
-                if (res == null || res.Result == null)
+                var feedInDb = await db.Feeds.FindAsync(feedUriHash);
+                if (feedInDb == null)
                 {
                     // Get information of this feed.
                     feed = await RefreshFeedAsync(feedOriginalUri, noItems: true);
@@ -209,18 +220,39 @@ namespace FeedReader.WebApi.Processors
                     }
 
                     // Save to feed table.
+                    db.Feeds.Add(new ServerCore.Models.Feed
+                    {
+                        Description = feed.Description,
+                        IconUri = feed.IconUri,
+                        Id = feedUriHash,
+                        Name = feed.Name,
+                        RegistrationTimeInUtc = DateTime.UtcNow,
+                        WebSiteUri = feed.WebsiteLink,
+                        Uri = feed.OriginalUri,
+                    });
+
                     try
                     {
-                        await feedTable.ExecuteAsync(TableOperation.Insert(new FeedInfoEntity(partitionKey: "feed_info", rowKey: feedUriHash, feed)));
+                        await db.SaveChangesAsync();
                     }
-                    catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == (int)HttpStatusCode.Conflict)
+                    catch (DbUpdateException ex) when (ex.IsUniqueConstraintException())
                     {
                         // Save to ignore.
                     }
+
+                    break;
                 }
                 else
                 {
-                    feed = ((FeedInfoEntity)res.Result).CopyTo(new Feed());
+                    feed = new Feed
+                    {
+                        Description = feedInDb.Description,
+                        IconUri = feedInDb.IconUri,
+                        Name = feedInDb.Name,
+                        OriginalUri = feedInDb.Uri,
+                        Uri = feedUri,
+                        WebsiteLink = feedInDb.WebSiteUri,
+                    };
                 }
             }
 

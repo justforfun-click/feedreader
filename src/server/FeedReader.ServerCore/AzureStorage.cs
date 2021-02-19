@@ -9,8 +9,6 @@ namespace FeedReader.ServerCore
     {
         const string REFRESH_FEED_JOBS_QUEUE = "feedrefreshjobs";
 
-        const string FEEDS_TABLE = "feeds";
-
         const string FEED_ITEMS_TABLE = "feeditems";
 
         const string LATEST_FEED_ITEMS_TABLE = "latestfeeditems";
@@ -23,9 +21,9 @@ namespace FeedReader.ServerCore
         private static readonly CloudStorageAccount _tableStorageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable(Consts.ENV_KEY_AZURE_STORAGE));
         private static readonly CloudTableClient _tableClient = _tableStorageAccount.CreateCloudTableClient();
 
-        public static CloudTable GetFeedsTable()
+        public static CloudTable MigrationOnly_GetAzureFeedsTable()
         {
-            return _tableClient.GetTableReference(FEEDS_TABLE);
+            return _tableClient.GetTableReference("feeds");
         }
 
         public static CloudTable GetFeedItemsTable()

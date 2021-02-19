@@ -197,7 +197,7 @@ namespace FeedReader.WebApi.Processors
             return feedItems;
         }
 
-        public async Task MarkItemsAsReaded(User user, string feedUri, DateTime lastReadedTime, CloudTable usersFeedsTable, CloudTable feedsTable, QueueClient feedRefreshJobs)
+        public async Task MarkItemsAsReaded(User user, string feedUri, DateTime lastReadedTime, CloudTable usersFeedsTable, QueueClient feedRefreshJobs)
         {
             var feedUriHash = Utils.Sha256(feedUri);
             var res = await usersFeedsTable.ExecuteAsync(TableOperation.Retrieve<UserFeedEntity>(partitionKey: Consts.FEEDREADER_UUID_PREFIX + user.Id, rowkey: feedUriHash, new List<string>() { "ETag" }));
@@ -208,8 +208,9 @@ namespace FeedReader.WebApi.Processors
             var userFeed = (UserFeedEntity)res.Result;
 
             // Get the latest feed from the feed info table.
-            var feedInfoRes = await feedsTable.ExecuteAsync(TableOperation.Retrieve<FeedInfoEntity>(partitionKey: "feed_info", rowkey: feedUriHash));
-            if (feedInfoRes == null || feedInfoRes.Result == null)
+            var db = _dbFactory.CreateDbContext();
+            var feed = await db.Feeds.FindAsync(feedUriHash);
+            if (feed == null)
             {
                 LogError($"{feedUri} can't be found in feed info table, but exists in user feed table.");
 
@@ -219,10 +220,9 @@ namespace FeedReader.WebApi.Processors
             else
             {
                 // Update with latest feed info.
-                var feedInfo = (FeedInfoEntity)feedInfoRes.Result;
-                userFeed.Description = feedInfo.Description;
-                userFeed.IconUri = feedInfo.IconUri;
-                userFeed.WebsiteLink = feedInfo.WebsiteLink;
+                userFeed.Description = feed.Description;
+                userFeed.IconUri = feed.IconUri;
+                userFeed.WebsiteLink = feed.WebSiteUri;
             }
 
             userFeed.LastReadedTime = lastReadedTime;

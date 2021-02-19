@@ -6,25 +6,54 @@ using System.Net.Http;
 using FeedReader.Backend.Share.FeedParsers;
 using FeedReader.WebApi.Processors;
 using FeedReader.Backend.Share.Entities;
-using FeedReader.Share;
 using System.Net.Http.Headers;
 using FeedReader.WebApi.Extensions;
+using Microsoft.EntityFrameworkCore;
+using FeedReader.ServerCore.Datas;
+using FeedReader.ServerCore;
+using System.Threading;
 
 namespace FeedReader.WebApi.AdminFunctions
 {
     public static class UpdateFeedFunc
     {
-        public static async Task UpdateFeed(string feedUri, CloudTable feedsTable, CloudTable feedItemsTable, CloudTable latestFeedItemsTable, ILogger log, HttpClient httpClient = null)
+        public static async Task UpdateFeeds(IDbContextFactory<FeedReaderDbContext> dbFactory, CancellationToken cancellationToken, ILogger logger)
         {
-            // Get original uri.
-            feedUri = feedUri.Trim().ToLower();
-            var feedUriHash = Utils.Sha256(feedUri);
-            var res = await feedsTable.ExecuteAsync(TableOperation.Retrieve<FeedInfoEntity>(partitionKey: "feed_info", rowkey: feedUriHash));
-            if (res?.Result == null)
+            var db = dbFactory.CreateDbContext();
+            var feedItemsTable = AzureStorage.GetFeedItemsTable();
+            var latestFeedItemsTable = AzureStorage.GetLatestFeedItemsTable();
+            int count = 0;
+            foreach (var feed in await db.Feeds.ToListAsync())
             {
-                throw new ExternalErrorExceptionNotFound();
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
+                try
+                {
+                    await UpdateFeed(feed, feedItemsTable, latestFeedItemsTable, logger);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError($"Background.FeedsRefreshService update {feed.Uri} throws exception: {ex}");
+                }
+
+                if (++count == 50)
+                {
+                    await db.SaveChangesAsync();
+                }
             }
-            var feedOriginalUri = ((FeedInfoEntity)res.Result).OriginalUri;
+            await db.SaveChangesAsync();
+        }
+
+        public static async Task UpdateFeed(ServerCore.Models.Feed feed, CloudTable feedItemsTable, CloudTable latestFeedItemsTable, ILogger log, HttpClient httpClient = null)
+        {
+            log.LogInformation($"UpdateFeed: {feed.Uri}");
+
+            // Get original uri.
+            var feedUriHash = feed.Id;
+            var feedOriginalUri = feed.Uri;
 
             // Get feed content.
             if (httpClient == null)
@@ -93,14 +122,11 @@ namespace FeedReader.WebApi.AdminFunctions
             }
 
             // Save feed info to table.
-            feedInfo.PartitionKey = "feed_info";
-            feedInfo.RowKey = feedUriHash;
-            feedInfo.Uri = feedUri;
-            feedInfo.OriginalUri = feedOriginalUri;
-            await feedsTable.ExecuteAsync(TableOperation.InsertOrMerge(feedInfo));
-
-            // Retrive info, we need the category property.
-            feedInfo = (FeedInfoEntity)(await feedsTable.ExecuteAsync(TableOperation.Retrieve<FeedInfoEntity>(partitionKey: "feed_info", rowkey: feedUriHash))).Result;
+            feed.Description = feedInfo.Description;
+            feed.IconUri = feedInfo.IconUri;
+            feed.LastUpdateTimeInUtc = DateTime.UtcNow;
+            feed.Name = feedInfo.Name;
+            feed.WebSiteUri = feedInfo.WebsiteLink;
 
             // Parse feed items.
             var feedItems = parser.ParseFeedItems();
@@ -127,9 +153,9 @@ namespace FeedReader.WebApi.AdminFunctions
             batch.Clear();
             foreach (var item in feedItems)
             {
-                batch.Add(TableOperation.InsertOrMerge(new FeedItemExEntity(item, feedInfo)
+                batch.Add(TableOperation.InsertOrMerge(new FeedItemExEntity(item, feed)
                 {
-                    PartitionKey = feedInfo.Category ?? "Default",
+                    PartitionKey = feed.Category ?? "Default",
                     RowKey = item.RowKey,
                 }));
                 if (batch.Count == 100)
@@ -142,6 +168,8 @@ namespace FeedReader.WebApi.AdminFunctions
             {
                 await latestFeedItemsTable.ExecuteBatchAsync(batch);
             }
+
+            log.LogInformation($"UpdateFeed: {feed.Uri} finished");
         }
     }
 }
