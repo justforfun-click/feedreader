@@ -1,25 +1,10 @@
-﻿using FeedReader.Share.DataContracts;
-using FeedReader.WebApi.Entities;
-using FeedReader.WebApi.Extensions;
-using FeedReader.WebApi.Processors;
-using Newtonsoft.Json;
-using NSubstitute;
-using System;
-using System.Linq;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Threading.Tasks;
-using Xunit;
-using Microsoft.AspNetCore.JsonPatch.Operations;
-using FeedReader.Backend.Share;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.Storage.Blob;
-using Azure.Storage.Blobs;
 using System.IO;
-using System.Text;
 using Azure.Core;
 using System.Diagnostics.CodeAnalysis;
-using Azure.Storage.Blobs.Models;
 using Azure;
 
 namespace FeedReader.WebApi.Test

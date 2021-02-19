@@ -78,8 +78,6 @@ namespace FeedReader.Server
 
                 endpoints.MapFallbackToFile("index.html");
             });
-
-            WebApi.MigrationTools.MoveUserTableFromAzureToDb();
         }
     }
 }

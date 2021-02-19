@@ -1,7 +1,7 @@
 ﻿using FeedReader.Protos;
+using FeedReader.ServerCore;
 using FeedReader.ServerCore.Datas;
 using FeedReader.WebApi;
-using FeedReader.WebApi.Extensions;
 using FeedReader.WebApi.Processors;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -30,8 +30,6 @@ namespace FeedReader.Server.Services
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
                 var processor = new UserProcessor(_dbContext);
-                var userContainer = AzureStorage.GetUserContainer();
-                var uuidIndexTable = AzureStorage.GetRelatedUuidIndexTable();
                 var usersFeedsTable = AzureStorage.GetUsersFeedsTable();
                 var userEntity = await processor.LoginAsync(user, usersFeedsTable);
                 var res = new UserInfo
@@ -54,8 +52,8 @@ namespace FeedReader.Server.Services
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
                 var userFeedsTable = AzureStorage.GetUsersFeedsTable();
-                var feedsTable = Backend.Share.AzureStorage.GetFeedsTable();
-                var feedRefresJobsQueue = Backend.Share.AzureStorage.GetFeedRefreshJobsQueue();
+                var feedsTable = AzureStorage.GetFeedsTable();
+                var feedRefresJobsQueue = AzureStorage.GetFeedRefreshJobsQueue();
                 await new UserProcessor(_dbContext).MarkItemsAsReaded(user, request.FeedUri, request.Timestamp.ToDateTime(), userFeedsTable, feedsTable, feedRefresJobsQueue);
                 return new Empty();
             }
@@ -71,10 +69,9 @@ namespace FeedReader.Server.Services
             {
                 var userToken = context.RequestHeaders.Get("authentication")?.Value;
                 var user = userToken == null ? null : await _authService.AuthenticateTokenAsync(userToken);
-                var userBlob = user == null ? null : AzureStorage.GetUserBlob(Consts.FEEDREADER_UUID_PREFIX + user.Id);
                 var userFeedsTable = AzureStorage.GetUsersFeedsTable();
-                var feedsTable = Backend.Share.AzureStorage.GetFeedsTable();
-                var feedItemsTable = Backend.Share.AzureStorage.GetFeedItemsTable();
+                var feedsTable = AzureStorage.GetFeedsTable();
+                var feedItemsTable = AzureStorage.GetFeedItemsTable();
                 var feed = await new FeedProcessor(_dbContext).GetFeedItemsAsync(request.FeedUri, request.NextRowKey, user, userFeedsTable, feedsTable, feedItemsTable);
                 var response = new RefreshFeedResponse()
                 {
@@ -92,7 +89,7 @@ namespace FeedReader.Server.Services
 
         public override async Task<GetFeedsByCategoryResponse> GetFeedsByCategory(GetFeedsByCategoryRequest request, ServerCallContext context)
         {
-            var items = await new FeedProcessor(_dbContext).GetFeedItemsByCategory(GetDataContractsFeedCategory(request.Category), request.NextRowKey, Backend.Share.AzureStorage.GetLatestFeedItemsTable());
+            var items = await new FeedProcessor(_dbContext).GetFeedItemsByCategory(GetDataContractsFeedCategory(request.Category), request.NextRowKey, AzureStorage.GetLatestFeedItemsTable());
             var response = new GetFeedsByCategoryResponse();
             if (items.Count > 0)
             {
@@ -107,7 +104,7 @@ namespace FeedReader.Server.Services
             try
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                var items = await new UserProcessor(_dbContext).GetStaredFeedItemsAsync(request.NextRowKey, user, Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
+                var items = await new UserProcessor(_dbContext).GetStaredFeedItemsAsync(request.NextRowKey, user, AzureStorage.GetUserStaredFeedItemsTable());
                 var response = new GetStaredFeedItemsResponse();
                 if (items.Count > 0)
                 {
@@ -137,7 +134,7 @@ namespace FeedReader.Server.Services
                 }
 
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new UserProcessor(_dbContext).StarFeedItemAsync(GetDataContractFeedItem(request.FeedItem), user, Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
+                await new UserProcessor(_dbContext).StarFeedItemAsync(GetDataContractFeedItem(request.FeedItem), user, AzureStorage.GetUserStaredFeedItemsTable());
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -156,7 +153,7 @@ namespace FeedReader.Server.Services
                 }
 
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new UserProcessor(_dbContext).UnstarFeedItemAsync(request.FeedItemUri, request.FeedItemPubDate.ToDateTime(), user, Backend.Share.AzureStorage.GetUserStaredFeedItemsTable());
+                await new UserProcessor(_dbContext).UnstarFeedItemAsync(request.FeedItemUri, request.FeedItemPubDate.ToDateTime(), user, AzureStorage.GetUserStaredFeedItemsTable());
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -177,7 +174,7 @@ namespace FeedReader.Server.Services
                 request.OriginalUri = request.OriginalUri.Trim();
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
                 var usersFeedsTable = AzureStorage.GetUsersFeedsTable();
-                var feedTable = Backend.Share.AzureStorage.GetFeedsTable();
+                var feedTable = AzureStorage.GetFeedsTable();
                 var feed = await new FeedProcessor(_dbContext).SubscribeFeedAsync(request.OriginalUri, request.Name, request.Group, Consts.FEEDREADER_UUID_PREFIX + user.Id, usersFeedsTable, feedTable);
                 return new SubscribeFeedResponse
                 {

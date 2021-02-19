@@ -31,8 +31,37 @@ namespace FeedReader.WebApi.Processors
 
         public async Task<Share.DataContracts.User> LoginAsync(User user, CloudTable usersFeedsTable)
         {
-            // Get feedreader user.
-            user = await GetFeedReaderUser(user);
+            var db = _dbFactory.CreateDbContext();
+
+            // If it is feedreader user already (has id property), query user in db.
+            if (!string.IsNullOrEmpty(user.Id))
+            {
+                user = await db.Users.FindAsync(user.Id);
+                if (user == null)
+                {
+                    throw new UnauthorizedAccessException();
+                }
+            }
+            else
+            {
+                // Not feedreader uuid, try to find from the related uuid index.
+                var dbUser = await db.Users.FirstOrDefaultAsync(u => u.ThirdPartyId == user.ThirdPartyId);
+                if (dbUser != null)
+                {
+                    user = dbUser;
+                }
+                else
+                {
+                    // Not found, let's register it.
+                    user.Id = Guid.NewGuid().ToString("N").ToLower();
+                    user.RegistrationTimeInUtc = DateTime.UtcNow;
+                    db.Users.Add(user);
+                }
+            }
+
+            // Update last active time.
+            user.LastActiveTimeInUtc = DateTime.UtcNow;
+            await db.SaveChangesAsync();
 
             // Generate our jwt token.
             var now = DateTimeOffset.UtcNow;
@@ -198,32 +227,6 @@ namespace FeedReader.WebApi.Processors
 
             userFeed.LastReadedTime = lastReadedTime;
             await usersFeedsTable.ExecuteAsync(TableOperation.Merge(userFeed));
-        }
-
-        private async Task<User> GetFeedReaderUser(User user)
-        {
-            // If it is feedreader user already (has id property), return directly.
-            if (!string.IsNullOrEmpty(user.Id))
-            {
-                return user;
-            }
-
-            // Not feedreader uuid, try to find from the related uuid index.
-            var db = _dbFactory.CreateDbContext();
-            var dbUser = await db.Users.FirstOrDefaultAsync(u => u.ThirdPartyId == user.ThirdPartyId);
-            if (dbUser != null)
-            {
-                return dbUser;
-            }
-
-            // Not found, let's register it.
-            user.Id = Guid.NewGuid().ToString("N").ToLower();
-            user.RegistrationTimeInUtc = DateTime.UtcNow;
-            db.Users.Add(user);
-            await db.SaveChangesAsync();
-
-            // Return this user.
-            return user;
         }
     }
 }

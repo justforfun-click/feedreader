@@ -3,7 +3,7 @@ using FeedReader.WebApi;
 using Microsoft.Azure.Cosmos.Table;
 using System;
 
-namespace FeedReader.Backend.Share
+namespace FeedReader.ServerCore
 {
     public static class AzureStorage
     {
@@ -16,6 +16,8 @@ namespace FeedReader.Backend.Share
         const string LATEST_FEED_ITEMS_TABLE = "latestfeeditems";
 
         const string USER_STARED_FEED_ITEMS_TABLE = "userstaredfeeditems";
+
+        const string USERS_FEEDS_TABLE = "usersfeeds";
 
         private static readonly string _conns = Environment.GetEnvironmentVariable(Consts.ENV_KEY_AZURE_STORAGE);
         private static readonly CloudStorageAccount _tableStorageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable(Consts.ENV_KEY_AZURE_STORAGE));
@@ -46,15 +48,9 @@ namespace FeedReader.Backend.Share
             return new QueueClient(_conns, REFRESH_FEED_JOBS_QUEUE);
         }
 
-        static AzureStorage()
+        public static CloudTable GetUsersFeedsTable()
         {
-#if DEBUG
-            GetFeedsTable().CreateIfNotExists();
-            GetFeedItemsTable().CreateIfNotExists();
-            GetLatestFeedItemsTable().CreateIfNotExists();
-            GetFeedRefreshJobsQueue().CreateIfNotExists();
-            GetUserStaredFeedItemsTable().CreateIfNotExists();
-#endif
+            return _tableClient.GetTableReference(USERS_FEEDS_TABLE);
         }
     }
 }
