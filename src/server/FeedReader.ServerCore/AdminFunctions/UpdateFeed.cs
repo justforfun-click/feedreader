@@ -71,7 +71,7 @@ namespace FeedReader.WebApi.AdminFunctions
 
             // Parse feed info.
             var feedInfo = parser.ParseFeedInfo();
-            feedInfo.Uri = feedUriHash;
+            feedInfo.Uri = feedOriginalUri;
             feedInfo.OriginalUri = feedOriginalUri;
 
             // Parse html content to get icon uri.
