@@ -52,9 +52,8 @@ namespace FeedReader.Server.Services
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
                 var userFeedsTable = AzureStorage.GetUsersFeedsTable();
-                var feedsTable = AzureStorage.GetFeedsTable();
                 var feedRefresJobsQueue = AzureStorage.GetFeedRefreshJobsQueue();
-                await new UserProcessor(_dbContext).MarkItemsAsReaded(user, request.FeedUri, request.Timestamp.ToDateTime(), userFeedsTable, feedsTable, feedRefresJobsQueue);
+                await new UserProcessor(_dbContext).MarkItemsAsReaded(user, request.FeedUri, request.Timestamp.ToDateTime(), userFeedsTable, feedRefresJobsQueue);
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -70,9 +69,8 @@ namespace FeedReader.Server.Services
                 var userToken = context.RequestHeaders.Get("authentication")?.Value;
                 var user = userToken == null ? null : await _authService.AuthenticateTokenAsync(userToken);
                 var userFeedsTable = AzureStorage.GetUsersFeedsTable();
-                var feedsTable = AzureStorage.GetFeedsTable();
                 var feedItemsTable = AzureStorage.GetFeedItemsTable();
-                var feed = await new FeedProcessor(_dbContext).GetFeedItemsAsync(request.FeedUri, request.NextRowKey, user, userFeedsTable, feedsTable, feedItemsTable);
+                var feed = await new FeedProcessor(_dbContext).GetFeedItemsAsync(request.FeedUri, request.NextRowKey, user, userFeedsTable, feedItemsTable);
                 var response = new RefreshFeedResponse()
                 {
                     FeedInfo = GetFeedInfo(feed),
@@ -174,8 +172,7 @@ namespace FeedReader.Server.Services
                 request.OriginalUri = request.OriginalUri.Trim();
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
                 var usersFeedsTable = AzureStorage.GetUsersFeedsTable();
-                var feedTable = AzureStorage.GetFeedsTable();
-                var feed = await new FeedProcessor(_dbContext).SubscribeFeedAsync(request.OriginalUri, request.Name, request.Group, Consts.FEEDREADER_UUID_PREFIX + user.Id, usersFeedsTable, feedTable);
+                var feed = await new FeedProcessor(_dbContext).SubscribeFeedAsync(request.OriginalUri, request.Name, request.Group, Consts.FEEDREADER_UUID_PREFIX + user.Id, usersFeedsTable);
                 return new SubscribeFeedResponse
                 {
                     Feed = GetFeedInfo(feed)

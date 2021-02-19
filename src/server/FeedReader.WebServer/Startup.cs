@@ -1,5 +1,6 @@
 ﻿using AspNetCore.Proxy;
 using FeedReader.Server.Services;
+using FeedReader.ServerCore.Datas;
 using FeedReader.WebApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -78,6 +79,8 @@ namespace FeedReader.Server
 
                 endpoints.MapFallbackToFile("index.html");
             });
+
+            ServerCore.MigrationTools.MoveFeedTableFromAzureToDb(app.ApplicationServices.GetRequiredService<IDbContextFactory<FeedReaderDbContext>>());
         }
     }
 }
