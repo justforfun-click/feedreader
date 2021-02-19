@@ -12,5 +12,7 @@ namespace FeedReader.ServerCore.Models
         public string ThirdPartyId { get; set; }
         [Required]
         public DateTime RegistrationTimeInUtc { get; set; }
+        [Required]
+        public DateTime LastActiveTimeInUtc { get; set; }
     }
 }
