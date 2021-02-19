@@ -23,7 +23,7 @@ namespace FeedReader.WebApi.AdminFunctions
             var feedItemsTable = AzureStorage.GetFeedItemsTable();
             var latestFeedItemsTable = AzureStorage.GetLatestFeedItemsTable();
             int count = 0;
-            foreach (var feed in db.Feeds)
+            foreach (var feed in await db.Feeds.ToListAsync())
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
