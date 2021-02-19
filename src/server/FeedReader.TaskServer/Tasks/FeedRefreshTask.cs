@@ -1,4 +1,4 @@
-﻿using FeedReader.Backend.Share;
+﻿using FeedReader.ServerCore;
 using FeedReader.WebApi.AdminFunctions;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Logging;

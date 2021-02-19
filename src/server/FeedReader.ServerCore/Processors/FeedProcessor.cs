@@ -1,5 +1,4 @@
-﻿using Azure.Storage.Blobs;
-using FeedReader.Backend.Share.FeedParsers;
+﻿using FeedReader.Backend.Share.FeedParsers;
 using FeedReader.ServerCore.Datas;
 using FeedReader.Share;
 using FeedReader.Share.DataContracts;
@@ -7,7 +6,6 @@ using FeedReader.WebApi.Entities;
 using FeedReader.WebApi.Extensions;
 using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
