@@ -71,6 +71,8 @@ namespace FeedReader.WebApi.AdminFunctions
 
             // Parse feed info.
             var feedInfo = parser.ParseFeedInfo();
+            feedInfo.Uri = feedUriHash;
+            feedInfo.OriginalUri = feedOriginalUri;
 
             // Parse html content to get icon uri.
             if (string.IsNullOrWhiteSpace(feedInfo.IconUri))
@@ -123,7 +125,7 @@ namespace FeedReader.WebApi.AdminFunctions
 
             // Save feed info to table.
             feed.Description = feedInfo.Description;
-            feed.IconUri = feedInfo.Uri;
+            feed.IconUri = feedInfo.IconUri;
             feed.LastUpdateTimeInUtc = DateTime.UtcNow;
             feed.Name = feedInfo.Name;
             feed.WebSiteUri = feedInfo.WebsiteLink;
