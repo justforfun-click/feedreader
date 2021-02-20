@@ -52,8 +52,7 @@ namespace FeedReader.Server.Services
             try
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                var feedRefresJobsQueue = AzureStorage.GetFeedRefreshJobsQueue();
-                await new UserProcessor(_dbContext).MarkItemsAsReaded(user, request.FeedUri, request.Timestamp.ToDateTime(), feedRefresJobsQueue);
+                await new UserProcessor(_dbContext).MarkItemsAsReaded(user, request.FeedUri, request.Timestamp.ToDateTime());
                 return new Empty();
             }
             catch (UnauthorizedAccessException)

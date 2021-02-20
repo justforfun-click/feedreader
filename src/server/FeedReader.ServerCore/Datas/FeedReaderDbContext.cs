@@ -26,6 +26,7 @@ namespace FeedReader.ServerCore.Datas
         public DbSet<UserFavorite> UserFavorites { get; set; }
         public DbSet<Feed> Feeds { get; set; }
         public DbSet<UserFeed> UserFeeds { get; set; }
+        public DbSet<FeedItem> FeedItems { get; set; }
     }
 
     public class DesignTimeFeedReaderDbContextFactory : IDesignTimeDbContextFactory<FeedReaderDbContext>
