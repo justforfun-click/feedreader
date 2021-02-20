@@ -56,7 +56,6 @@ namespace FeedReader.WebClient.Services
             {
                 OriginalUri = feed.OriginalUri,
                 Group = feed.Group ?? string.Empty,
-                Name = feed.Name ?? string.Empty
             });
             return GetFeed(feedInfo.Feed);
         }
@@ -74,7 +73,6 @@ namespace FeedReader.WebClient.Services
             await _apiClient.UpdateFeedAsync(new Protos.UpdateFeedRequest
             {
                 FeedUri = feed.Uri,
-                FeedName = feed.Name ?? string.Empty,
                 FeedGroup = feed.Group ?? string.Empty
             });
         }
@@ -206,7 +204,7 @@ namespace FeedReader.WebClient.Services
             return new Feed
             {
                 Description = f.Description,
-                Group = f.Group,
+                Group = string.IsNullOrEmpty(f.Group) ? "Default" : f.Group,
                 IconUri = f.IconUri,
                 Name = f.Name,
                 OriginalUri = f.OriginalUri,

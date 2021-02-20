@@ -3,15 +3,17 @@ using System;
 using FeedReader.ServerCore.Datas;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace FeedReader.ServerCore.Migrations
 {
     [DbContext(typeof(FeedReaderDbContext))]
-    partial class FeedReaderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210220152717_AddUserFeedTable")]
+    partial class AddUserFeedTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,16 +100,10 @@ namespace FeedReader.ServerCore.Migrations
             modelBuilder.Entity("FeedReader.ServerCore.Models.UserFeed", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("character varying(32)");
-
-                    b.Property<string>("FeedId")
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<string>("Group")
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("LastReadedTimeInUtc")
-                        .HasColumnType("timestamp without time zone");
+                    b.Property<string>("FeedId")
+                        .HasColumnType("text");
 
                     b.HasKey("UserId", "FeedId");
 
@@ -116,30 +112,6 @@ namespace FeedReader.ServerCore.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserFeeds");
-                });
-
-            modelBuilder.Entity("FeedReader.ServerCore.Models.UserFeed", b =>
-                {
-                    b.HasOne("FeedReader.ServerCore.Models.Feed", "Feed")
-                        .WithMany()
-                        .HasForeignKey("FeedId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FeedReader.ServerCore.Models.User", "User")
-                        .WithMany("Feeds")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Feed");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("FeedReader.ServerCore.Models.User", b =>
-                {
-                    b.Navigation("Feeds");
                 });
 #pragma warning restore 612, 618
         }

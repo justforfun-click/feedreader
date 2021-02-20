@@ -15,13 +15,17 @@ namespace FeedReader.ServerCore.Datas
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserFavorites>()
+            modelBuilder.Entity<UserFavorite>()
                 .HasKey(item => new { item.UserId, item.FavoriteItemIdHash });
+
+            modelBuilder.Entity<UserFeed>()
+                .HasKey(item => new { item.UserId, item.FeedId });
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<UserFavorites> UserFavorites { get; set; }
+        public DbSet<UserFavorite> UserFavorites { get; set; }
         public DbSet<Feed> Feeds { get; set; }
+        public DbSet<UserFeed> UserFeeds { get; set; }
     }
 
     public class DesignTimeFeedReaderDbContextFactory : IDesignTimeDbContextFactory<FeedReaderDbContext>

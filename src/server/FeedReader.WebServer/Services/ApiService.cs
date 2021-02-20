@@ -1,7 +1,6 @@
 ﻿using FeedReader.Protos;
 using FeedReader.ServerCore;
 using FeedReader.ServerCore.Datas;
-using FeedReader.WebApi;
 using FeedReader.WebApi.Processors;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -30,14 +29,16 @@ namespace FeedReader.Server.Services
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
                 var processor = new UserProcessor(_dbContext);
-                var usersFeedsTable = AzureStorage.GetUsersFeedsTable();
-                var userEntity = await processor.LoginAsync(user, usersFeedsTable);
+                user = await processor.LoginAsync(user);
                 var res = new UserInfo
                 {
-                    Token = userEntity.Token,
-                    Uuid = userEntity.Uuid
+                    Token = user.Token,
+                    Uuid = user.Id
                 };
-                res.Feeds.AddRange(userEntity.Feeds.Select(f => GetFeedInfo(f)));
+                if (user.Feeds != null)
+                {
+                    res.Feeds.AddRange(user.Feeds.Select(f => GetFeedInfo(f)));
+                }
                 return res;
             }
             catch (UnauthorizedAccessException)
@@ -51,9 +52,8 @@ namespace FeedReader.Server.Services
             try
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                var userFeedsTable = AzureStorage.GetUsersFeedsTable();
                 var feedRefresJobsQueue = AzureStorage.GetFeedRefreshJobsQueue();
-                await new UserProcessor(_dbContext).MarkItemsAsReaded(user, request.FeedUri, request.Timestamp.ToDateTime(), userFeedsTable, feedRefresJobsQueue);
+                await new UserProcessor(_dbContext).MarkItemsAsReaded(user, request.FeedUri, request.Timestamp.ToDateTime(), feedRefresJobsQueue);
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -68,9 +68,8 @@ namespace FeedReader.Server.Services
             {
                 var userToken = context.RequestHeaders.Get("authentication")?.Value;
                 var user = userToken == null ? null : await _authService.AuthenticateTokenAsync(userToken);
-                var userFeedsTable = AzureStorage.GetUsersFeedsTable();
                 var feedItemsTable = AzureStorage.GetFeedItemsTable();
-                var feed = await new FeedProcessor(_dbContext).GetFeedItemsAsync(request.FeedUri, request.NextRowKey, user, userFeedsTable, feedItemsTable);
+                var feed = await new FeedProcessor(_dbContext).GetFeedItemsAsync(request.FeedUri, request.NextRowKey, user, feedItemsTable);
                 var response = new RefreshFeedResponse()
                 {
                     FeedInfo = GetFeedInfo(feed),
@@ -171,8 +170,7 @@ namespace FeedReader.Server.Services
 
                 request.OriginalUri = request.OriginalUri.Trim();
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                var usersFeedsTable = AzureStorage.GetUsersFeedsTable();
-                var feed = await new FeedProcessor(_dbContext).SubscribeFeedAsync(request.OriginalUri, request.Name, request.Group, Consts.FEEDREADER_UUID_PREFIX + user.Id, usersFeedsTable);
+                var feed = await new FeedProcessor(_dbContext).SubscribeFeedAsync(request.OriginalUri, request.Group, user);
                 return new SubscribeFeedResponse
                 {
                     Feed = GetFeedInfo(feed)
@@ -194,7 +192,7 @@ namespace FeedReader.Server.Services
                 }
 
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new FeedProcessor(_dbContext).UnsubscribeFeedAsync(request.FeedUri, Consts.FEEDREADER_UUID_PREFIX + user.Id, AzureStorage.GetUsersFeedsTable());
+                await new FeedProcessor(_dbContext).UnsubscribeFeedAsync(request.FeedUri, user);
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -213,7 +211,7 @@ namespace FeedReader.Server.Services
                 }
 
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new FeedProcessor(_dbContext).UpdateFeedAsync(request.FeedUri, request.FeedName, request.FeedGroup, Consts.FEEDREADER_UUID_PREFIX + user.Id, AzureStorage.GetUsersFeedsTable());
+                await new FeedProcessor(_dbContext).UpdateFeedAsync(request.FeedUri, request.FeedGroup, user);
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -248,6 +246,21 @@ namespace FeedReader.Server.Services
                 case FeedCategory.Kids:
                     return Share.DataContracts.FeedCategory.Kids;
             }
+        }
+
+        private FeedInfo GetFeedInfo(ServerCore.Models.UserFeed userFeed)
+        {
+            var feed = userFeed.Feed;
+            return new FeedInfo
+            {
+                Description = feed.Description ?? string.Empty,
+                Group = userFeed.Group ?? string.Empty,
+                IconUri = feed.IconUri ?? string.Empty,
+                Name = feed.Name ?? string.Empty,
+                OriginalUri = feed.Uri,
+                Uri = feed.Uri,
+                WebsiteLink = feed.WebSiteUri ?? string.Empty
+            };
         }
 
         private FeedInfo GetFeedInfo(Share.DataContracts.Feed feed)

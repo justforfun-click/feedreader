@@ -97,8 +97,6 @@ message SubscribeFeedRequest
 {
     string OriginalUri = 1;
 
-    string Name = 2;
-
     string Group = 3;
 }
 
@@ -115,8 +113,6 @@ message UnsubscribeFeedRequest
 message UpdateFeedRequest
 {
     string FeedUri = 1;
-
-    string FeedName = 2;
 
     string FeedGroup = 3;
 }

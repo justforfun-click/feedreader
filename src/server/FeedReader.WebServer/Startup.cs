@@ -80,7 +80,7 @@ namespace FeedReader.Server
                 endpoints.MapFallbackToFile("index.html");
             });
 
-            ServerCore.MigrationTools.MoveFeedTableFromAzureToDb(app.ApplicationServices.GetRequiredService<IDbContextFactory<FeedReaderDbContext>>());
+            ServerCore.MigrationTools.MoveUserFeedsFromAzureToDb(app.ApplicationServices.GetRequiredService<IDbContextFactory<FeedReaderDbContext>>());
         }
     }
 }

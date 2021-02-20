@@ -29,14 +29,14 @@ namespace FeedReader.WebApi.Processors
             _dbFactory = dbFactory;
         }
 
-        public async Task<Share.DataContracts.User> LoginAsync(User user, CloudTable usersFeedsTable)
+        public async Task<User> LoginAsync(User user)
         {
             var db = _dbFactory.CreateDbContext();
 
             // If it is feedreader user already (has id property), query user in db.
             if (!string.IsNullOrEmpty(user.Id))
             {
-                user = await db.Users.FindAsync(user.Id);
+                user = await db.Users.Include(u => u.Feeds).ThenInclude(f => f.Feed).FirstOrDefaultAsync(u => u.Id == user.Id);
                 if (user == null)
                 {
                     throw new UnauthorizedAccessException();
@@ -45,7 +45,7 @@ namespace FeedReader.WebApi.Processors
             else
             {
                 // Not feedreader uuid, try to find from the related uuid index.
-                var dbUser = await db.Users.FirstOrDefaultAsync(u => u.ThirdPartyId == user.ThirdPartyId);
+                var dbUser = await db.Users.Include(u => u.Feeds).ThenInclude(f => f.Feed).FirstOrDefaultAsync(u => u.ThirdPartyId == user.ThirdPartyId);
                 if (dbUser != null)
                 {
                     user = dbUser;
@@ -65,7 +65,7 @@ namespace FeedReader.WebApi.Processors
 
             // Generate our jwt token.
             var now = DateTimeOffset.UtcNow;
-            var token = new JwtBuilder()
+            user.Token = new JwtBuilder()
                 .WithAlgorithm(new HMACSHA256Algorithm())
                 .WithSecret(Environment.GetEnvironmentVariable(Consts.ENV_KEY_JWT_SECRET))
                 .AddClaim("iss", Consts.FEEDREADER_ISS)
@@ -74,20 +74,7 @@ namespace FeedReader.WebApi.Processors
                 .AddClaim("iat", now.ToUnixTimeSeconds())
                 .AddClaim("exp", now.AddDays(7).ToUnixTimeSeconds())
                 .Encode();
-
-            // Get users feeds table.
-            var res = await usersFeedsTable.ExecuteQuerySegmentedAsync(new TableQuery<UserFeedEntity>()
-            {
-                FilterString = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, Consts.FEEDREADER_UUID_PREFIX + user.Id)
-            }, null);
-
-            // Return user info
-            return new Share.DataContracts.User
-            {
-                Token = token,
-                Uuid = user.Id,
-                Feeds = (res != null && res.Results != null) ? res.Results.Select(f => f.CopyTo(new Feed())).ToList() : new List<Feed>(),
-            };
+            return user;
         }
 
         public async Task StarFeedItemAsync(FeedItem feedItem, User user, Microsoft.Azure.Cosmos.Table.CloudTable userFeedItemStartsTable)
@@ -113,7 +100,7 @@ namespace FeedReader.WebApi.Processors
             var linkMd5 = feedItem.PermentLink.Md5();
             try
             {
-                db.UserFavorites.Add(new ServerCore.Models.UserFavorites
+                db.UserFavorites.Add(new ServerCore.Models.UserFavorite
                 {
                     UserId = user.Id,
                     FavoriteItemIdHash = linkMd5
@@ -142,7 +129,7 @@ namespace FeedReader.WebApi.Processors
             var db = _dbFactory.CreateDbContext();
             try
             {
-                var favorite = new FeedReader.ServerCore.Models.UserFavorites
+                var favorite = new FeedReader.ServerCore.Models.UserFavorite
                 {
                     UserId = user.Id,
                     FavoriteItemIdHash = linkMd5
@@ -197,36 +184,19 @@ namespace FeedReader.WebApi.Processors
             return feedItems;
         }
 
-        public async Task MarkItemsAsReaded(User user, string feedUri, DateTime lastReadedTime, CloudTable usersFeedsTable, QueueClient feedRefreshJobs)
+        public async Task MarkItemsAsReaded(User user, string feedUri, DateTime lastReadedTime, QueueClient feedRefreshJobs)
         {
-            var feedUriHash = Utils.Sha256(feedUri);
-            var res = await usersFeedsTable.ExecuteAsync(TableOperation.Retrieve<UserFeedEntity>(partitionKey: Consts.FEEDREADER_UUID_PREFIX + user.Id, rowkey: feedUriHash, new List<string>() { "ETag" }));
-            if (res?.Result == null)
+            var feedId = Utils.Sha256(feedUri);
+            var db = _dbFactory.CreateDbContext();
+            var userFeed = await db.UserFeeds.FindAsync(user.Id, feedId);
+            if (userFeed == null)
             {
                 throw new ExternalErrorExcepiton("'feedUri' is not found.");
             }
-            var userFeed = (UserFeedEntity)res.Result;
 
-            // Get the latest feed from the feed info table.
-            var db = _dbFactory.CreateDbContext();
-            var feed = await db.Feeds.FindAsync(feedUriHash);
-            if (feed == null)
-            {
-                LogError($"{feedUri} can't be found in feed info table, but exists in user feed table.");
-
-                // Send a message to feed refresh jobs queue.
-                _ = feedRefreshJobs.SendMessageAsync(userFeed.OriginalUri.Base64());
-            }
-            else
-            {
-                // Update with latest feed info.
-                userFeed.Description = feed.Description;
-                userFeed.IconUri = feed.IconUri;
-                userFeed.WebsiteLink = feed.WebSiteUri;
-            }
-
-            userFeed.LastReadedTime = lastReadedTime;
-            await usersFeedsTable.ExecuteAsync(TableOperation.Merge(userFeed));
+            // Update with latest feed info.
+            userFeed.LastReadedTimeInUtc = lastReadedTime.ToUniversalTime();
+            await db.SaveChangesAsync();
         }
     }
 }

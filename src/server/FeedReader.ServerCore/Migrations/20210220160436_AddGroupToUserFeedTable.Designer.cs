@@ -3,15 +3,17 @@ using System;
 using FeedReader.ServerCore.Datas;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace FeedReader.ServerCore.Migrations
 {
     [DbContext(typeof(FeedReaderDbContext))]
-    partial class FeedReaderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210220160436_AddGroupToUserFeedTable")]
+    partial class AddGroupToUserFeedTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,9 +107,6 @@ namespace FeedReader.ServerCore.Migrations
 
                     b.Property<string>("Group")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("LastReadedTimeInUtc")
-                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("UserId", "FeedId");
 
