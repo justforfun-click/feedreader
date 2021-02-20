@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace FeedReader.ServerCore.Models
 {
     [Index(nameof(UserId))]
-    public class UserFavorites
+    public class UserFavorite
     {
         [Key, StringLength(32)]
         public string UserId { get; set; }

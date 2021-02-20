@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FeedReader.ServerCore.Models
 {
@@ -14,5 +16,10 @@ namespace FeedReader.ServerCore.Models
         public DateTime RegistrationTimeInUtc { get; set; }
         [Required]
         public DateTime LastActiveTimeInUtc { get; set; }
+
+        public virtual ICollection<UserFeed> Feeds { get; set; }
+
+        [NotMapped]
+        public string Token { get; set; }
     }
 }

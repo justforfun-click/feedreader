@@ -65,54 +65,49 @@ namespace FeedReader.WebApi.Processors
             return feed;
         }
 
-        public async Task<Feed> GetFeedItemsAsync(string feedUri, string nextRowKey, User user, CloudTable usersFeedsTable, CloudTable feedItemsTable)
+        public async Task<Feed> GetFeedItemsAsync(string feedUri, string nextRowKey, User user, CloudTable feedItemsTable)
         {
             var originalUri = feedUri;
             feedUri = feedUri.Trim().ToLower();
             var feedUriHash = Utils.Sha256(feedUri);
+            var db = _dbFactory.CreateDbContext();
 
             // Get feed information.
             // If the user blob is not null, we will get the feed from the user blob because user might customize the group and name on this feed.
-            UserFeedEntity userFeedEntity = null;
-            Feed feed = null;
+            ServerCore.Models.UserFeed userFeed = null;
+            ServerCore.Models.Feed feedInDb = null;
             if (user != null)
             {
-                var res = await usersFeedsTable.ExecuteAsync(TableOperation.Retrieve<UserFeedEntity>(partitionKey: Consts.FEEDREADER_UUID_PREFIX + user.Id, rowkey: feedUriHash));
-                if (res?.Result != null)
-                {
-                    userFeedEntity = (UserFeedEntity)res.Result;
-                    feed = userFeedEntity.CopyTo(new Feed());
-                }
+                userFeed = await db.UserFeeds.Include(f => f.Feed).FirstOrDefaultAsync(u => u.UserId == user.Id && u.FeedId == feedUriHash);
+                feedInDb = userFeed?.Feed;
             }
 
             // If we didn't get the feed, two possibility:
             // 1. The feed is not subscribed by user yet.
             // 2. Anonymous user.
             // No matter for which case, we will try to get the feed info from feed info table directly.
-            if (feed == null)
+            if (feedInDb == null)
             {
-                var db = _dbFactory.CreateDbContext();
-                var feedInDb = await db.Feeds.FindAsync(feedUriHash);
-                if (feedInDb != null)
-                {
-                    feed = new Feed
-                    {
-                        Description = feed.Description,
-                        IconUri = feed.IconUri,
-                        Name = feed.Name,
-                        OriginalUri = feed.Uri,
-                        Uri = feedUri,
-                        WebsiteLink = feed.WebsiteLink,
-                    };
-                }
-                else
-                {
-                    feed = new Feed()
-                    {
-                        Uri = feedUri,
-                        OriginalUri = originalUri,
-                    };
-                }
+                feedInDb = await db.Feeds.FindAsync(feedUriHash);
+            }
+
+            if (feedInDb == null)
+            {
+                throw new ExternalErrorExcepiton($"Feed '{feedUri}' is not found.");
+            }
+
+            var feed = new Feed
+            {
+                Description = feedInDb.Description,
+                IconUri = feedInDb.IconUri,
+                Name = feedInDb.Name,
+                OriginalUri = feedInDb.Uri,
+                Uri = feedUri,
+                WebsiteLink = feedInDb.WebSiteUri,
+            };
+            if (userFeed != null)
+            {
+                feed.Group = userFeed.Group;
             }
 
             // Get feed items.
@@ -154,12 +149,13 @@ namespace FeedReader.WebApi.Processors
                 feed = await RefreshFeedAsync(string.IsNullOrWhiteSpace(feed.OriginalUri) ? feed.Uri : feed.OriginalUri);
             }
 
+
             // Mark readed or not.
-            if (userFeedEntity != null && userFeedEntity.LastReadedTime != null)
+            if (userFeed != null && userFeed.LastReadedTimeInUtc.Ticks != 0)
             {
                 foreach (var feedItem in feed.Items)
                 {
-                    if (feedItem.PubDate <= userFeedEntity.LastReadedTime)
+                    if (feedItem.PubDate <= userFeed.LastReadedTimeInUtc)
                     {
                         feedItem.IsReaded = true;
                     }
@@ -169,7 +165,7 @@ namespace FeedReader.WebApi.Processors
             // Mark stared or not.
             if (user != null)
             {
-                var db = _dbFactory.CreateDbContext();
+                // Mark stared or not
                 var staredHashs = db.UserFavorites.Where(f => f.UserId == user.Id).Select(f => f.FavoriteItemIdHash).ToList();
                 if (staredHashs.Count > 0)
                 {
@@ -192,7 +188,7 @@ namespace FeedReader.WebApi.Processors
             await SaveFeedAsync(await RefreshFeedAsync(feedOriginalUri), feedTable, feedItemTable);
         }
 
-        public async Task<Feed> SubscribeFeedAsync(string feedOriginalUri, string customName, string customGroup, string userUuid, CloudTable usersFeedsTable)
+        public async Task<Feed> SubscribeFeedAsync(string feedOriginalUri, string customGroup, User user)
         {
             Feed feed = null;
             string feedUriHash = null;
@@ -259,39 +255,40 @@ namespace FeedReader.WebApi.Processors
             Debug.Assert(feed != null);
             Debug.Assert(feedUriHash != null);
 
-            // Use user customized name.
-            if (!string.IsNullOrWhiteSpace(customName))
-            {
-                feed.Name = customName;
-            }
-
             // User user customized group.
             feed.Group = customGroup;
 
             // Save to usersfeeds table.
-            await usersFeedsTable.ExecuteAsync(TableOperation.InsertOrReplace(new UserFeedEntity(partitionKey: userUuid, rowKey: feedUriHash, feed)));
+            db.UserFeeds.Add(new ServerCore.Models.UserFeed
+            {
+                UserId = user.Id,
+                FeedId = feedUriHash
+            });
+            try
+            {
+                await db.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex) when (ex.IsUniqueConstraintException())
+            {
+                // Save to ignore.
+            }
 
             // Return
             return feed;
         }
 
-        public async Task UnsubscribeFeedAsync(string feedUri, string userUuid, CloudTable usersFeedsTable)
+        public async Task UnsubscribeFeedAsync(string feedUri, User user)
         {
-            // Get from usersFeedsTable table
-            try
+            var feedId = Utils.Sha256(feedUri);
+            var userFeed = new ServerCore.Models.UserFeed
             {
-                var res = await usersFeedsTable.ExecuteAsync(TableOperation.Retrieve<UserFeedEntity>(partitionKey: userUuid, rowkey: Utils.Sha256(feedUri)));
-                if (res == null || res.Result == null)
-                {
-                    return;
-                }
-
-                await usersFeedsTable.ExecuteAsync(TableOperation.Delete((UserFeedEntity)res.Result));
-            }
-            catch (StorageException ex) when (ex.RequestInformation.HttpStatusCode == (int)HttpStatusCode.NotFound)
-            {
-                // Save to ignore.
-            }
+                UserId = user.Id,
+                FeedId = feedId
+            };
+            var db = _dbFactory.CreateDbContext();
+            db.UserFeeds.Attach(userFeed);
+            db.UserFeeds.Remove(userFeed);
+            await db.SaveChangesAsync();
         }
 
         public async Task<List<Feed>> GetFeedsByCategory(FeedCategory category, CloudTable feedTable, CloudTable feedItemTable)
@@ -399,29 +396,19 @@ namespace FeedReader.WebApi.Processors
             return feedItems;
         }
 
-        public async Task UpdateFeedAsync(string feedUri, string newFeedName, string newFeedGroup, string userUuid, CloudTable usersFeedsTable)
+        public async Task UpdateFeedAsync(string feedUri, string newFeedGroup, User user)
         {
             // Get the original feed.
-            var feedUriHash = Utils.Sha256(feedUri);
-            var res = await usersFeedsTable.ExecuteAsync(TableOperation.Retrieve<UserFeedEntity>(userUuid, feedUriHash));
-            if (res?.Result == null)
-            {
+            var feedId = Utils.Sha256(feedUri);
+            var db = _dbFactory.CreateDbContext();
+            var userFeed = await db.UserFeeds.FindAsync(user.Id, feedId);
+            if (userFeed == null)
+            { 
                 throw new ExternalErrorExceptionNotFound();
             }
 
-            var userFeedEntity = (UserFeedEntity)res.Result;
-            if (!string.IsNullOrWhiteSpace(newFeedName))
-            {
-                userFeedEntity.Name = newFeedName;
-            }
-
-            if (!string.IsNullOrWhiteSpace(newFeedGroup))
-            {
-                userFeedEntity.Group = newFeedGroup;
-            }
-
-            // Update
-            await usersFeedsTable.ExecuteAsync(TableOperation.Replace(userFeedEntity));
+            userFeed.Group = newFeedGroup;
+            await db.SaveChangesAsync();
         }
 
         private async Task SaveFeedAsync(Feed feed, CloudTable feedTable, CloudTable feedItemTable)

@@ -15,16 +15,9 @@ namespace FeedReader.ServerCore
 
         const string USER_STARED_FEED_ITEMS_TABLE = "userstaredfeeditems";
 
-        const string USERS_FEEDS_TABLE = "usersfeeds";
-
         private static readonly string _conns = Environment.GetEnvironmentVariable(Consts.ENV_KEY_AZURE_STORAGE);
         private static readonly CloudStorageAccount _tableStorageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable(Consts.ENV_KEY_AZURE_STORAGE));
         private static readonly CloudTableClient _tableClient = _tableStorageAccount.CreateCloudTableClient();
-
-        public static CloudTable MigrationOnly_GetAzureFeedsTable()
-        {
-            return _tableClient.GetTableReference("feeds");
-        }
 
         public static CloudTable GetFeedItemsTable()
         {
@@ -46,9 +39,9 @@ namespace FeedReader.ServerCore
             return new QueueClient(_conns, REFRESH_FEED_JOBS_QUEUE);
         }
 
-        public static CloudTable GetUsersFeedsTable()
+        public static CloudTable MigrationOnly_GetUsersFeedsTable()
         {
-            return _tableClient.GetTableReference(USERS_FEEDS_TABLE);
+            return _tableClient.GetTableReference("usersfeeds");
         }
     }
 }

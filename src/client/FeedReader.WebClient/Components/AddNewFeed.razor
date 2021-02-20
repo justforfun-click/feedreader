@@ -5,11 +5,6 @@
     <div class="title">Add New Feed</div>
     <div class="form">
         <div class="field">
-            <div class="label">Title <span>optional</span></div>
-            <input placeholder="Title" @bind="@FeedName"/>
-        </div>
-
-        <div class="field">
             <div class="label">Group <span>required</span></div>
             <div class="group-selection">
                 <select @onchange="OnGroupSelectionChanged">
@@ -45,8 +40,6 @@
     public EventCallback<Feed> OnSave { get; set; }
 
     private List<string> Groups { get; set; }
-
-    private string FeedName { get; set; }
 
     private string FeedURL { get; set; }
 
@@ -106,7 +99,6 @@
         await OnSave.InvokeAsync(new Feed()
         {
             Group = (SelectedGroup == "Create a new group" ? newGroupName : SelectedGroup),
-            Name = FeedName,
             Uri = FeedURL.Trim().ToLower(),
             OriginalUri = FeedURL
         });
