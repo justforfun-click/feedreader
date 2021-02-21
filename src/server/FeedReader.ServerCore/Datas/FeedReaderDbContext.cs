@@ -18,6 +18,11 @@ namespace FeedReader.ServerCore.Datas
             modelBuilder.Entity<UserFavorite>()
                 .HasKey(item => new { item.UserId, item.FavoriteItemIdHash });
 
+            modelBuilder.Entity<UserFavorite>()
+                .HasOne(item => item.FeedItem)
+                .WithMany()
+                .HasForeignKey(item => item.FeedItemId);
+
             modelBuilder.Entity<UserFeed>()
                 .HasKey(item => new { item.UserId, item.FeedId });
 
