@@ -353,47 +353,41 @@ namespace FeedReader.WebApi.Processors
             return feeds;
         }
 
-        public async Task<List<FeedItem>> GetFeedItemsByCategory(FeedCategory category, string nextRowKey, Microsoft.Azure.Cosmos.Table.CloudTable latestFeedItemsTable)
+        public async Task<List<FeedItem>> GetFeedItemsByCategory(FeedCategory category, int page)
         {
-            // Generate filter.
-            var partitionKey = category == FeedCategory.Recommended ? "Default" : category.ToString();
-            Microsoft.Azure.Cosmos.Table.TableContinuationToken token = null;
-            if (!string.IsNullOrWhiteSpace(nextRowKey))
+            var db = _dbFactory.CreateDbContext();
+            List<ServerCore.Models.FeedItem> feedItems;
+            if (category == FeedCategory.Recommended)
             {
-                token = new Microsoft.Azure.Cosmos.Table.TableContinuationToken()
-                {
-                    NextPartitionKey = partitionKey,
-                    NextRowKey = nextRowKey
-                };
-            }
-            var queryRes = await latestFeedItemsTable.ExecuteQuerySegmentedAsync(new Microsoft.Azure.Cosmos.Table.TableQuery<Backend.Share.Entities.FeedItemExEntity>()
-            {
-                TakeCount = MAX_RETURN_COUNT * 2,
-                FilterString = Microsoft.Azure.Cosmos.Table.TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey)
-            }, token);
-
-            List<FeedItem> feedItems;
-            if (queryRes != null && queryRes.Results != null && queryRes.Results.Count > 0)
-            {
-                // Remove duplicated feed item which might be caused by updating (the same link but has two different pubDate).
-                var items = queryRes.Results.GroupBy(i => i.PermentLink).Select(i => i.First()).ToList();
-                if (items.Count > MAX_RETURN_COUNT)
-                {
-                    nextRowKey = items[MAX_RETURN_COUNT].RowKey;
-                    items.RemoveRange(MAX_RETURN_COUNT, items.Count - MAX_RETURN_COUNT);
-                }
-                else
-                {
-                    nextRowKey = queryRes.ContinuationToken?.NextRowKey;
-                }
-                feedItems = items.Select(i => i.CopyTo(new FeedItem())).ToList();
-                feedItems.Last().NextRowKey = nextRowKey;
+                feedItems = await db.FeedItems
+                    .Include(f => f.Feed)
+                    .Where(f => f.Feed.Category == "Default" || string.IsNullOrEmpty(f.Feed.Category))
+                    .OrderByDescending(f => f.PublishTimeInUtc)
+                    .Skip(page * 50)
+                    .Take(50).ToListAsync();
             }
             else
             {
-                feedItems = new List<FeedItem>();
+                feedItems = await db.FeedItems
+                    .Include(f => f.Feed)
+                    .Where(f => f.Feed.Category == category.ToString())
+                    .OrderByDescending(f => f.PublishTimeInUtc)
+                    .Skip(page * 50)
+                    .Take(50).ToListAsync();
             }
-            return feedItems;
+
+            return feedItems.Select(f => new FeedItem
+            {
+                Summary = f.Summary,
+                Content = f.Content,
+                FeedIconUri = f.Feed.IconUri,
+                FeedName = f.Feed.Name,
+                FeedUri = f.Feed.Uri,
+                PermentLink = f.Uri,
+                PubDate = f.PublishTimeInUtc,
+                Title = f.Title,
+                TopicPictureUri = f.TopicPictureUri,
+            }).ToList();
         }
 
         public async Task UpdateFeedAsync(string feedUri, string newFeedGroup, User user)

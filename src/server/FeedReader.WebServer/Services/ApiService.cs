@@ -85,12 +85,11 @@ namespace FeedReader.Server.Services
 
         public override async Task<GetFeedsByCategoryResponse> GetFeedsByCategory(GetFeedsByCategoryRequest request, ServerCallContext context)
         {
-            var items = await new FeedProcessor(_dbContext).GetFeedItemsByCategory(GetDataContractsFeedCategory(request.Category), request.NextRowKey, AzureStorage.GetLatestFeedItemsTable());
+            var items = await new FeedProcessor(_dbContext).GetFeedItemsByCategory(GetDataContractsFeedCategory(request.Category), request.Page);
             var response = new GetFeedsByCategoryResponse();
             if (items.Count > 0)
             {
                 response.FeedItems.AddRange(items.Select(f => GetFeedItemMessageWithFeedInfo(f)));
-                response.NextRowKey = items.Last().NextRowKey ?? string.Empty;
             }
             return response;
         }
