@@ -11,8 +11,6 @@ namespace FeedReader.ServerCore
 
         const string LATEST_FEED_ITEMS_TABLE = "latestfeeditems";
 
-        const string USER_STARED_FEED_ITEMS_TABLE = "userstaredfeeditems";
-
         private static readonly string _conns = Environment.GetEnvironmentVariable(Consts.ENV_KEY_AZURE_STORAGE);
         private static readonly CloudStorageAccount _tableStorageAccount = CloudStorageAccount.Parse(Environment.GetEnvironmentVariable(Consts.ENV_KEY_AZURE_STORAGE));
         private static readonly CloudTableClient _tableClient = _tableStorageAccount.CreateCloudTableClient();
@@ -27,9 +25,9 @@ namespace FeedReader.ServerCore
             return _tableClient.GetTableReference(LATEST_FEED_ITEMS_TABLE);
         }
 
-        public static CloudTable GetUserStaredFeedItemsTable()
+        public static CloudTable Mitigration_GetUserStaredFeedItemsTable()
         {
-            return _tableClient.GetTableReference(USER_STARED_FEED_ITEMS_TABLE);
+            return _tableClient.GetTableReference("userstaredfeeditems");
         }
     }
 }

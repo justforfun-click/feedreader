@@ -77,111 +77,36 @@ namespace FeedReader.WebApi.Processors
             return user;
         }
 
-        public async Task StarFeedItemAsync(FeedItem feedItem, User user, Microsoft.Azure.Cosmos.Table.CloudTable userFeedItemStartsTable)
+        public async Task StarFeedItemAsync(FeedItem feedItem, User user)
         {
-            // Insert to the stared-feed-items table.
-            await userFeedItemStartsTable.ExecuteAsync(Microsoft.Azure.Cosmos.Table.TableOperation.InsertOrReplace(new Backend.Share.Entities.FeedItemExEntity()
-            {
-                PartitionKey = Consts.FEEDREADER_UUID_PREFIX + user.Id,
-                RowKey = $"{string.Format("{0:D19}", DateTime.MaxValue.Ticks - feedItem.PubDate.ToUniversalTime().Ticks)}-{feedItem.PermentLink.Sha256()}",
-                PermentLink = feedItem.PermentLink,
-                Content = feedItem.Content,
-                FeedIconUri = feedItem.FeedIconUri,
-                FeedName = feedItem.FeedName,
-                FeedUri = feedItem.FeedUri,
-                PubDate = feedItem.PubDate,
-                Summary = feedItem.Summary,
-                Title = feedItem.Title,
-                TopicPictureUri = feedItem.TopicPictureUri,
-            }));
-
-            // Update the hash set.
             var db = _dbFactory.CreateDbContext();
-            var linkMd5 = feedItem.PermentLink.Md5();
-            try
+            db.UserFavorites.Add(new ServerCore.Models.UserFavorite
             {
-                db.UserFavorites.Add(new ServerCore.Models.UserFavorite
-                {
-                    UserId = user.Id,
-                    FavoriteItemIdHash = linkMd5
-                });
-                await db.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                LogError($"Add item to UserFavorites table failed: {ex.Message}");
-            }
+                UserId = user.Id,
+                FavoriteItemIdHash = feedItem.PermentLink.Md5(),
+                FeedItemId = feedItem.PermentLink.Sha256()
+            });
+            await db.SaveChangesAsync();
         }
 
-        public async Task UnstarFeedItemAsync(string feedItemPermentLink, DateTime pubDate, User user, Microsoft.Azure.Cosmos.Table.CloudTable userFeedItemStartsTable)
+        public async Task UnstarFeedItemAsync(string feedItemPermentLink, DateTime pubDate, User user)
         {
             // Remove from the star items table.
-            var partitionKey = Consts.FEEDREADER_UUID_PREFIX + user.Id;
-            var rowKey = $"{string.Format("{0:D19}", DateTime.MaxValue.Ticks - pubDate.ToUniversalTime().Ticks)}-{feedItemPermentLink.Sha256()}";
-            var res = await userFeedItemStartsTable.ExecuteAsync(Microsoft.Azure.Cosmos.Table.TableOperation.Retrieve<Backend.Share.Entities.FeedItemExEntity>(partitionKey: partitionKey, rowkey: rowKey));
-            if (res?.Result != null)
-            {
-                await userFeedItemStartsTable.ExecuteAsync(Microsoft.Azure.Cosmos.Table.TableOperation.Delete((Backend.Share.Entities.FeedItemExEntity)res.Result));
-            }
-
-            // Remove from the hash set.
-            var linkMd5 = feedItemPermentLink.Md5();
             var db = _dbFactory.CreateDbContext();
-            try
+            var favoritItem = new ServerCore.Models.UserFavorite
             {
-                var favorite = new FeedReader.ServerCore.Models.UserFavorite
-                {
-                    UserId = user.Id,
-                    FavoriteItemIdHash = linkMd5
-                };
-                db.UserFavorites.Attach(favorite);
-                db.UserFavorites.Remove(favorite);
-                await db.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                LogError($"Remove item from UserFavorites table failed: {ex.Message}");
-            }
+                UserId = user.Id,
+                FavoriteItemIdHash = feedItemPermentLink.Md5()
+            };
+            db.UserFavorites.Attach(favoritItem);
+            db.UserFavorites.Remove(favoritItem);
+            await db.SaveChangesAsync();
         }
 
-        public async Task<List<FeedItem>> GetStaredFeedItemsAsync(string nextRowKey, User user, Microsoft.Azure.Cosmos.Table.CloudTable userFeedItemStartsTable)
+        public async Task<List<ServerCore.Models.FeedItem>> GetStaredFeedItemsAsync(string nextRowKey, User user)
         {
-            Microsoft.Azure.Cosmos.Table.TableContinuationToken token = null;
-            if (!string.IsNullOrWhiteSpace(nextRowKey))
-            {
-                token = new Microsoft.Azure.Cosmos.Table.TableContinuationToken()
-                {
-                    NextPartitionKey = Consts.FEEDREADER_UUID_PREFIX + user.Id,
-                    NextRowKey = nextRowKey
-                };
-            }
-
-            var queryRes = await userFeedItemStartsTable.ExecuteQuerySegmentedAsync(new Microsoft.Azure.Cosmos.Table.TableQuery<Backend.Share.Entities.FeedItemExEntity>()
-            {
-                TakeCount = MAX_RETURN_COUNT * 2,
-                FilterString = Microsoft.Azure.Cosmos.Table.TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, Consts.FEEDREADER_UUID_PREFIX + user.Id)
-            }, token);
-
-            List<FeedItem> feedItems;
-            if (queryRes != null && queryRes.Results != null && queryRes.Results.Count > 0)
-            {
-                if (queryRes.Results.Count > MAX_RETURN_COUNT)
-                {
-                    nextRowKey = queryRes.Results[MAX_RETURN_COUNT].RowKey;
-                    queryRes.Results.RemoveRange(MAX_RETURN_COUNT, queryRes.Results.Count - MAX_RETURN_COUNT);
-                }
-                else
-                {
-                    nextRowKey = queryRes.ContinuationToken?.NextRowKey;
-                }
-                feedItems = queryRes.Results.Select(i => i.CopyTo(new FeedItem())).ToList();
-                feedItems.Last().NextRowKey = nextRowKey;
-            }
-            else
-            {
-                feedItems = new List<FeedItem>();
-            }
-            return feedItems;
+            var db = _dbFactory.CreateDbContext();
+            return await db.UserFavorites.Where(f => f.UserId == user.Id).Include(f => f.FeedItem).ThenInclude(f => f.Feed).Select(f => f.FeedItem).ToListAsync();
         }
 
         public async Task MarkItemsAsReaded(User user, string feedUri, DateTime lastReadedTime)
