@@ -67,12 +67,10 @@ namespace FeedReader.Server.Services
             {
                 var userToken = context.RequestHeaders.Get("authentication")?.Value;
                 var user = userToken == null ? null : await _authService.AuthenticateTokenAsync(userToken);
-                var feedItemsTable = AzureStorage.GetFeedItemsTable();
-                var feed = await new FeedProcessor(_dbContext).GetFeedItemsAsync(request.FeedUri, request.NextRowKey, user, feedItemsTable);
+                var feed = await new FeedProcessor(_dbContext).GetFeedItemsAsync(request.FeedUri, request.Page, user);
                 var response = new RefreshFeedResponse()
                 {
                     FeedInfo = GetFeedInfo(feed),
-                    NextRowKey = feed.NextRowKey ?? string.Empty,
                 };
                 response.FeedItems.AddRange(feed.Items.Select(f => GetFeedItemMessage(f)));
                 return response;

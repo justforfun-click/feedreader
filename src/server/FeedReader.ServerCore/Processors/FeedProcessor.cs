@@ -65,11 +65,11 @@ namespace FeedReader.WebApi.Processors
             return feed;
         }
 
-        public async Task<Feed> GetFeedItemsAsync(string feedUri, string nextRowKey, User user, CloudTable feedItemsTable)
+        public async Task<Feed> GetFeedItemsAsync(string feedUri, int page, User user)
         {
             var originalUri = feedUri;
             feedUri = feedUri.Trim().ToLower();
-            var feedUriHash = Utils.Sha256(feedUri);
+            var feedId = Utils.Sha256(feedUri);
             var db = _dbFactory.CreateDbContext();
 
             // Get feed information.
@@ -78,7 +78,7 @@ namespace FeedReader.WebApi.Processors
             ServerCore.Models.Feed feedInDb = null;
             if (user != null)
             {
-                userFeed = await db.UserFeeds.Include(f => f.Feed).FirstOrDefaultAsync(u => u.UserId == user.Id && u.FeedId == feedUriHash);
+                userFeed = await db.UserFeeds.Include(f => f.Feed).FirstOrDefaultAsync(u => u.UserId == user.Id && u.FeedId == feedId);
                 feedInDb = userFeed?.Feed;
             }
 
@@ -88,7 +88,7 @@ namespace FeedReader.WebApi.Processors
             // No matter for which case, we will try to get the feed info from feed info table directly.
             if (feedInDb == null)
             {
-                feedInDb = await db.Feeds.FindAsync(feedUriHash);
+                feedInDb = await db.Feeds.FindAsync(feedId);
             }
 
             if (feedInDb == null)
@@ -111,44 +111,28 @@ namespace FeedReader.WebApi.Processors
             }
 
             // Get feed items.
-            var partitionKey = feedUriHash;
-            TableContinuationToken token = null;
-            if (!string.IsNullOrWhiteSpace(nextRowKey))
+            var feedItems = await db.FeedItems
+                .Where(f => f.FeedId == feedId)
+                .OrderByDescending(f => f.PublishTimeInUtc)
+                .Skip(page * 50)
+                .Take(50).ToListAsync();
+            if (feedItems.Count > 0)
             {
-                token = new TableContinuationToken()
+                feed.Items = feedItems.Select(f => new FeedItem
                 {
-                    NextPartitionKey = partitionKey,
-                    NextRowKey = nextRowKey
-                };
+                    Summary = f.Summary,
+                    Content = f.Content,
+                    PermentLink = f.Uri,
+                    PubDate = f.PublishTimeInUtc,
+                    Title = f.Title,
+                    TopicPictureUri = f.TopicPictureUri,
+                }).ToList();
             }
-
-            var queryRes = await feedItemsTable.ExecuteQuerySegmentedAsync(new TableQuery<FeedItemEntity>()
-            {
-                TakeCount = MAX_RETURN_COUNT * 2,
-                FilterString = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey)
-            }, token);
-
-            if (queryRes != null && queryRes.Results != null && queryRes.Results.Count > 0)
-            {
-                // Remove duplicated feed item which might be caused by updating (the same link but has two different pubDate).
-                var items = queryRes.Results.GroupBy(i => i.PermentLink).Select(i => i.First()).ToList();
-                if (items.Count > MAX_RETURN_COUNT)
-                {
-                    feed.NextRowKey = items[MAX_RETURN_COUNT].RowKey;
-                    items.RemoveRange(MAX_RETURN_COUNT, items.Count - MAX_RETURN_COUNT);
-                }
-                else
-                {
-                    feed.NextRowKey = queryRes.ContinuationToken?.NextRowKey;
-                }
-                feed.Items = items.Select(i => i.CopyTo(new FeedItem())).ToList();
-            }
-            else
+            else if (page == 0)
             {
                 // We haven't refreshed this feed on the server (new added?), get it directly form rss.
                 feed = await RefreshFeedAsync(string.IsNullOrWhiteSpace(feed.OriginalUri) ? feed.Uri : feed.OriginalUri);
             }
-
 
             // Mark readed or not.
             if (userFeed != null && userFeed.LastReadedTimeInUtc.Ticks != 0)

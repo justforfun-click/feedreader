@@ -77,12 +77,12 @@ namespace FeedReader.WebClient.Services
             });
         }
 
-        public async Task<Feed> RefreshFeed(string feedUri, string nextRowKey)
+        public async Task<Feed> RefreshFeed(string feedUri, int page)
         {
             var response = await _apiClient.RefreshFeedAsync(new Protos.RefreshFeedRequest
             {
                 FeedUri = feedUri,
-                NextRowKey = nextRowKey ?? string.Empty
+                Page = page
             });
 
             var feed = new Feed
@@ -108,8 +108,8 @@ namespace FeedReader.WebClient.Services
                     FeedIconUri = response.FeedInfo.IconUri,
                     FeedName = response.FeedInfo.Name,
                 }).ToList(),
-                NextRowKey = response.NextRowKey
             };
+            feed.NextItemsPage = feed.Items.Count == 50 ? page + 1 : 0;
             return feed;
         }
 
