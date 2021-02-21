@@ -108,7 +108,7 @@ namespace FeedReader.WebApi.Processors
 
         public async Task MarkItemsAsReaded(User user, string feedUri, DateTime lastReadedTime)
         {
-            var feedId = Utils.Sha256(feedUri);
+            var feedId = Utils.Sha256(feedUri.Trim().ToLower());
             var db = _dbFactory.CreateDbContext();
             var userFeed = await db.UserFeeds.FindAsync(user.Id, feedId);
             if (userFeed == null)
