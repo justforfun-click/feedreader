@@ -1,9 +1,8 @@
-﻿using Microsoft.Azure.Cosmos.Table;
-using System;
+﻿using System;
 
 namespace FeedReader.Backend.Share.Entities
 {
-    public class FeedInfoEntity : TableEntity
+    public class FeedInfoEntity
     {
         public string Uri { get; set; }
 
@@ -20,7 +19,7 @@ namespace FeedReader.Backend.Share.Entities
         public string Category { get; set; }
     }
 
-    public class FeedItemEntity : TableEntity
+    public class FeedItemEntity
     {
         public string Title { get; set; }
 

@@ -100,12 +100,12 @@ namespace FeedReader.Server.Services
             try
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                var items = await new UserProcessor(_dbContext).GetStaredFeedItemsAsync(request.NextRowKey, user, AzureStorage.GetUserStaredFeedItemsTable());
+                var items = await new UserProcessor(_dbContext).GetStaredFeedItemsAsync(request.NextRowKey, user);
                 var response = new GetStaredFeedItemsResponse();
                 if (items.Count > 0)
                 {
                     response.FeedItems.AddRange(items.Select(f => GetFeedItemMessageWithFeedInfo(f)));
-                    response.NextRowKey = items.Last().NextRowKey ?? string.Empty;
+                    response.NextRowKey = string.Empty;
                 }
                 return response;
             }
@@ -130,7 +130,7 @@ namespace FeedReader.Server.Services
                 }
 
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new UserProcessor(_dbContext).StarFeedItemAsync(GetDataContractFeedItem(request.FeedItem), user, AzureStorage.GetUserStaredFeedItemsTable());
+                await new UserProcessor(_dbContext).StarFeedItemAsync(GetDataContractFeedItem(request.FeedItem), user);
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -149,7 +149,7 @@ namespace FeedReader.Server.Services
                 }
 
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new UserProcessor(_dbContext).UnstarFeedItemAsync(request.FeedItemUri, request.FeedItemPubDate.ToDateTime(), user, AzureStorage.GetUserStaredFeedItemsTable());
+                await new UserProcessor(_dbContext).UnstarFeedItemAsync(request.FeedItemUri, request.FeedItemPubDate.ToDateTime(), user);
                 return new Empty();
             }
             catch (UnauthorizedAccessException)

@@ -3,15 +3,17 @@ using System;
 using FeedReader.ServerCore.Datas;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace FeedReader.ServerCore.Migrations
 {
     [DbContext(typeof(FeedReaderDbContext))]
-    partial class FeedReaderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210221211210_AddFeedItemIdToUserFavorites")]
+    partial class AddFeedItemIdToUserFavorites
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -124,11 +126,9 @@ namespace FeedReader.ServerCore.Migrations
                         .HasColumnType("character varying(32)");
 
                     b.Property<string>("FeedItemId")
-                        .HasColumnType("character varying(64)");
+                        .HasColumnType("text");
 
                     b.HasKey("UserId", "FavoriteItemIdHash");
-
-                    b.HasIndex("FeedItemId");
 
                     b.HasIndex("UserId");
 
@@ -165,15 +165,6 @@ namespace FeedReader.ServerCore.Migrations
                         .HasForeignKey("FeedId");
 
                     b.Navigation("Feed");
-                });
-
-            modelBuilder.Entity("FeedReader.ServerCore.Models.UserFavorite", b =>
-                {
-                    b.HasOne("FeedReader.ServerCore.Models.FeedItem", "FeedItem")
-                        .WithMany()
-                        .HasForeignKey("FeedItemId");
-
-                    b.Navigation("FeedItem");
                 });
 
             modelBuilder.Entity("FeedReader.ServerCore.Models.UserFeed", b =>
