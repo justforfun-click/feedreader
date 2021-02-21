@@ -1,5 +1,4 @@
 ﻿using FeedReader.Share.DataContracts;
-using FeedReader.WebApi.Entities;
 using FeedReader.WebApi.Extensions;
 using JWT.Algorithms;
 using JWT.Builder;
@@ -9,8 +8,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FeedReader.Share;
 using Microsoft.Extensions.Logging;
-using Microsoft.Azure.Cosmos.Table;
-using Azure.Storage.Queues;
 using User = FeedReader.ServerCore.Models.User;
 using Microsoft.EntityFrameworkCore;
 using FeedReader.ServerCore.Datas;

@@ -1,10 +1,9 @@
 ﻿using FeedReader.Share.DataContracts;
-using Microsoft.Azure.Cosmos.Table;
 using System;
 
 namespace FeedReader.WebApi.Entities
 {
-    public class FeedInfoEntity : TableEntity
+    public class FeedInfoEntity
     {
         public string Uri { get; set; }
 
@@ -22,8 +21,7 @@ namespace FeedReader.WebApi.Entities
         {
         }
 
-        public FeedInfoEntity(string partitionKey, string rowKey, Feed feed)
-            : base(partitionKey, rowKey)
+        public FeedInfoEntity(Feed feed)
         {
             Uri = feed.Uri;
             OriginalUri = feed.OriginalUri;
@@ -50,7 +48,7 @@ namespace FeedReader.WebApi.Entities
         }
     }
 
-    public class FeedItemEntity : TableEntity
+    public class FeedItemEntity
     {
         public string Title { get; set; }
 
@@ -93,8 +91,7 @@ namespace FeedReader.WebApi.Entities
         {
         }
 
-        public UserFeedEntity(string partitionKey, string rowKey, Feed feed)
-            : base(partitionKey, rowKey, feed)
+        public UserFeedEntity(Feed feed)
         {
             Group = feed.Group;
         }

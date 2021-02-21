@@ -5,13 +5,11 @@ using FeedReader.Share;
 using FeedReader.Share.DataContracts;
 using FeedReader.WebApi.Entities;
 using FeedReader.WebApi.Extensions;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -167,11 +165,6 @@ namespace FeedReader.WebApi.Processors
             return feed;
         }
 
-        public async Task RefreshFeedAsync(string feedOriginalUri, CloudTable feedTable, CloudTable feedItemTable)
-        {
-            await SaveFeedAsync(await RefreshFeedAsync(feedOriginalUri), feedTable, feedItemTable);
-        }
-
         public async Task<Feed> SubscribeFeedAsync(string feedOriginalUri, string customGroup, User user)
         {
             Feed feed = null;
@@ -275,68 +268,6 @@ namespace FeedReader.WebApi.Processors
             await db.SaveChangesAsync();
         }
 
-        public async Task<List<Feed>> GetFeedsByCategory(FeedCategory category, CloudTable feedTable, CloudTable feedItemTable)
-        {
-            // Generate filter.
-            var filter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "feed_info");
-            if (category != FeedCategory.Recommended)
-            {
-                filter = TableQuery.CombineFilters(filter, TableOperators.And, TableQuery.GenerateFilterCondition("Category", QueryComparisons.Equal, category.ToString()));
-            }
-
-            var queryRes = await feedTable.ExecuteQuerySegmentedAsync(new TableQuery<FeedInfoEntity>()
-            {
-                TakeCount = 10,
-                FilterString = filter
-            }, null);
-
-            var feeds = new List<Feed>();
-            if (queryRes != null && queryRes.Results != null)
-            {
-                feeds = queryRes.Results.Select(f => f.CopyTo(new Feed())).ToList();
-            }
-
-            var tuples = new List<Tuple<Feed, FeedItem>>();
-            foreach (var feed in feeds)
-            {
-                var itemQueryRes = await feedItemTable.ExecuteQuerySegmentedAsync(new TableQuery<FeedItemEntity>()
-                {
-                    TakeCount = MAX_RETURN_COUNT,
-                    FilterString = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, Utils.Sha256(feed.Uri))
-                }, null);
-
-                if (itemQueryRes != null && itemQueryRes.Results != null)
-                {
-                    tuples.AddRange(itemQueryRes.Results.Select(i => Tuple.Create(feed, i.CopyTo(new FeedItem()))).ToList());
-                }
-            }
-
-            tuples = tuples.OrderByDescending(t => t.Item2.PubDate).ToList();
-            feeds = tuples.Select(t => t.Item1).Distinct().ToList();
-            foreach (var feed in feeds)
-            {
-                feed.Items = tuples.Where(t => t.Item1 == feed).Select(t => t.Item2).ToList();
-            }
-
-            int leftCount = MAX_RETURN_COUNT;
-            feeds = feeds.OrderBy(f => f.Items.Count).ToList();
-            for (int i = 0; leftCount > 0 && i < feeds.Count; ++i)
-            {
-                int avg = Math.Max(leftCount / (feeds.Count - i), 1);
-                if (feeds[i].Items.Count <= avg)
-                {
-                    // Use all items in this feed, check the next feed.
-                    leftCount -= feeds[i].Items.Count;
-                }
-                else
-                {
-                    feeds[i].Items.RemoveRange(avg, feeds[i].Items.Count - avg);
-                    leftCount -= avg;
-                }
-            }
-            return feeds;
-        }
-
         public async Task UpdateFeedAsync(string feedUri, string newFeedGroup, User user)
         {
             // Get the original feed.
@@ -350,44 +281,6 @@ namespace FeedReader.WebApi.Processors
 
             userFeed.Group = newFeedGroup;
             await db.SaveChangesAsync();
-        }
-
-        private async Task SaveFeedAsync(Feed feed, CloudTable feedTable, CloudTable feedItemTable)
-        {
-            // Update feed info into feed table.
-            var feedUri = feed.Uri.Trim().ToLower();
-            await feedTable.ExecuteAsync(TableOperation.InsertOrMerge(new FeedInfoEntity()
-            {
-                PartitionKey = "feed_info",
-                RowKey = Utils.Sha256(feedUri),
-                Uri = feedUri,
-                OriginalUri = feed.OriginalUri,
-                Name = feed.Name,
-                Description = feed.Description,
-                IconUri = feed.IconUri,
-                WebsiteLink = feed.WebsiteLink,
-            }));
-
-            // Save feed items
-            if (feed.Items != null)
-            {
-                var partitionKey = Utils.Sha256(feed.Uri.Trim().ToLower());
-                foreach (var item in feed.Items)
-                {
-                    var itemUri = item.PermentLink.Trim();
-                    await feedItemTable.ExecuteAsync(TableOperation.InsertOrMerge(new FeedItemEntity()
-                    {
-                        PartitionKey = partitionKey,
-                        RowKey = $"{string.Format("{0:D19}", DateTime.MaxValue.Ticks - item.PubDate.ToUniversalTime().Ticks)}-{Utils.Sha256(itemUri)}",
-                        PermentLink = itemUri,
-                        Title = item.Title,
-                        Summary = item.Summary,
-                        Content = item.Content,
-                        PubDate = item.PubDate,
-                        TopicPictureUri = item.TopicPictureUri,
-                    }));
-                }
-            }
         }
 
         private async Task<string> DiscoverFeedUriAsync(string uri)

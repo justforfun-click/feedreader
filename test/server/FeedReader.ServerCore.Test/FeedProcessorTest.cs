@@ -1,17 +1,4 @@
-﻿using FeedReader.WebApi.Entities;
-using FeedReader.WebApi.Processors;
-using Microsoft.Azure.Cosmos.Table;
-using NSubstitute;
-using RichardSzalay.MockHttp;
-using System;
-using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-
-namespace FeedReader.WebApi.Test
+﻿namespace FeedReader.WebApi.Test
 {
     public class FeedProcessorTest
     {

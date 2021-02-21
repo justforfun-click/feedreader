@@ -1,16 +1,13 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Microsoft.Azure.Cosmos.Table;
 using System.Net.Http;
 using FeedReader.Backend.Share.FeedParsers;
 using FeedReader.WebApi.Processors;
-using FeedReader.Backend.Share.Entities;
 using System.Net.Http.Headers;
 using FeedReader.WebApi.Extensions;
 using Microsoft.EntityFrameworkCore;
 using FeedReader.ServerCore.Datas;
-using FeedReader.ServerCore;
 using System.Threading;
 
 namespace FeedReader.WebApi.AdminFunctions
@@ -20,8 +17,6 @@ namespace FeedReader.WebApi.AdminFunctions
         public static async Task UpdateFeeds(IDbContextFactory<FeedReaderDbContext> dbFactory, CancellationToken cancellationToken, ILogger logger)
         {
             var db = dbFactory.CreateDbContext();
-            var feedItemsTable = AzureStorage.GetFeedItemsTable();
-            var latestFeedItemsTable = AzureStorage.GetLatestFeedItemsTable();
             int count = 0;
             foreach (var feed in await db.Feeds.ToListAsync())
             {
@@ -32,7 +27,7 @@ namespace FeedReader.WebApi.AdminFunctions
 
                 try
                 {
-                    await UpdateFeed(dbFactory, feed, feedItemsTable, latestFeedItemsTable, logger);
+                    await UpdateFeed(dbFactory, feed, logger);
                 }
                 catch (Exception ex)
                 {
@@ -47,7 +42,7 @@ namespace FeedReader.WebApi.AdminFunctions
             await db.SaveChangesAsync();
         }
 
-        public static async Task UpdateFeed(IDbContextFactory<FeedReaderDbContext> dbFactory, ServerCore.Models.Feed feed, CloudTable feedItemsTable, CloudTable latestFeedItemsTable, ILogger log, HttpClient httpClient = null)
+        public static async Task UpdateFeed(IDbContextFactory<FeedReaderDbContext> dbFactory, ServerCore.Models.Feed feed, ILogger log, HttpClient httpClient = null)
         {
             log.LogInformation($"UpdateFeed: {feed.Uri}");
 
@@ -152,44 +147,6 @@ namespace FeedReader.WebApi.AdminFunctions
                 }
             }
             await db.SaveChangesAsync();
-
-            // Save feed items to table.
-            /*var batch = new TableBatchOperation();
-            foreach (var item in feedItems)
-            {
-                item.PartitionKey = feedUriHash;
-                item.RowKey = $"{string.Format("{0:D19}", DateTime.MaxValue.Ticks - item.PubDate.ToUniversalTime().Ticks)}-{item.PermentLink.Sha256()}";
-                batch.Add(TableOperation.InsertOrMerge(item));
-                if (batch.Count == 100)
-                {
-                    await feedItemsTable.ExecuteBatchAsync(batch);
-                    batch.Clear();
-                }
-            }
-            if (batch.Count > 0)
-            {
-                await feedItemsTable.ExecuteBatchAsync(batch);
-            }
-
-            // Svae to latest feed items table.
-            batch.Clear();
-            foreach (var item in feedItems)
-            {
-                batch.Add(TableOperation.InsertOrMerge(new FeedItemExEntity(item, feed)
-                {
-                    PartitionKey = feed.Category ?? "Default",
-                    RowKey = item.RowKey,
-                }));
-                if (batch.Count == 100)
-                {
-                    await latestFeedItemsTable.ExecuteBatchAsync(batch);
-                    batch.Clear();
-                }
-            }
-            if (batch.Count > 0)
-            {
-                await latestFeedItemsTable.ExecuteBatchAsync(batch);
-            }*/
 
             log.LogInformation($"UpdateFeed: {feed.Uri} finished");
         }
