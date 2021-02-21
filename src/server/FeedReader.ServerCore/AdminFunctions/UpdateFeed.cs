@@ -154,7 +154,7 @@ namespace FeedReader.WebApi.AdminFunctions
             await db.SaveChangesAsync();
 
             // Save feed items to table.
-            var batch = new TableBatchOperation();
+            /*var batch = new TableBatchOperation();
             foreach (var item in feedItems)
             {
                 item.PartitionKey = feedUriHash;
@@ -189,7 +189,7 @@ namespace FeedReader.WebApi.AdminFunctions
             if (batch.Count > 0)
             {
                 await latestFeedItemsTable.ExecuteBatchAsync(batch);
-            }
+            }*/
 
             log.LogInformation($"UpdateFeed: {feed.Uri} finished");
         }
