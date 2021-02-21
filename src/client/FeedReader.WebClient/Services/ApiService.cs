@@ -77,12 +77,12 @@ namespace FeedReader.WebClient.Services
             });
         }
 
-        public async Task<Feed> RefreshFeed(string feedUri, string nextRowKey)
+        public async Task<Feed> RefreshFeed(string feedUri, int page)
         {
             var response = await _apiClient.RefreshFeedAsync(new Protos.RefreshFeedRequest
             {
                 FeedUri = feedUri,
-                NextRowKey = nextRowKey ?? string.Empty
+                Page = page
             });
 
             var feed = new Feed
@@ -108,8 +108,8 @@ namespace FeedReader.WebClient.Services
                     FeedIconUri = response.FeedInfo.IconUri,
                     FeedName = response.FeedInfo.Name,
                 }).ToList(),
-                NextRowKey = response.NextRowKey
             };
+            feed.NextItemsPage = feed.Items.Count == 50 ? page + 1 : 0;
             return feed;
         }
 
@@ -155,20 +155,14 @@ namespace FeedReader.WebClient.Services
             return feedItems;
         }
 
-        public async Task<List<FeedItem>> GetFeedItemsByCategory(FeedCategory feedCategory, string nextRowKey)
+        public async Task<List<FeedItem>> GetFeedItemsByCategory(FeedCategory feedCategory, int page)
         {
             var res = await _apiClient.GetFeedsByCategoryAsync(new Protos.GetFeedsByCategoryRequest
             {
                 Category = GetProtosFeedCategory(feedCategory),
-                NextRowKey = nextRowKey ?? string.Empty
+                Page = page
             });
-
-            var feedItems = res.FeedItems.Select(f => GetFeedItem(f)).ToList();
-            if (feedItems.Count > 0)
-            {
-                feedItems.Last().NextRowKey = res.NextRowKey;
-            }
-            return feedItems;
+            return res.FeedItems.Select(f => GetFeedItem(f)).ToList();
         }
 
         private Protos.FeedCategory GetProtosFeedCategory(FeedCategory category)

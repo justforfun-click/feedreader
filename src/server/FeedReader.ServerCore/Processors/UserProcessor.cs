@@ -184,7 +184,7 @@ namespace FeedReader.WebApi.Processors
             return feedItems;
         }
 
-        public async Task MarkItemsAsReaded(User user, string feedUri, DateTime lastReadedTime, QueueClient feedRefreshJobs)
+        public async Task MarkItemsAsReaded(User user, string feedUri, DateTime lastReadedTime)
         {
             var feedId = Utils.Sha256(feedUri);
             var db = _dbFactory.CreateDbContext();

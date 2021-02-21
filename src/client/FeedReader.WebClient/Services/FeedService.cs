@@ -22,7 +22,7 @@ namespace FeedReader.WebClient.Services
 
         public async Task RefreshFeedAsync(Feed feed, bool more = false)
         {
-            var res = await _api.RefreshFeed(feed.Uri, more ? feed.NextRowKey : null);
+            var res = await _api.RefreshFeed(feed.Uri, more ? feed.NextItemsPage : 0);
             if (string.IsNullOrWhiteSpace(feed.Name))
             {
                 // Only update name if we don't have customized name.
@@ -32,7 +32,7 @@ namespace FeedReader.WebClient.Services
             feed.WebsiteLink = res.WebsiteLink;
             feed.Description = res.Description;
             feed.Error = res.Error;
-            feed.NextRowKey = res.NextRowKey;
+            feed.NextItemsPage = res.NextItemsPage;
 
             if (res.Items != null)
             {
@@ -55,9 +55,9 @@ namespace FeedReader.WebClient.Services
             }
         }
 
-        public Task<List<FeedItem>> GetFeedItemsByCategory(FeedCategory feedCategory, string nextRowKey)
+        public Task<List<FeedItem>> GetFeedItemsByCategory(FeedCategory feedCategory, int page)
         {
-            return _api.GetFeedItemsByCategory(feedCategory, nextRowKey);
+            return _api.GetFeedItemsByCategory(feedCategory, page);
         }
     }
 }

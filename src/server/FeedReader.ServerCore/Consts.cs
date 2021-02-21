@@ -44,5 +44,9 @@ namespace FeedReader.WebApi
         public const string ENV_KEY_GITHUB_CLIENT_SECRET = "GitHubClientSecret";
 
         public const string ENV_KEY_FEEDREADER_DB_CONNECTION_STRING = "FeedreaderDbConnectionString";
+
+        public const string ENV_KEY_FEEDREADER_REDIS_CONNECTION_STRING = "FeedreaderRedisConnectionString";
+
+        public const string CACHE_KEY_LATEST_FEEDITEMS_CATEGORY_PREFIX = "Feedreader.Latest.FeedItems.Category.";
     }
 }

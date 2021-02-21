@@ -42,31 +42,24 @@ message MarkFeedAsReadedFromTimestampRequest
 message RefreshFeedRequest
 {
     string FeedUri = 1;
-
-    string NextRowKey = 2;
+    int32 Page = 2;
 }
 
 message RefreshFeedResponse
 {
     FeedInfo FeedInfo = 1;
-
     repeated FeedItemMessage FeedItems = 2;
-
-    string NextRowKey = 3;
 }
 
 message GetFeedsByCategoryRequest
 {
     FeedCategory Category = 1;
-
-    string NextRowKey = 3;
+    int32 Page = 2;
 }
 
 message GetFeedsByCategoryResponse
 {
-    repeated FeedItemMessageWithFeedInfo FeedItems = 2;
-
-    string NextRowKey = 3;
+    repeated FeedItemMessageWithFeedInfo FeedItems = 1;
 }
 
 message GetStaredFeedItemsRequest

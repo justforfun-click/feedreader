@@ -118,16 +118,16 @@
                         </div>
                     }
 
-                    if (!string.IsNullOrWhiteSpace(Feed?.NextRowKey))
+                    if (Feed != null && Feed.NextItemsPage != 0)
                     {
                         <div class="feed-item">
                             <div class="more" @onclick="More">Loading more ...</div>
                         </div>
                     }
-                    else if (!string.IsNullOrWhiteSpace(FeedItems.Last().NextRowKey))
+                    else if (NextPage != 0)
                     {
                         <div class="feed-item">
-                            <div class="more" @onclick="() => ShowCategory(Category, FeedItems.Last().NextRowKey)">Loading more ...</div>
+                            <div class="more" @onclick="() => ShowCategory(Category, NextPage)">Loading more ...</div>
                         </div>
                     }
                 }
@@ -155,6 +155,8 @@
 
     private Dictionary<FeedCategory, List<FeedItem>> FeedItemsByCategory = new Dictionary<FeedCategory, List<FeedItem>>();
 
+    private int NextPage { get; set; }
+
     protected override void OnInitialized()
     {
         if (Feed != null)
@@ -181,7 +183,7 @@
         return FeedService.RefreshFeedAsync(Feed, true);
     }
 
-    private async Task ShowCategory(FeedCategory category, string nextRowKey = null)
+    private async Task ShowCategory(FeedCategory category, int page = 0)
     {
         if (OnShowCategory.HasDelegate)
         {
@@ -194,13 +196,13 @@
         var token = _cancelToken;
         await JsRuntime.InvokeVoidAsync("eval", $"document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active')); document.querySelector('.nav-item-{category}').classList.add('active')");
 
-        var feedItems = await FeedService.GetFeedItemsByCategory(category, nextRowKey);
+        var feedItems = await FeedService.GetFeedItemsByCategory(category, page);
         if (token.IsCancellationRequested)
         {
             return;
         }
 
-        if (string.IsNullOrEmpty(nextRowKey))
+        if (page == 0)
         {
             FeedItemsByCategory[category] = feedItems;
         }
@@ -209,6 +211,7 @@
             FeedItemsByCategory[category].AddRange(feedItems);
         }
 
+        NextPage = feedItems.Count == 50 ? page + 1 : 0;
         FeedItems = FeedItemsByCategory[category];
         StateHasChanged();
     }

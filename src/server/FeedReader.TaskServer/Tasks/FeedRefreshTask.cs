@@ -1,6 +1,4 @@
-﻿using FeedReader.ServerCore.Datas;
-using FeedReader.WebApi.AdminFunctions;
-using Microsoft.EntityFrameworkCore;
+﻿using FeedReader.ServerCore.Services;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
@@ -10,17 +8,17 @@ namespace FeedReader.TaskServer.Tasks
 {
     class FeedRefreshTask : TaskBase
     {
-        private IDbContextFactory<FeedReaderDbContext> _dbFactory;
+        private readonly IFeedService _feedService;
 
-        public FeedRefreshTask(IDbContextFactory<FeedReaderDbContext> dbFactory, ILogger<FeedRefreshTask> logger)
+        public FeedRefreshTask(IFeedService feedService, ILogger<FeedRefreshTask> logger)
             : base("FeedRefreshTask", TimeSpan.FromMinutes(10), logger)
         {
-            _dbFactory = dbFactory;
+            _feedService = feedService;
         }
 
-        protected override async Task DoTaskOnce(CancellationToken cancellationToken)
+        protected override Task DoTaskOnce(CancellationToken cancellationToken)
         {
-            await UpdateFeedFunc.UpdateFeeds(_dbFactory, cancellationToken, Logger);
+            return _feedService.UpdateFeeds(cancellationToken);
         }
     }
 }

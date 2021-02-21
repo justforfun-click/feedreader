@@ -7,8 +7,6 @@ namespace FeedReader.ServerCore
 {
     public static class AzureStorage
     {
-        const string REFRESH_FEED_JOBS_QUEUE = "feedrefreshjobs";
-
         const string FEED_ITEMS_TABLE = "feeditems";
 
         const string LATEST_FEED_ITEMS_TABLE = "latestfeeditems";
@@ -32,16 +30,6 @@ namespace FeedReader.ServerCore
         public static CloudTable GetUserStaredFeedItemsTable()
         {
             return _tableClient.GetTableReference(USER_STARED_FEED_ITEMS_TABLE);
-        }
-
-        public static QueueClient GetFeedRefreshJobsQueue()
-        {
-            return new QueueClient(_conns, REFRESH_FEED_JOBS_QUEUE);
-        }
-
-        public static CloudTable MigrationOnly_GetUsersFeedsTable()
-        {
-            return _tableClient.GetTableReference("usersfeeds");
         }
     }
 }

@@ -32,7 +32,5 @@ namespace FeedReader.Share.DataContracts
         public List<FeedItem> Items { get; set; } = new List<FeedItem>();
 
         public string Error { get; set; }
-
-        public string NextRowKey { get; set; }
     }
 }

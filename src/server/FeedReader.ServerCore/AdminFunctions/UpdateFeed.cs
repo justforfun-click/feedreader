@@ -32,7 +32,7 @@ namespace FeedReader.WebApi.AdminFunctions
 
                 try
                 {
-                    await UpdateFeed(feed, feedItemsTable, latestFeedItemsTable, logger);
+                    await UpdateFeed(dbFactory, feed, feedItemsTable, latestFeedItemsTable, logger);
                 }
                 catch (Exception ex)
                 {
@@ -47,7 +47,7 @@ namespace FeedReader.WebApi.AdminFunctions
             await db.SaveChangesAsync();
         }
 
-        public static async Task UpdateFeed(ServerCore.Models.Feed feed, CloudTable feedItemsTable, CloudTable latestFeedItemsTable, ILogger log, HttpClient httpClient = null)
+        public static async Task UpdateFeed(IDbContextFactory<FeedReaderDbContext> dbFactory, ServerCore.Models.Feed feed, CloudTable feedItemsTable, CloudTable latestFeedItemsTable, ILogger log, HttpClient httpClient = null)
         {
             log.LogInformation($"UpdateFeed: {feed.Uri}");
 
@@ -131,8 +131,30 @@ namespace FeedReader.WebApi.AdminFunctions
             // Parse feed items.
             var feedItems = parser.ParseFeedItems();
 
+            // Save feed items to db.
+            var db = dbFactory.CreateDbContext();
+            foreach (var item in feedItems)
+            {
+                var feedItemId = item.PermentLink.Sha256();
+                if (await db.FeedItems.FindAsync(feedItemId) == null)
+                {
+                    db.FeedItems.Add(new ServerCore.Models.FeedItem
+                    {
+                        Content = item.Content,
+                        FeedId = feed.Id,
+                        Id = feedItemId,
+                        PublishTimeInUtc = item.PubDate.ToUniversalTime(),
+                        Summary = item.Summary,
+                        Title = item.Title,
+                        TopicPictureUri = item.TopicPictureUri,
+                        Uri = item.PermentLink
+                    });
+                }
+            }
+            await db.SaveChangesAsync();
+
             // Save feed items to table.
-            var batch = new TableBatchOperation();
+            /*var batch = new TableBatchOperation();
             foreach (var item in feedItems)
             {
                 item.PartitionKey = feedUriHash;
@@ -167,7 +189,7 @@ namespace FeedReader.WebApi.AdminFunctions
             if (batch.Count > 0)
             {
                 await latestFeedItemsTable.ExecuteBatchAsync(batch);
-            }
+            }*/
 
             log.LogInformation($"UpdateFeed: {feed.Uri} finished");
         }

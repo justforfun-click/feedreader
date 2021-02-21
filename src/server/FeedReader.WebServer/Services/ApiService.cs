@@ -1,6 +1,7 @@
 ﻿using FeedReader.Protos;
 using FeedReader.ServerCore;
 using FeedReader.ServerCore.Datas;
+using FeedReader.ServerCore.Services;
 using FeedReader.WebApi.Processors;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -15,11 +16,13 @@ namespace FeedReader.Server.Services
     public class ApiService : FeedReaderServerApi.FeedReaderServerApiBase
     {
         private readonly AuthService _authService;
+        private readonly IFeedService _feedService;
         private readonly IDbContextFactory<FeedReaderDbContext> _dbContext;
 
         public ApiService(IServiceProvider sp)
         {
             _authService = sp.GetService<AuthService>();
+            _feedService = sp.GetService<IFeedService>();
             _dbContext = sp.GetService<IDbContextFactory<FeedReaderDbContext>>();
         }
 
@@ -52,8 +55,7 @@ namespace FeedReader.Server.Services
             try
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                var feedRefresJobsQueue = AzureStorage.GetFeedRefreshJobsQueue();
-                await new UserProcessor(_dbContext).MarkItemsAsReaded(user, request.FeedUri, request.Timestamp.ToDateTime(), feedRefresJobsQueue);
+                await new UserProcessor(_dbContext).MarkItemsAsReaded(user, request.FeedUri, request.Timestamp.ToDateTime());
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -68,12 +70,10 @@ namespace FeedReader.Server.Services
             {
                 var userToken = context.RequestHeaders.Get("authentication")?.Value;
                 var user = userToken == null ? null : await _authService.AuthenticateTokenAsync(userToken);
-                var feedItemsTable = AzureStorage.GetFeedItemsTable();
-                var feed = await new FeedProcessor(_dbContext).GetFeedItemsAsync(request.FeedUri, request.NextRowKey, user, feedItemsTable);
+                var feed = await new FeedProcessor(_dbContext).GetFeedItemsAsync(request.FeedUri, request.Page, user);
                 var response = new RefreshFeedResponse()
                 {
                     FeedInfo = GetFeedInfo(feed),
-                    NextRowKey = feed.NextRowKey ?? string.Empty,
                 };
                 response.FeedItems.AddRange(feed.Items.Select(f => GetFeedItemMessage(f)));
                 return response;
@@ -86,12 +86,11 @@ namespace FeedReader.Server.Services
 
         public override async Task<GetFeedsByCategoryResponse> GetFeedsByCategory(GetFeedsByCategoryRequest request, ServerCallContext context)
         {
-            var items = await new FeedProcessor(_dbContext).GetFeedItemsByCategory(GetDataContractsFeedCategory(request.Category), request.NextRowKey, AzureStorage.GetLatestFeedItemsTable());
+            var items = await _feedService.GetCategoryFeedItems(GetModesFeedCategory(request.Category), request.Page);
             var response = new GetFeedsByCategoryResponse();
-            if (items.Count > 0)
+            if (items?.Count > 0)
             {
                 response.FeedItems.AddRange(items.Select(f => GetFeedItemMessageWithFeedInfo(f)));
-                response.NextRowKey = items.Last().NextRowKey ?? string.Empty;
             }
             return response;
         }
@@ -325,6 +324,60 @@ namespace FeedReader.Server.Services
                 FeedIconUri = f.FeedIconUri ?? string.Empty,
                 FeedName = f.FeedName ?? string.Empty
             };
+        }
+
+        private FeedItemMessage GetFeedItemMessage(ServerCore.Models.FeedItem f)
+        {
+            return new FeedItemMessage
+            {
+                Content = f.Content ?? string.Empty,
+                PermentLink = f.Uri,
+                PubDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(f.PublishTimeInUtc),
+                Summary = f.Summary ?? string.Empty,
+                Title = f.Title ?? string.Empty,
+                TopicPictureUri = f.TopicPictureUri ?? string.Empty
+            };
+        }
+
+        private FeedItemMessageWithFeedInfo GetFeedItemMessageWithFeedInfo(ServerCore.Models.FeedItem f)
+        {
+            return new FeedItemMessageWithFeedInfo
+            {
+                FeedItem = GetFeedItemMessage(f),
+                FeedUri = f.Feed.Uri,
+                FeedIconUri = f.Feed.IconUri ?? string.Empty,
+                FeedName = f.Feed.Name ?? string.Empty
+            };
+        }
+
+        private ServerCore.Models.FeedCategory GetModesFeedCategory(Protos.FeedCategory category)
+        {
+            switch (category)
+            {
+                case FeedCategory.Default:
+                    return ServerCore.Models.FeedCategory.Default;
+
+                case FeedCategory.Art:
+                    return ServerCore.Models.FeedCategory.Art;
+
+                case FeedCategory.Business:
+                    return ServerCore.Models.FeedCategory.Business;
+
+                case FeedCategory.News:
+                    return ServerCore.Models.FeedCategory.News;
+
+                case FeedCategory.Sport:
+                    return ServerCore.Models.FeedCategory.Sport;
+
+                case FeedCategory.Technology:
+                    return ServerCore.Models.FeedCategory.Technology;
+
+                case FeedCategory.Kids:
+                    return ServerCore.Models.FeedCategory.Kids;
+
+                default:
+                    throw new ArgumentException($"Bad category: {category}");
+            }
         }
     }
 }
