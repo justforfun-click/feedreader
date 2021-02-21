@@ -20,6 +20,10 @@ namespace FeedReader.ServerCore.Datas
 
             modelBuilder.Entity<UserFeed>()
                 .HasKey(item => new { item.UserId, item.FeedId });
+
+            modelBuilder.Entity<FeedItem>()
+                .Property(f => f.PublishTimeInUtc)
+                .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         }
 
         public DbSet<User> Users { get; set; }

@@ -337,43 +337,6 @@ namespace FeedReader.WebApi.Processors
             return feeds;
         }
 
-        public async Task<List<FeedItem>> GetFeedItemsByCategory(FeedCategory category, int page)
-        {
-            var db = _dbFactory.CreateDbContext();
-            List<ServerCore.Models.FeedItem> feedItems;
-            if (category == FeedCategory.Recommended)
-            {
-                feedItems = await db.FeedItems
-                    .Include(f => f.Feed)
-                    .Where(f => f.Feed.Category == "Default" || string.IsNullOrEmpty(f.Feed.Category))
-                    .OrderByDescending(f => f.PublishTimeInUtc)
-                    .Skip(page * 50)
-                    .Take(50).ToListAsync();
-            }
-            else
-            {
-                feedItems = await db.FeedItems
-                    .Include(f => f.Feed)
-                    .Where(f => f.Feed.Category == category.ToString())
-                    .OrderByDescending(f => f.PublishTimeInUtc)
-                    .Skip(page * 50)
-                    .Take(50).ToListAsync();
-            }
-
-            return feedItems.Select(f => new FeedItem
-            {
-                Summary = f.Summary,
-                Content = f.Content,
-                FeedIconUri = f.Feed.IconUri,
-                FeedName = f.Feed.Name,
-                FeedUri = f.Feed.Uri,
-                PermentLink = f.Uri,
-                PubDate = f.PublishTimeInUtc,
-                Title = f.Title,
-                TopicPictureUri = f.TopicPictureUri,
-            }).ToList();
-        }
-
         public async Task UpdateFeedAsync(string feedUri, string newFeedGroup, User user)
         {
             // Get the original feed.

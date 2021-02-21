@@ -24,6 +24,7 @@ namespace FeedReader.Server
             });
             services.AddProxies();
             services.AddSingleton<AuthService>();
+            services.AddFeedReaderServerCoreServices();
 
             var dbConns = Environment.GetEnvironmentVariable(Consts.ENV_KEY_FEEDREADER_DB_CONNECTION_STRING);
             services.AddDbContextFactory<ServerCore.Datas.FeedReaderDbContext>(options => options.UseNpgsql(dbConns));

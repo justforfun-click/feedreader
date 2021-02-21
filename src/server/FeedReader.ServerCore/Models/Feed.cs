@@ -3,6 +3,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace FeedReader.ServerCore.Models
 {
+    public enum FeedCategory
+    {
+        Default,
+        Art,
+        Business,
+        News,
+        Sport,
+        Technology,
+        Kids
+    }
+
     public class Feed
     {
         [Key, StringLength(64)]
