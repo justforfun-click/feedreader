@@ -30,10 +30,12 @@ namespace Microsoft.Extensions.DependencyInjection
             });
 
             // Add feed service.
+            sc.AddSingleton<IAuthService, AuthService>();
             sc.AddSingleton<IFeedService, FeedService>();
 
             // Expose feed reader server core services.
             var sp = sc.BuildServiceProvider();
+            services.AddSingleton<IAuthService>(_ => sp.GetRequiredService<IAuthService>());
             services.AddSingleton<IFeedService>(_ => sp.GetRequiredService<IFeedService>());
             return services;
         }

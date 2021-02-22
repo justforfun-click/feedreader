@@ -23,7 +23,6 @@ namespace FeedReader.Server
                 options.Interceptors.Add<GrpcExceptionInterceptor>();
             });
             services.AddProxies();
-            services.AddSingleton<AuthService>();
             services.AddFeedReaderServerCoreServices();
 
             var dbConns = Environment.GetEnvironmentVariable(Consts.ENV_KEY_FEEDREADER_DB_CONNECTION_STRING);

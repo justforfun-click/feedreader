@@ -1,5 +1,4 @@
 ﻿using FeedReader.Protos;
-using FeedReader.ServerCore;
 using FeedReader.ServerCore.Datas;
 using FeedReader.ServerCore.Services;
 using FeedReader.WebApi.Processors;
@@ -15,13 +14,13 @@ namespace FeedReader.Server.Services
 {
     public class ApiService : FeedReaderServerApi.FeedReaderServerApiBase
     {
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
         private readonly IFeedService _feedService;
         private readonly IDbContextFactory<FeedReaderDbContext> _dbContext;
 
         public ApiService(IServiceProvider sp)
         {
-            _authService = sp.GetService<AuthService>();
+            _authService = sp.GetService<IAuthService>();
             _feedService = sp.GetService<IFeedService>();
             _dbContext = sp.GetService<IDbContextFactory<FeedReaderDbContext>>();
         }
