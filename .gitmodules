@@ -1,0 +1,3 @@
+[submodule "src/share/FeedParser"]
+	path = src/share/FeedParser
+	url = https://github.com/feedreaderorg/FeedParser.git
