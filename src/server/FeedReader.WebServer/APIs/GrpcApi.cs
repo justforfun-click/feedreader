@@ -1,28 +1,25 @@
 ﻿using FeedReader.Protos;
-using FeedReader.ServerCore.Datas;
 using FeedReader.ServerCore.Services;
-using FeedReader.WebApi.Processors;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FeedReader.Server.Services
+namespace FeedReader.WebServer.APIs
 {
-    public class ApiService : FeedReaderServerApi.FeedReaderServerApiBase
+    public class GrpcApi : FeedReaderServerApi.FeedReaderServerApiBase
     {
         private readonly IAuthService _authService;
+        private readonly IUserService _userService;
         private readonly IFeedService _feedService;
-        private readonly IDbContextFactory<FeedReaderDbContext> _dbContext;
 
-        public ApiService(IServiceProvider sp)
+        public GrpcApi(IServiceProvider sp)
         {
             _authService = sp.GetService<IAuthService>();
+            _userService = sp.GetService<IUserService>();
             _feedService = sp.GetService<IFeedService>();
-            _dbContext = sp.GetService<IDbContextFactory<FeedReaderDbContext>>();
         }
 
         public override async Task<UserInfo> Login(LoginRequest request, ServerCallContext context)
@@ -30,8 +27,7 @@ namespace FeedReader.Server.Services
             try
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                var processor = new UserProcessor(_dbContext);
-                user = await processor.LoginAsync(user);
+                user = await _userService.Login(user);
                 var res = new UserInfo
                 {
                     Token = user.Token,
@@ -54,7 +50,7 @@ namespace FeedReader.Server.Services
             try
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new UserProcessor(_dbContext).MarkItemsAsReaded(user, request.FeedUri, request.Timestamp.ToDateTime());
+                await _userService.MarkItemsAsReaded(user, request.FeedUri, request.Timestamp.ToDateTime().ToUniversalTime());
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -69,7 +65,7 @@ namespace FeedReader.Server.Services
             {
                 var userToken = context.RequestHeaders.Get("authentication")?.Value;
                 var user = userToken == null ? null : await _authService.AuthenticateTokenAsync(userToken);
-                var feed = await new FeedProcessor(_dbContext).GetFeedItemsAsync(request.FeedUri, request.Page, user);
+                var feed = await _userService.GetFeedItemsAsync(user, request.FeedUri, request.Page);
                 var response = new RefreshFeedResponse()
                 {
                     FeedInfo = GetFeedInfo(feed),
@@ -99,7 +95,7 @@ namespace FeedReader.Server.Services
             try
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                var items = await new UserProcessor(_dbContext).GetStaredFeedItemsAsync(request.NextRowKey, user);
+                var items = await _userService.GetStaredFeedItemsAsync(user, request.NextRowKey);
                 var response = new GetStaredFeedItemsResponse();
                 if (items.Count > 0)
                 {
@@ -129,7 +125,7 @@ namespace FeedReader.Server.Services
                 }
 
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new UserProcessor(_dbContext).StarFeedItemAsync(GetDataContractFeedItem(request.FeedItem), user);
+                await _userService.StarFeedItemAsync(user, request.FeedItem);
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -148,7 +144,7 @@ namespace FeedReader.Server.Services
                 }
 
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new UserProcessor(_dbContext).UnstarFeedItemAsync(request.FeedItemUri, request.FeedItemPubDate.ToDateTime(), user);
+                await _userService.UnstarFeedItemAsync(user, request.FeedItemUri, request.FeedItemPubDate.ToDateTime().ToUniversalTime());
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -168,7 +164,7 @@ namespace FeedReader.Server.Services
 
                 request.OriginalUri = request.OriginalUri.Trim();
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                var feed = await new FeedProcessor(_dbContext).SubscribeFeedAsync(request.OriginalUri, request.Group, user);
+                var feed = await _userService.SubscribeFeedAsync(user, request.OriginalUri, request.Group);
                 return new SubscribeFeedResponse
                 {
                     Feed = GetFeedInfo(feed)
@@ -190,7 +186,7 @@ namespace FeedReader.Server.Services
                 }
 
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new FeedProcessor(_dbContext).UnsubscribeFeedAsync(request.FeedUri, user);
+                await _userService.UnsubscribeFeedAsync(user, request.FeedUri);
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -209,7 +205,7 @@ namespace FeedReader.Server.Services
                 }
 
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                await new FeedProcessor(_dbContext).UpdateFeedAsync(request.FeedUri, request.FeedGroup, user);
+                await _userService.UpdateFeedAsync(user, request.FeedUri, request.FeedGroup);
                 return new Empty();
             }
             catch (UnauthorizedAccessException)
@@ -273,30 +269,6 @@ namespace FeedReader.Server.Services
                 Uri = feed.Uri,
                 WebsiteLink = feed.WebsiteLink ?? string.Empty
             };
-        }
-
-        private Share.DataContracts.FeedItem GetDataContractFeedItem(FeedItemMessage f)
-        {
-            return new Share.DataContracts.FeedItem
-            {
-                Content = f.Content,
-                IsReaded = f.IsReaded,
-                IsStared = f.IsReaded,
-                PermentLink = f.PermentLink,
-                PubDate = f.PubDate.ToDateTime(),
-                Summary = f.Summary,
-                Title = f.Title,
-                TopicPictureUri = f.TopicPictureUri
-            };
-        }
-
-        private Share.DataContracts.FeedItem GetDataContractFeedItem(FeedItemMessageWithFeedInfo f)
-        {
-            var feedItem = GetDataContractFeedItem(f.FeedItem);
-            feedItem.FeedIconUri = f.FeedIconUri;
-            feedItem.FeedName = f.FeedName;
-            feedItem.FeedUri = f.FeedUri;
-            return feedItem;
         }
 
         private FeedItemMessage GetFeedItemMessage(Share.DataContracts.FeedItem f)
