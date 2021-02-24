@@ -15,10 +15,10 @@ namespace FeedReader.ServerCore.Datas
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<UserFavorite>()
-                .HasKey(item => new { item.UserId, item.FavoriteItemIdHash });
+            modelBuilder.Entity<UserFeedItem>()
+                .HasKey(item => new { item.UserId, item.FeedItemId });
 
-            modelBuilder.Entity<UserFavorite>()
+            modelBuilder.Entity<UserFeedItem>()
                 .HasOne(item => item.FeedItem)
                 .WithMany()
                 .HasForeignKey(item => item.FeedItemId);
@@ -32,7 +32,7 @@ namespace FeedReader.ServerCore.Datas
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<UserFavorite> UserFavorites { get; set; }
+        public DbSet<UserFeedItem> UserFeedItems { get; set; }
         public DbSet<Feed> Feeds { get; set; }
         public DbSet<UserFeed> UserFeeds { get; set; }
         public DbSet<FeedItem> FeedItems { get; set; }

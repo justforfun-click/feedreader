@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using FeedReader.Share;
 using Microsoft.Extensions.Logging;
 using User = FeedReader.ServerCore.Models.User;
+using UserFeedItem = FeedReader.ServerCore.Models.UserFeedItem;
 using Microsoft.EntityFrameworkCore;
 using FeedReader.ServerCore.Datas;
 
@@ -77,12 +78,21 @@ namespace FeedReader.WebApi.Processors
         public async Task StarFeedItemAsync(FeedItem feedItem, User user)
         {
             var db = _dbFactory.CreateDbContext();
-            db.UserFavorites.Add(new ServerCore.Models.UserFavorite
+            var feedItemId = feedItem.PermentLink.Sha256();
+            var userFeedItem = await db.UserFeedItems.FindAsync(user.Id, feedItemId);
+            if (userFeedItem == null)
             {
-                UserId = user.Id,
-                FavoriteItemIdHash = feedItem.PermentLink.Md5(),
-                FeedItemId = feedItem.PermentLink.Sha256()
-            });
+                db.UserFeedItems.Add(new UserFeedItem
+                {
+                    UserId = user.Id,
+                    FeedItemId = feedItemId,
+                    IsFavorite = true,
+                });
+            }
+            else
+            {
+                userFeedItem.IsFavorite = true;
+            }
             await db.SaveChangesAsync();
         }
 
@@ -90,20 +100,19 @@ namespace FeedReader.WebApi.Processors
         {
             // Remove from the star items table.
             var db = _dbFactory.CreateDbContext();
-            var favoritItem = new ServerCore.Models.UserFavorite
+            var feedItemId = feedItemPermentLink.Sha256();
+            var userFeedItem = await db.UserFeedItems.FindAsync(user.Id, feedItemId);
+            if (userFeedItem != null)
             {
-                UserId = user.Id,
-                FavoriteItemIdHash = feedItemPermentLink.Md5()
-            };
-            db.UserFavorites.Attach(favoritItem);
-            db.UserFavorites.Remove(favoritItem);
-            await db.SaveChangesAsync();
+                userFeedItem.IsFavorite = false;
+                await db.SaveChangesAsync();
+            }
         }
 
         public async Task<List<ServerCore.Models.FeedItem>> GetStaredFeedItemsAsync(string nextRowKey, User user)
         {
             var db = _dbFactory.CreateDbContext();
-            return await db.UserFavorites.Where(f => f.UserId == user.Id).Include(f => f.FeedItem).ThenInclude(f => f.Feed).Select(f => f.FeedItem).ToListAsync();
+            return await db.UserFeedItems.Where(f => f.UserId == user.Id && f.IsFavorite).Include(f => f.FeedItem).ThenInclude(f => f.Feed).Select(f => f.FeedItem).ToListAsync();
         }
 
         public async Task MarkItemsAsReaded(User user, string feedUri, DateTime lastReadedTime)

@@ -3,15 +3,17 @@ using System;
 using FeedReader.ServerCore.Datas;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace FeedReader.ServerCore.Migrations
 {
     [DbContext(typeof(FeedReaderDbContext))]
-    partial class FeedReaderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210224163559_AddIsFavoriteToUserFeedItemsTable")]
+    partial class AddIsFavoriteToUserFeedItemsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -142,19 +144,23 @@ namespace FeedReader.ServerCore.Migrations
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)");
 
+                    b.Property<string>("FavoriteItemIdHash")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
                     b.Property<string>("FeedItemId")
                         .HasColumnType("character varying(64)");
 
                     b.Property<bool>("IsFavorite")
                         .HasColumnType("boolean");
 
-                    b.HasKey("UserId", "FeedItemId");
+                    b.HasKey("UserId", "FavoriteItemIdHash");
 
                     b.HasIndex("FeedItemId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserFeedItems");
+                    b.ToTable("UserFavorites");
                 });
 
             modelBuilder.Entity("FeedReader.ServerCore.Models.FeedItem", b =>
@@ -189,9 +195,7 @@ namespace FeedReader.ServerCore.Migrations
                 {
                     b.HasOne("FeedReader.ServerCore.Models.FeedItem", "FeedItem")
                         .WithMany()
-                        .HasForeignKey("FeedItemId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("FeedItemId");
 
                     b.Navigation("FeedItem");
                 });
