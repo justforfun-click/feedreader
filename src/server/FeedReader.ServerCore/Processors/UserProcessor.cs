@@ -112,7 +112,13 @@ namespace FeedReader.WebApi.Processors
         public async Task<List<ServerCore.Models.FeedItem>> GetStaredFeedItemsAsync(string nextRowKey, User user)
         {
             var db = _dbFactory.CreateDbContext();
-            return await db.UserFeedItems.Where(f => f.UserId == user.Id && f.IsFavorite).Include(f => f.FeedItem).ThenInclude(f => f.Feed).Select(f => f.FeedItem).ToListAsync();
+            return await db.UserFeedItems
+                .Where(f => f.UserId == user.Id && f.IsFavorite)
+                .Include(f => f.FeedItem)
+                .ThenInclude(f => f.Feed)
+                .OrderByDescending(f => f.FeedItem.PublishTimeInUtc)
+                .Select(f => f.FeedItem)
+                .ToListAsync();
         }
 
         public async Task MarkItemsAsReaded(User user, string feedUri, DateTime lastReadedTime)
