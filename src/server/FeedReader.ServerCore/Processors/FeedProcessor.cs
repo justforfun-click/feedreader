@@ -1,13 +1,10 @@
-﻿using FeedReader.Backend.Share.FeedParsers;
-using FeedReader.ServerCore;
+﻿using FeedReader.ServerCore;
 using FeedReader.ServerCore.Datas;
 using FeedReader.Share;
 using FeedReader.Share.DataContracts;
-using FeedReader.WebApi.Entities;
 using FeedReader.WebApi.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
@@ -37,7 +34,7 @@ namespace FeedReader.WebApi.Processors
             Feed feed = null;
             try
             {
-                var parser = FeedParser.Create(await _httpClient.GetStringAsync(uri));
+                var parser = FeedParser.FeedParser.Create(await _httpClient.GetStringAsync(uri));
                 feed = parser.ParseFeedInfo().ToFeed();
                 if (!noItems)
                 {
@@ -148,12 +145,12 @@ namespace FeedReader.WebApi.Processors
             if (user != null)
             {
                 // Mark stared or not
-                var staredHashs = db.UserFavorites.Where(f => f.UserId == user.Id).Select(f => f.FavoriteItemIdHash).ToList();
-                if (staredHashs.Count > 0)
+                var favorites = db.UserFeedItems.Where(f => f.UserId == user.Id && f.IsFavorite).Select(f => f.FeedItemId).ToList();
+                if (favorites.Count > 0)
                 {
                     foreach (var feedItem in feed.Items)
                     {
-                        if (staredHashs.Contains(Share.Utils.Md5(feedItem.PermentLink)))
+                        if (favorites.Find(id => id == feedItem.PermentLink.Sha256()) != null)
                         {
                             feedItem.IsStared = true;
                         }

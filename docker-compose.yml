@@ -49,3 +49,11 @@ services:
 
   redis:
     image: redis:6.0
+
+  pgAdmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=test@test.com
+      - PGADMIN_DEFAULT_PASSWORD=test
+    ports:
+      - 8080:80

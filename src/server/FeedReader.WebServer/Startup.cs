@@ -1,16 +1,11 @@
 ﻿using AspNetCore.Proxy;
-using FeedReader.Server.Services;
-using FeedReader.ServerCore.Datas;
-using FeedReader.WebApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 using System.Threading.Tasks;
 
-namespace FeedReader.Server
+namespace FeedReader.WebServer
 {
     public class Startup
     {
@@ -20,14 +15,10 @@ namespace FeedReader.Server
         {
             services.AddGrpc(options =>
             {
-                options.Interceptors.Add<GrpcExceptionInterceptor>();
+                options.Interceptors.Add<APIs.GrpcApiExceptionInterceptor>();
             });
             services.AddProxies();
-            services.AddSingleton<AuthService>();
             services.AddFeedReaderServerCoreServices();
-
-            var dbConns = Environment.GetEnvironmentVariable(Consts.ENV_KEY_FEEDREADER_DB_CONNECTION_STRING);
-            services.AddDbContextFactory<ServerCore.Datas.FeedReaderDbContext>(options => options.UseNpgsql(dbConns));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -76,7 +67,7 @@ namespace FeedReader.Server
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcService<ApiService>().EnableGrpcWeb();
+                endpoints.MapGrpcService<APIs.GrpcApi>().EnableGrpcWeb();
 
                 endpoints.MapFallbackToFile("index.html");
             });

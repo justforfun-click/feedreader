@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
-namespace FeedReader.Server
+namespace FeedReader.WebServer
 {
     public class Program
     {

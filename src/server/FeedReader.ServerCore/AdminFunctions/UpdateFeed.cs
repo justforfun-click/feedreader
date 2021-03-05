@@ -2,7 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Net.Http;
-using FeedReader.Backend.Share.FeedParsers;
 using FeedReader.WebApi.Processors;
 using System.Net.Http.Headers;
 using FeedReader.WebApi.Extensions;
@@ -62,7 +61,7 @@ namespace FeedReader.WebApi.AdminFunctions
             var feedContent = await httpClient.GetStringAsync(feedOriginalUri);
 
             // Create parser.
-            var parser = FeedParser.Create(feedContent);
+            var parser = FeedParser.FeedParser.Create(feedContent);
 
             // Parse feed info.
             var feedInfo = parser.ParseFeedInfo();

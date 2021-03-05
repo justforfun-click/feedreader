@@ -4,9 +4,9 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace FeedReader.Server
+namespace FeedReader.WebServer.APIs
 {
-    public class GrpcExceptionInterceptor : Interceptor
+    public class GrpcApiExceptionInterceptor : Interceptor
     {
         public override async Task<TResponse> UnaryServerHandler<TRequest, TResponse>(TRequest request, ServerCallContext context, UnaryServerMethod<TRequest, TResponse> continuation)
         {

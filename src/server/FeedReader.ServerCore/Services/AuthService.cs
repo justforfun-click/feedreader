@@ -1,4 +1,5 @@
-﻿using JWT;
+﻿using FeedReader.ServerCore.Models;
+using JWT;
 using JWT.Algorithms;
 using JWT.Builder;
 using Newtonsoft.Json;
@@ -10,11 +11,15 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using User = FeedReader.ServerCore.Models.User;
 
-namespace FeedReader.Server.Services
+namespace FeedReader.ServerCore.Services
 {
-    public class AuthService
+    public interface IAuthService
+    {
+        Task<User> AuthenticateTokenAsync(string token);
+    }
+
+    class AuthService : IAuthService
     {
         public async Task<User> AuthenticateTokenAsync(string token)
         {
