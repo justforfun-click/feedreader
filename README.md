@@ -17,17 +17,12 @@ Website: https://feedreader.org
 
 ## Get Started
 
-1. Install [VS 2019](https://visualstudio.microsoft.com/vs/). Community version is good enough.
-   Install `ASP.NET and web development` workload. Make sure `Cloud tools for web development` is also selected.
-
 1. Install [DotNet 5.0](https://dotnet.microsoft.com/download/dotnet/5.0).
+
+1. Install [VS 2019](https://visualstudio.microsoft.com/vs/) (not required, but recommend).
 
 1. Use the following command to clone the source code:
 
-        git clone https://github.com/feedreaderorg/feedreader.git
+        git clone https://github.com/feedreaderorg/feedreader.git --recursive
 
-1. Start `Microsfot Azure Storage Emulator` from start menu. Or you can run the following command directly:
-
-        C:\Program Files (x86)\Microsoft SDKs\Azure\Storage Emulator>AzureStorageEmulator.exe start
-
-1. Launch `FeedReader.Server` project. Open browser and navigate to `https://localhost`.
+1. Select `docker-compose` as start project, press `F5`, open browser and navigate to `http://localhost`.
