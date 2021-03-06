@@ -5,10 +5,10 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using FeedReader.ClientCore.Models;
+using FeedReader.Protos;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 using static FeedReader.Protos.FeedReaderServerApi;
-using FeedCategory = FeedReader.Share.DataContracts.FeedCategory;
 
 namespace FeedReader.WebClient.Services
 {
@@ -85,6 +85,21 @@ namespace FeedReader.WebClient.Services
                 Page = page
             });
 
+            var items = response.FeedItems.Select(f => new FeedItem
+            {
+                Content = f.Content,
+                IsReaded = f.IsReaded,
+                IsStared = f.IsStared,
+                PermentLink = f.PermentLink,
+                PubDate = f.PubDate.ToDateTime().AddMinutes(TimezoneOffset),
+                Summary = f.Summary,
+                Title = f.Title,
+                TopicPictureUri = f.TopicPictureUri,
+                FeedUri = response.FeedInfo.Uri,
+                FeedIconUri = response.FeedInfo.IconUri,
+                FeedName = response.FeedInfo.Name,
+            }).ToList();
+
             var feed = new Feed
             {
                 Description = response.FeedInfo.Description,
@@ -94,22 +109,12 @@ namespace FeedReader.WebClient.Services
                 OriginalUri = response.FeedInfo.OriginalUri,
                 Uri = response.FeedInfo.Uri,
                 WebsiteLink = response.FeedInfo.WebsiteLink,
-                Items = response.FeedItems.Select(f => new FeedItem
+                Items = new FeedItems
                 {
-                    Content = f.Content,
-                    IsReaded = f.IsReaded,
-                    IsStared = f.IsStared,
-                    PermentLink = f.PermentLink,
-                    PubDate = f.PubDate.ToDateTime().AddMinutes(TimezoneOffset),
-                    Summary = f.Summary,
-                    Title = f.Title,
-                    TopicPictureUri = f.TopicPictureUri,
-                    FeedUri = response.FeedInfo.Uri,
-                    FeedIconUri = response.FeedInfo.IconUri,
-                    FeedName = response.FeedInfo.Name,
-                }).ToList(),
+                    Items = items,
+                    NextPage = items.Count == 50 ? page + 1 : 0
+                }
             };
-            feed.NextItemsPage = feed.Items.Count == 50 ? page + 1 : 0;
             return feed;
         }
 
@@ -158,38 +163,10 @@ namespace FeedReader.WebClient.Services
         {
             var res = await _apiClient.GetFeedsByCategoryAsync(new Protos.GetFeedsByCategoryRequest
             {
-                Category = GetProtosFeedCategory(feedCategory),
+                Category = feedCategory,
                 Page = page
             });
             return res.FeedItems.Select(f => GetFeedItem(f)).ToList();
-        }
-
-        private Protos.FeedCategory GetProtosFeedCategory(FeedCategory category)
-        {
-            switch (category)
-            {
-                default:
-                case FeedCategory.Recommended:
-                    return Protos.FeedCategory.Default;
-
-                case FeedCategory.News:
-                    return Protos.FeedCategory.News;
-
-                case FeedCategory.Technology:
-                    return Protos.FeedCategory.Technology;
-
-                case FeedCategory.Business:
-                    return Protos.FeedCategory.Business;
-
-                case FeedCategory.Sports:
-                    return Protos.FeedCategory.Sport;
-
-                case FeedCategory.Art:
-                    return Protos.FeedCategory.Art;
-
-                case FeedCategory.Kids:
-                    return Protos.FeedCategory.Kids;
-            }
         }
 
         private Feed GetFeed(Protos.FeedInfo f)

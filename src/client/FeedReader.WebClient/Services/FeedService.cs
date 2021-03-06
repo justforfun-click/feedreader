@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using FeedCategory = FeedReader.Share.DataContracts.FeedCategory;
 using FeedReader.ClientCore.Models;
+using FeedReader.Protos;
 
 namespace FeedReader.WebClient.Services
 {
@@ -22,7 +22,7 @@ namespace FeedReader.WebClient.Services
 
         public async Task RefreshFeedAsync(Feed feed, bool more = false)
         {
-            var res = await _api.RefreshFeed(feed.Uri, more ? feed.NextItemsPage : 0);
+            var res = await _api.RefreshFeed(feed.Uri, more ? feed.Items.NextPage : 0);
             if (string.IsNullOrWhiteSpace(feed.Name))
             {
                 // Only update name if we don't have customized name.
@@ -32,25 +32,25 @@ namespace FeedReader.WebClient.Services
             feed.WebsiteLink = res.WebsiteLink;
             feed.Description = res.Description;
             feed.Error = res.Error;
-            feed.NextItemsPage = res.NextItemsPage;
+            feed.Items.NextPage = res.Items.NextPage;
 
             if (res.Items != null)
             {
                 if (!more)
                 {
-                    feed.Items.Clear();
+                    feed.Items.Items.Clear();
                 }
-                feed.Items.AddRange(res.Items);
+                feed.Items.Items.AddRange(res.Items.Items);
             }
             RefreshRequested?.Invoke();
         }
 
         public void MarkFeedAllItemsAsReadedAsync(Feed feed)
         {
-            if (feed.Items != null && feed.Items.Count > 0)
+            if (feed.Items != null && feed.Items.Items.Count > 0)
             {
-                _ = _api.MarkAsReaded(feed.Uri, feed.Items[0].PubDate);
-                feed.Items.ForEach(i => i.IsReaded = true);
+                _ = _api.MarkAsReaded(feed.Uri, feed.Items.Items[0].PubDate);
+                feed.Items.Items.ForEach(i => i.IsReaded = true);
                 RefreshRequested?.Invoke();
             }
         }

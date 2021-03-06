@@ -213,34 +213,6 @@ namespace FeedReader.WebServer.APIs
             }
         }
 
-        private Share.DataContracts.FeedCategory GetDataContractsFeedCategory(FeedCategory category)
-        {
-            switch (category)
-            {
-                default:
-                case FeedCategory.Default:
-                    return Share.DataContracts.FeedCategory.Recommended;
-
-                case FeedCategory.Art:
-                    return Share.DataContracts.FeedCategory.Art;
-
-                case FeedCategory.Business:
-                    return Share.DataContracts.FeedCategory.Business;
-
-                case FeedCategory.News:
-                    return Share.DataContracts.FeedCategory.News;
-
-                case FeedCategory.Sport:
-                    return Share.DataContracts.FeedCategory.Sports;
-
-                case FeedCategory.Technology:
-                    return Share.DataContracts.FeedCategory.Technology;
-
-                case FeedCategory.Kids:
-                    return Share.DataContracts.FeedCategory.Kids;
-            }
-        }
-
         private FeedInfo GetFeedInfo(ServerCore.Models.UserFeed userFeed)
         {
             var feed = userFeed.Feed;
