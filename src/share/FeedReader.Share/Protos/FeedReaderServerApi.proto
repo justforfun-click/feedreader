@@ -64,14 +64,12 @@ message GetFeedsByCategoryResponse
 
 message GetStaredFeedItemsRequest
 {
-    string NextRowKey = 1;
+    int32 Page = 1;
 }
 
 message GetStaredFeedItemsResponse
 {
     repeated FeedItemMessageWithFeedInfo FeedItems = 1;
-
-    string NextRowKey = 2;
 }
 
 message StarFeedItemRequest

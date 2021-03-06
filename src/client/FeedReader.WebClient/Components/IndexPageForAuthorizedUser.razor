@@ -217,8 +217,9 @@
 
         RightPanelContent = @<WaitingPage Text="Loading..."/>;
 
-        var staredFeedItems = await LocalUser.GetStaredFeedItems();
-        RightPanelContent = @<ShowStaredFeedItems StaredFeedItems="@staredFeedItems"/>;
+        // TODO: enable page.
+        var staredFeedItems = await LocalUser.GetStaredFeedItems(page: 0);
+        RightPanelContent = @<ShowStaredFeedItems StaredFeedItems="@staredFeedItems.Items"/>;
 
         StateHasChanged();
     }

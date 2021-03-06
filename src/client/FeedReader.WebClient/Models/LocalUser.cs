@@ -193,10 +193,10 @@ namespace FeedReader.WebClient.Models
             }
         }
 
-        public async Task<List<FeedItem>> GetStaredFeedItems()
+        public async Task<FeedItems> GetStaredFeedItems(int page)
         {
-            var items = await _api.GetStaredFeedItems();
-            items.ForEach(i => i.IsStared = true);
+            var items = await _api.GetStaredFeedItems(page);
+            items.Items.ForEach(i => i.IsStared = true);
             return items;
         }
     }

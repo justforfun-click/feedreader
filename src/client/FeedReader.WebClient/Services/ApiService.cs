@@ -139,20 +139,19 @@ namespace FeedReader.WebClient.Services
             });
         }
 
-        public async Task<List<FeedItem>> GetStaredFeedItems()
+        public async Task<FeedItems> GetStaredFeedItems(int page)
         {
             var res = await _apiClient.GetStaredFeedItemsAsync(new Protos.GetStaredFeedItemsRequest
             {
-                // TODO
-                NextRowKey = string.Empty
+                Page = page
             });
 
             var feedItems = res.FeedItems.Select(f => GetFeedItem(f)).ToList();
-            if (feedItems.Count > 0)
+            return new FeedItems
             {
-                feedItems.Last().NextRowKey = res.NextRowKey;
-            }
-            return feedItems;
+                Items = feedItems,
+                NextPage = feedItems.Count == 50 ? page + 1 : 0
+            };
         }
 
         public async Task<List<FeedItem>> GetFeedItemsByCategory(FeedCategory feedCategory, int page)

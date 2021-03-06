@@ -95,12 +95,11 @@ namespace FeedReader.WebServer.APIs
             try
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                var items = await _userService.GetStaredFeedItemsAsync(user, request.NextRowKey);
+                var items = await _userService.GetStaredFeedItemsAsync(user, request.Page);
                 var response = new GetStaredFeedItemsResponse();
                 if (items.Count > 0)
                 {
                     response.FeedItems.AddRange(items.Select(f => GetFeedItemMessageWithFeedInfo(f)));
-                    response.NextRowKey = string.Empty;
                 }
                 return response;
             }
