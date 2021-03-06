@@ -114,7 +114,8 @@ namespace FeedReader.WebApi.Processors
             var db = _dbFactory.CreateDbContext();
             return await db.UserFeedItems
                 .Where(f => f.UserId == user.Id && f.IsFavorite)
-                .Take(page * 50)
+                .Skip(page * 50)
+                .Take(50)
                 .Include(f => f.FeedItem)
                 .ThenInclude(f => f.Feed)
                 .OrderByDescending(f => f.FeedItem.PublishTimeInUtc)
