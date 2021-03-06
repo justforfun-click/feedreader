@@ -78,7 +78,7 @@ namespace FeedReader.WebApi.AdminFunctions
                     }
                     else
                     {
-                        uri = new Uri(feedInfo.OriginalUri).GetLeftPart(UriPartial.Authority);
+                        uri = new Uri(feedOriginalUri).GetLeftPart(UriPartial.Authority);
                     }
 
                     var response = await httpClient.GetAsync(uri);
@@ -100,7 +100,7 @@ namespace FeedReader.WebApi.AdminFunctions
                 string uri = null;
                 try
                 {
-                    var uriBuilder = new UriBuilder(string.IsNullOrWhiteSpace(feedInfo.WebsiteLink) ? feedInfo.OriginalUri : feedInfo.WebsiteLink);
+                    var uriBuilder = new UriBuilder(string.IsNullOrWhiteSpace(feedInfo.WebsiteLink) ? feedOriginalUri : feedInfo.WebsiteLink);
                     uriBuilder.Path = "/favicon.ico";
                     uri = uriBuilder.Uri.ToString();
                     var response = await httpClient.GetAsync(uriBuilder.Uri);
