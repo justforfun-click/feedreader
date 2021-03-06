@@ -95,12 +95,11 @@ namespace FeedReader.WebServer.APIs
             try
             {
                 var user = await _authService.AuthenticateTokenAsync(context.RequestHeaders.Get("authentication")?.Value);
-                var items = await _userService.GetStaredFeedItemsAsync(user, request.NextRowKey);
+                var items = await _userService.GetStaredFeedItemsAsync(user, request.Page);
                 var response = new GetStaredFeedItemsResponse();
                 if (items.Count > 0)
                 {
                     response.FeedItems.AddRange(items.Select(f => GetFeedItemMessageWithFeedInfo(f)));
-                    response.NextRowKey = string.Empty;
                 }
                 return response;
             }
@@ -211,34 +210,6 @@ namespace FeedReader.WebServer.APIs
             catch (UnauthorizedAccessException)
             {
                 throw new RpcException(new Status(StatusCode.Unauthenticated, "Unauthenticated"));
-            }
-        }
-
-        private Share.DataContracts.FeedCategory GetDataContractsFeedCategory(FeedCategory category)
-        {
-            switch (category)
-            {
-                default:
-                case FeedCategory.Default:
-                    return Share.DataContracts.FeedCategory.Recommended;
-
-                case FeedCategory.Art:
-                    return Share.DataContracts.FeedCategory.Art;
-
-                case FeedCategory.Business:
-                    return Share.DataContracts.FeedCategory.Business;
-
-                case FeedCategory.News:
-                    return Share.DataContracts.FeedCategory.News;
-
-                case FeedCategory.Sport:
-                    return Share.DataContracts.FeedCategory.Sports;
-
-                case FeedCategory.Technology:
-                    return Share.DataContracts.FeedCategory.Technology;
-
-                case FeedCategory.Kids:
-                    return Share.DataContracts.FeedCategory.Kids;
             }
         }
 

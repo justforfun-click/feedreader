@@ -14,7 +14,7 @@ namespace FeedReader.ServerCore.Services
         Task<User> Login(User user);
         Task MarkItemsAsReaded(User user, string feedUri, DateTime datatimeInUtc);
         Task<Share.DataContracts.Feed> GetFeedItemsAsync(User user, string feedUri, int page);
-        Task<List<FeedItem>> GetStaredFeedItemsAsync(User user, string nextRowKey);
+        Task<List<FeedItem>> GetStaredFeedItemsAsync(User user, int page);
         Task StarFeedItemAsync(User user, Protos.FeedItemMessageWithFeedInfo feedItem);
         Task UnstarFeedItemAsync(User user, string feedItemUri, DateTime publishDateInUtc);
         Task<Share.DataContracts.Feed> SubscribeFeedAsync(User user, string feedUri, string group);
@@ -36,9 +36,9 @@ namespace FeedReader.ServerCore.Services
             return new FeedProcessor(_dbFactory).GetFeedItemsAsync(feedUri, page, user);
         }
 
-        public Task<List<FeedItem>> GetStaredFeedItemsAsync(User user, string nextRowKey)
+        public Task<List<FeedItem>> GetStaredFeedItemsAsync(User user, int page)
         {
-            return new UserProcessor(_dbFactory).GetStaredFeedItemsAsync(nextRowKey, user);
+            return new UserProcessor(_dbFactory).GetStaredFeedItemsAsync(page, user);
         }
 
         public Task<User> Login(User user)

@@ -26,12 +26,6 @@ namespace FeedReader.Share.DataContracts
         public string FeedIconUri { get; set; }
 
         public string FeedName { get; set; }
-
-        /// <summary>
-        ///  This property only avaliable on the last returned item.
-        ///  If it is null or empty, which means no more items.
-        /// </summary>
-        public string NextRowKey { get; set; }
         #endregion
     }
 }

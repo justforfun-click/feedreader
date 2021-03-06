@@ -11,8 +11,6 @@ namespace FeedReader.WebApi.Extensions
                 Description = feedInfo.Description,
                 IconUri = feedInfo.IconUri,
                 Name = feedInfo.Name,
-                OriginalUri = feedInfo.OriginalUri,
-                Uri = feedInfo.Uri,
                 WebsiteLink = feedInfo.WebsiteLink,
             };
         }

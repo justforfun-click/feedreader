@@ -109,11 +109,13 @@ namespace FeedReader.WebApi.Processors
             }
         }
 
-        public async Task<List<ServerCore.Models.FeedItem>> GetStaredFeedItemsAsync(string nextRowKey, User user)
+        public async Task<List<ServerCore.Models.FeedItem>> GetStaredFeedItemsAsync(int page, User user)
         {
             var db = _dbFactory.CreateDbContext();
             return await db.UserFeedItems
                 .Where(f => f.UserId == user.Id && f.IsFavorite)
+                .Skip(page * 50)
+                .Take(50)
                 .Include(f => f.FeedItem)
                 .ThenInclude(f => f.Feed)
                 .OrderByDescending(f => f.FeedItem.PublishTimeInUtc)

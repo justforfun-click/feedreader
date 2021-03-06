@@ -2,17 +2,6 @@
 
 namespace FeedReader.Share.DataContracts
 {
-    public enum FeedCategory
-    {
-        Recommended,
-        News,
-        Technology,
-        Business,
-        Sports,
-        Art,
-        Kids
-    }
-
     public class Feed
     {
         public string Uri { get; set; }

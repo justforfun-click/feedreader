@@ -2,8 +2,12 @@
 
 namespace FeedReader.ClientCore.Models
 {
-    public class User : Share.DataContracts.User
+    public class User
     {
-        public new List<Feed> Feeds { get; set; }
+        public string Token { get; set; }
+
+        public string Uuid { get; set; }
+
+        public List<Feed> Feeds { get; set; }
     }
 }

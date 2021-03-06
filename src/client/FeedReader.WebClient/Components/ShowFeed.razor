@@ -7,18 +7,18 @@
         {
             <div class="error">Error: @Feed.Error</div>
         }
-        else if (Feed.Items.Count == 0)
+        else if (Feed.Items.Items.Count == 0)
         {
             <WaitingPage Text="Loading..."/>
         }
         else
         {
-            foreach (var item in Feed.Items)
+            foreach (var item in Feed.Items.Items)
             {
                 <FeedItemThumbnail FeedItem=@item></FeedItemThumbnail>
             }
 
-            @if (Feed.NextItemsPage != 0)
+            @if (Feed.Items.NextPage != 0)
             {
                 <FeedItemThumbnail More="More"></FeedItemThumbnail>
             }
