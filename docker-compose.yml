@@ -51,9 +51,11 @@ services:
     image: redis:6.0
 
   pgAdmin:
-    image: dpage/pgadmin4
+    image: dpage/pgadmin4:5
     environment:
       - PGADMIN_DEFAULT_EMAIL=test@test.com
       - PGADMIN_DEFAULT_PASSWORD=test
     ports:
       - 8080:80
+    volumes:
+      - ${APPDATA}/feedreader/pgadmin:/var/lib/pgadmin
