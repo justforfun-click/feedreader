@@ -4,6 +4,8 @@ using FeedReader.WebApi;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using SolrNet;
+using Solrs = FeedReader.ServerCore.Models.Solrs;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -28,6 +30,10 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 options.ConfigurationOptions = StackExchange.Redis.ConfigurationOptions.Parse(redisConnectionString);
             });
+
+            // Add solr service.
+            var solrFeedItemConnectionString = Environment.GetEnvironmentVariable(Consts.ENV_KEY_FEEDREADER_SOLR_FEEDITEM_CONNECTION_STRING);
+            sc.AddSolrNet<Solrs.FeedItem>(solrFeedItemConnectionString);
 
             // Add feed service.
             sc.AddSingleton<IAuthService, AuthService>();

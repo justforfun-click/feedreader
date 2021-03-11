@@ -5,7 +5,7 @@ using System.Text;
 
 namespace FeedReader.Share
 {
-    public static class Utils
+    public class Utils
     {
         public static string Md5(string input)
         {

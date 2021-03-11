@@ -1,6 +1,5 @@
 ﻿using FeedReader.ServerCore;
 using FeedReader.ServerCore.Datas;
-using FeedReader.Share;
 using FeedReader.Share.DataContracts;
 using FeedReader.WebApi.Extensions;
 using Microsoft.EntityFrameworkCore;

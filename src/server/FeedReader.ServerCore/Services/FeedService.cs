@@ -6,12 +6,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using SolrNet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Solrs = FeedReader.ServerCore.Models.Solrs;
 
 namespace FeedReader.ServerCore.Services
 {
@@ -27,13 +29,15 @@ namespace FeedReader.ServerCore.Services
         private readonly IDistributedCache _remoteCache;
         private readonly IMemoryCache _memCache;
         private readonly ILogger _logger;
+        private readonly ISolrOperations<Solrs.FeedItem> _solrFeedItems;
 
-        public FeedService(IDbContextFactory<FeedReaderDbContext> dbFactory, IDistributedCache remoteCache, IMemoryCache memCache, ILogger<FeedService> logger)
+        public FeedService(IDbContextFactory<FeedReaderDbContext> dbFactory, ISolrOperations<Solrs.FeedItem> solrFeedItems, IDistributedCache remoteCache, IMemoryCache memCache, ILogger<FeedService> logger)
         {
             _dbFactory = dbFactory;
             _remoteCache = remoteCache;
             _memCache = memCache;
             _logger = logger;
+            _solrFeedItems = solrFeedItems;
         }
 
         /// <summary>
@@ -44,7 +48,7 @@ namespace FeedReader.ServerCore.Services
             // Update all feeds first.
             try
             {
-                await UpdateFeedFunc.UpdateFeeds(_dbFactory, cancellationToken, _logger);
+                await UpdateFeedFunc.UpdateFeeds(_dbFactory, _solrFeedItems, cancellationToken, _logger);
             }
             catch (Exception ex)
             {
