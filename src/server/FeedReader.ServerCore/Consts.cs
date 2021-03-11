@@ -47,6 +47,8 @@ namespace FeedReader.WebApi
 
         public const string ENV_KEY_FEEDREADER_REDIS_CONNECTION_STRING = "FeedreaderRedisConnectionString";
 
+        public const string ENV_KEY_FEEDREADER_SOLR_FEEDITEM_CONNECTION_STRING = "FeedReaderSolrFeedItemConnectionString";
+
         public const string CACHE_KEY_LATEST_FEEDITEMS_CATEGORY_PREFIX = "Feedreader.Latest.FeedItems.Category.";
     }
 }

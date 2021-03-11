@@ -8,12 +8,14 @@ using FeedReader.WebApi.Extensions;
 using Microsoft.EntityFrameworkCore;
 using FeedReader.ServerCore.Datas;
 using System.Threading;
+using Solrs = FeedReader.ServerCore.Models.Solrs;
+using SolrNet;
 
 namespace FeedReader.WebApi.AdminFunctions
 {
     public static class UpdateFeedFunc
     {
-        public static async Task UpdateFeeds(IDbContextFactory<FeedReaderDbContext> dbFactory, CancellationToken cancellationToken, ILogger logger)
+        public static async Task UpdateFeeds(IDbContextFactory<FeedReaderDbContext> dbFactory, ISolrOperations<Solrs.FeedItem> solrFeedItems, CancellationToken cancellationToken, ILogger logger)
         {
             var db = dbFactory.CreateDbContext();
             int count = 0;
@@ -26,7 +28,7 @@ namespace FeedReader.WebApi.AdminFunctions
 
                 try
                 {
-                    await UpdateFeed(dbFactory, feed, logger);
+                    await UpdateFeed(dbFactory, solrFeedItems, feed, logger);
                 }
                 catch (Exception ex)
                 {
@@ -41,7 +43,7 @@ namespace FeedReader.WebApi.AdminFunctions
             await db.SaveChangesAsync();
         }
 
-        public static async Task UpdateFeed(IDbContextFactory<FeedReaderDbContext> dbFactory, ServerCore.Models.Feed feed, ILogger log, HttpClient httpClient = null)
+        public static async Task UpdateFeed(IDbContextFactory<FeedReaderDbContext> dbFactory, ISolrOperations<Solrs.FeedItem> solrFeedItems, ServerCore.Models.Feed feed, ILogger log, HttpClient httpClient = null)
         {
             log.LogInformation($"UpdateFeed: {feed.Uri}");
 
@@ -132,7 +134,7 @@ namespace FeedReader.WebApi.AdminFunctions
                 var feedItemId = item.PermentLink.Sha256();
                 if (await db.FeedItems.FindAsync(feedItemId) == null)
                 {
-                    db.FeedItems.Add(new ServerCore.Models.FeedItem
+                    var feedItem = new ServerCore.Models.FeedItem
                     {
                         Content = item.Content,
                         FeedId = feed.Id,
@@ -142,10 +144,22 @@ namespace FeedReader.WebApi.AdminFunctions
                         Title = item.Title,
                         TopicPictureUri = item.TopicPictureUri,
                         Uri = item.PermentLink
-                    });
+                    };
+                    db.FeedItems.Add(feedItem);
+                    solrFeedItems.Add(new Solrs.FeedItem(feedItem, feed));
                 }
             }
             await db.SaveChangesAsync();
+
+            // Save to solrs
+            try
+            {
+                await solrFeedItems.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                log.LogError($"Save to solrs failed. ex: {ex.Message}");
+            }
 
             log.LogInformation($"UpdateFeed: {feed.Uri} finished");
         }
