@@ -12,69 +12,41 @@
         </div>
     }
 
-    @if (Feed == null)
-    {
-        <div class="feed-description">
-            <div class="icon">
-                <img src="/img/iconfinder_Flurry_Google_Reader_Alt_176646.png"/>
-            </div>
-            <div class="name-and-description">
-                <a class="name" href="/"><span>FeedReader</span></a>
-                <a class="description" href="/"><span>Read, Think, Share .... </span></a>
-            </div>
-            @if (LocalUser.IsAuthorized)
-            {
-                <div class="toolbar only-for-mobile">
-                    <DropdownButton Text="Add New Feed" OnClick="AddNewFeed">
-                        <MenuContent>
-                            <li @onclick="ShowExplorer">Explorer</li>
-                            <li @onclick="ShowStars">Stars</li>
-                            <li @onclick="Logout">Logout</li>
-                        </MenuContent>
-                    </DropdownButton>
-                </div>
+    <div class="feed-description">
+        <div class="icon">
+            <img src="/img/iconfinder_Flurry_Google_Reader_Alt_176646.png"/>
+        </div>
+        <div class="name-and-description">
+            <a class="name" href="/"><span>FeedReader</span></a>
+            <a class="description" href="/"><span>Read, Think, Share .... </span></a>
+        </div>
+    </div>
 
-                <div class="toolbar only-for-desktop">
-                    <DropdownButton Text="Logout" OnClick="Logout"/>
-                </div>
-            }
-            else
-            {
-                <div class="toolbar">
-                    <DropdownButton Text="Login" OnClick="Login"/>
-                </div>
-            }
+    <div class="search">
+        <input placeholder="Search for feed or feed items." />
+        <i class="btn fas fa-search"></i>
+    </div>
+
+    @if (LocalUser.IsAuthorized)
+    {
+        <div class="toolbar only-for-mobile">
+            <DropdownButton Text="Add New Feed" OnClick="AddNewFeed">
+                <MenuContent>
+                    <li @onclick="ShowExplorer">Explorer</li>
+                    <li @onclick="ShowStars">Stars</li>
+                    <li @onclick="Logout">Logout</li>
+                </MenuContent>
+            </DropdownButton>
+        </div>
+
+        <div class="toolbar only-for-desktop">
+            <DropdownButton Text="Logout" OnClick="Logout"/>
         </div>
     }
     else
     {
-        <div class="feed-description">
-            <div class="icon">
-                <FallbackImage Src="@WebClient.Utils.SafeImageUri(Feed.IconUri)" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(Feed.Uri).Host}")"/>
-            </div>
-            <div class="name-and-description">
-                <a class="name" href="@WebsiteLink" title="@Name" target="_blank"><span>@Name</span></a>
-                <a class="description" href="@Uri" target="_blank" title="@Description"><span>@Description</span></a>
-            </div>
-            <div class="toolbar">
-                @if (LocalUser.IsAuthorized)
-                {
-                    <DropdownButton Text="Mark all as read" OnClick="MarkAllReaded">
-                        <MenuContent>
-                            <li @onclick="Unsubscribe">Unsubscribe</li>
-                            <li @onclick="ChangeGroup">Change Group</li>
-                            <li class="only-for-mobile" @onclick="AddNewFeed">Add New Feed</li>
-                            <li class="only-for-mobile" @onclick="ShowExplorer">Explorer</li>
-                            <li class="only-for-mobile" @onclick="ShowStars">Stars</li>
-                            <li @onclick="Logout">Logout</li>
-                        </MenuContent>
-                    </DropdownButton>
-                }
-                else
-                {
-                    <DropdownButton Text="Login" OnClick="Login"/>
-                }
-            </div>
+        <div class="toolbar">
+            <DropdownButton Text="Login" OnClick="Login"/>
         </div>
     }
 </div>
