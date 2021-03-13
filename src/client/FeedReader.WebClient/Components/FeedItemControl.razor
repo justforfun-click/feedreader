@@ -1,0 +1,31 @@
+﻿<div class="feeditem">
+    <div class="feed">
+        <img class="icon" src="@FeedIconUri"/>
+        <div class="info">
+            <div class="name">@FeedName</div>
+            <div class="publish-time">@FeedItem.PubDate.AddMinutes(Utils.TimezoneOffset)</div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="item-title">@Title</div>
+        <div class="item-content">@Content</div>
+        <img class="item-topic-picture" src="@TopicPicture"/>
+    </div>
+</div>
+
+@code
+{
+    [Parameter]
+    public Feed Feed { get; set; }
+
+    [Parameter]
+    public FeedItem FeedItem { get; set; }
+
+    private string FeedIconUri => Feed?.IconUri ?? FeedItem.FeedIconUri;
+    private string FeedName => Feed?.Name ?? FeedItem.FeedName;
+    private string FeedContent => FeedItem.Content;
+    private string Title => FeedItem.Title;
+    private string Content => FeedItem.Content;
+    private string TopicPicture => FeedItem.TopicPictureUri;
+}

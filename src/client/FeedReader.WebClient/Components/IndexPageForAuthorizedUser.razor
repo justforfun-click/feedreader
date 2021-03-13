@@ -1,4 +1,5 @@
 @implements IDisposable
+@inject FeedReaderClient Client
 @inject FeedService FeedService
 @inject IJSRuntime JsRuntime
 @inject LocalUser LocalUser
@@ -7,7 +8,7 @@
 <MainLayout>
     <Header>
         <PageHeader Feed="@Feed" SideBarBtnPressed="@LeftPanelShow" OnUnsubscribe="Unsubscribe" OnSideBarBtnClick="ToggleSideBar" OnChangeFeedGroup="ChangeFeedGroup"
-                    OnAddNewFeed="@(() => _ = AddNewFeed())" OnShowExplorer="@(() => _ = ShowExplorer())" OnShowStarts="@(() => _ = ShowStars())"/>
+                    OnAddNewFeed="@(() => _ = AddNewFeed())" OnShowExplorer="@(() => _ = ShowExplorer())" OnShowStarts="@(() => _ = ShowStars())" OnSearch="Search"/>
     </Header>
     <ChildContent>
         <div class="authorized-user-page">
@@ -259,6 +260,40 @@
     private async void ChangeFeedGroup(string newGroup)
     {
         await LocalUser.ChangeFeedGroup(Feed, newGroup);
+        StateHasChanged();
+    }
+
+    private async void Search(string keywords)
+    {
+        LocalUser.Feeds.ForEach(f => f.IsActive = false);
+        await JsRuntime.InvokeVoidAsync("eval", $"document.querySelectorAll('.clickable').forEach(e => e.classList.remove('active'));");
+        RightPanelContent = @<WaitingPage Text="Loading..."/>;
+        StateHasChanged();
+        
+        var res = await Client.Search(keywords, 0);
+        if (res.Items.Count > 0)
+        {
+            RightPanelContent =
+    @<div class="search-results">
+        <h3>Search Results</h3>
+        @foreach (var item in res.Items)
+        {
+            <FeedItemControl Feeditem="@item"></FeedItemControl>
+        }
+    </div>
+    ;
+        }
+        else
+        {
+            RightPanelContent =
+    @<div class="search-results">
+        <div class="no-result">
+            <img src="/img/iconfinder_Pacman_Ghost_381615.svg"/>
+            <div class="text">Sorry, your search did not find any results.</div>
+        </div>
+    </div>
+    ;
+        }
         StateHasChanged();
     }
 }

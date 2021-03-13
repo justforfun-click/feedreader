@@ -1,3 +1,4 @@
+using FeedReader.ClientCore;
 using FeedReader.WebClient.Models;
 using FeedReader.WebClient.Services;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -14,11 +15,13 @@ namespace FeedReader.WebClient
         {
             Console.WriteLine($"FeedReader.WebClient: git-version: {ThisAssembly.Git.Commit}");
 
+            var client = new FeedReaderClient();
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
             builder.Services.AddSingleton<LogService>();
             builder.Services.AddSingleton<LocalStorageService>();
-            builder.Services.AddSingleton<ApiService>(new ApiService(builder.HostEnvironment.BaseAddress));
+            builder.Services.AddSingleton<FeedReaderClient>(client);
+            builder.Services.AddSingleton<ApiService>(new ApiService(builder.HostEnvironment.BaseAddress, client));
             builder.Services.AddSingleton<FeedService>();
             builder.Services.AddSingleton<LocalUser>();
             builder.Services.AddAuthorizationCore();
@@ -38,7 +41,7 @@ namespace FeedReader.WebClient
             {
                 apiService.GitHubClientId = "ae3b296154140f9e2153";
             }
-            apiService.TimezoneOffset = await host.Services.GetRequiredService<IJSRuntime>().InvokeAsync<int>("eval", "-new Date().getTimezoneOffset()");
+            Utils.TimezoneOffset = apiService.TimezoneOffset = await host.Services.GetRequiredService<IJSRuntime>().InvokeAsync<int>("eval", "-new Date().getTimezoneOffset()");
             var localUser = host.Services.GetRequiredService<LocalUser>();
             await localUser.InitializeAsync();
             await host.RunAsync();

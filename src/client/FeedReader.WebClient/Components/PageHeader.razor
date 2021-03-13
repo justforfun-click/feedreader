@@ -23,25 +23,44 @@
     </div>
 
     <div class="search">
-        <input placeholder="Search for feed or feed items." />
-        <i class="btn fas fa-search"></i>
+    @if (LocalUser.IsAuthorized)
+    {
+        <input placeholder="Search for feed or feed items." @oninput="e => SearchKeyWords = e.Value.ToString()" @onkeydown="e => OnSearchInputKeyDown(e)" />
+        <i class="btn fas fa-search" @onclick="_ => Search()"></i>
+    }
     </div>
 
     @if (LocalUser.IsAuthorized)
     {
-        <div class="toolbar only-for-mobile">
-            <DropdownButton Text="Add New Feed" OnClick="AddNewFeed">
+        if (Feed == null)
+        {
+            <div class="toolbar only-for-mobile">
+                <DropdownButton Text="New Feed" OnClick="AddNewFeed">
+                    <MenuContent>
+                        <li @onclick="ShowExplorer">Explorer</li>
+                        <li @onclick="ShowStars">Stars</li>
+                        <li @onclick="Logout">Logout</li>
+                    </MenuContent>
+                </DropdownButton>
+            </div>
+
+            <div class="toolbar only-for-desktop">
+                <DropdownButton Text="Logout" OnClick="Logout"/>
+            </div>
+        }
+        else
+        {
+            <DropdownButton Text="Mark read" OnClick="MarkAllReaded">
                 <MenuContent>
-                    <li @onclick="ShowExplorer">Explorer</li>
-                    <li @onclick="ShowStars">Stars</li>
+                    <li @onclick="Unsubscribe">Unsubscribe</li>
+                    <li @onclick="ChangeGroup">Move Group</li>
+                    <li class="only-for-mobile" @onclick="AddNewFeed">New Feed</li>
+                    <li class="only-for-mobile" @onclick="ShowExplorer">Explorer</li>
+                    <li class="only-for-mobile" @onclick="ShowStars">Stars</li>
                     <li @onclick="Logout">Logout</li>
                 </MenuContent>
             </DropdownButton>
-        </div>
-
-        <div class="toolbar only-for-desktop">
-            <DropdownButton Text="Logout" OnClick="Logout"/>
-        </div>
+        }
     }
     else
     {
@@ -76,6 +95,11 @@
 
     [Parameter]
     public Action OnShowStarts { get; set; }
+
+    [Parameter]
+    public Action<string> OnSearch { get; set; }
+
+    private string SearchKeyWords { get; set; }
 
     private string Name
     {
@@ -151,5 +175,21 @@
     private void ShowStars()
     {
         OnShowStarts.Invoke();
+    }
+
+    private void OnSearchInputKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            Search();
+        }
+    }
+
+    private void Search()
+    {
+        if (!string.IsNullOrWhiteSpace(SearchKeyWords))
+        {
+            OnSearch?.Invoke(SearchKeyWords);
+        }
     }
 }

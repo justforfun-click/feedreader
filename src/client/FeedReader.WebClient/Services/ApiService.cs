@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using FeedReader.ClientCore;
 using FeedReader.ClientCore.Models;
 using FeedReader.Protos;
 using Grpc.Net.Client;
@@ -17,18 +18,20 @@ namespace FeedReader.WebClient.Services
         private readonly string _serverAddr;
 
         private FeedReaderServerApiClient _apiClient;
+        private FeedReaderClient _client;
 
         public int TimezoneOffset { get; set; }
 
         public string GitHubClientId { get; set; }
 
-        public ApiService(string serverAddr)
+        public ApiService(string serverAddr, FeedReaderClient client)
         {
             _serverAddr = serverAddr;
 
             var httpHandler = new HttpClientHandler();
             var grpcHandler = new GrpcWebHandler(GrpcWebMode.GrpcWebText, httpHandler);
             _apiClient = new FeedReaderServerApiClient(GrpcChannel.ForAddress(_serverAddr, new GrpcChannelOptions { HttpHandler = grpcHandler }));
+            _client = client;
         }
 
         public async Task<User> LoginAsync(string token)
@@ -42,6 +45,7 @@ namespace FeedReader.WebClient.Services
             httpHandler = new CustomizedHttpClientHandler(user.Token);
             grpcHandler = new GrpcWebHandler(GrpcWebMode.GrpcWebText, httpHandler);
             _apiClient = new FeedReaderServerApiClient(GrpcChannel.ForAddress(_serverAddr, new GrpcChannelOptions { HttpHandler = grpcHandler }));
+            _client.SetApiClient(_apiClient);
             return new User
             {
                 Uuid = user.Uuid,
@@ -57,7 +61,7 @@ namespace FeedReader.WebClient.Services
                 OriginalUri = feed.OriginalUri,
                 Group = feed.Group ?? string.Empty,
             });
-            return GetFeed(feedInfo.Feed);
+            return GetFeed(feedInfo.Feed); 
         }
 
         public async Task UnsubscribeFeed(string feedUri)
