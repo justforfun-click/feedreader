@@ -22,7 +22,7 @@
     [Parameter]
     public FeedItem FeedItem { get; set; }
 
-    private string FeedIconUri => Feed?.IconUri ?? FeedItem.FeedIconUri;
+    private string FeedIconUri => Utils.SafeImageUri(Feed?.IconUri ?? FeedItem.FeedIconUri);
     private string FeedName => Feed?.Name ?? FeedItem.FeedName;
     private string FeedContent => FeedItem.Content;
     private string Title => FeedItem.Title;
