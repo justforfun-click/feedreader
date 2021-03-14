@@ -213,6 +213,17 @@ namespace FeedReader.WebServer.APIs
             }
         }
 
+        public override async Task<SearchResponse> Search(SearchRequest request, ServerCallContext context)
+        {
+            var feedItems = await _feedService.Search(request.KeyWords, request.Page);
+            var response = new SearchResponse();
+            if (feedItems.Count > 0)
+            {
+                response.FeedItems.AddRange(feedItems.Select(f => GetFeedItemMessageWithFeedInfo(f)));
+            }
+            return response;
+        }
+
         private FeedInfo GetFeedInfo(ServerCore.Models.UserFeed userFeed)
         {
             var feed = userFeed.Feed;
@@ -286,7 +297,7 @@ namespace FeedReader.WebServer.APIs
             return new FeedItemMessageWithFeedInfo
             {
                 FeedItem = GetFeedItemMessage(f),
-                FeedUri = f.Feed.Uri,
+                FeedUri = f.Feed.Uri ?? f.Feed.Id,
                 FeedIconUri = f.Feed.IconUri ?? string.Empty,
                 FeedName = f.Feed.Name ?? string.Empty
             };

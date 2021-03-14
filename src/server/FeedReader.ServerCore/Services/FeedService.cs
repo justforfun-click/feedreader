@@ -7,6 +7,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SolrNet;
+using SolrNet.Commands.Parameters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace FeedReader.ServerCore.Services
     {
         Task UpdateFeeds(CancellationToken cancellationToken);
         Task<List<FeedItem>> GetCategoryFeedItems(FeedCategory category, int page);
+        Task<List<FeedItem>> Search(string keywords, int page);
     }
 
     class FeedService : IFeedService
@@ -107,6 +109,17 @@ namespace FeedReader.ServerCore.Services
             return items.Skip(page * 50).Take(50).ToList();
         }
 
+        public async Task<List<FeedItem>> Search(string keywords, int page)
+        {
+            var res = await _solrFeedItems.QueryAsync(new SolrQuery($"content:{keywords}"), new QueryOptions
+            {
+                OrderBy = new [] { new SortOrder("publish_time_in_utc", Order.DESC) },
+                StartOrCursor = new StartOrCursor.Start(page * 50),
+                Rows = 50
+            });
+            return res.Select(s => SolrFeedItemToFeedItem(s)).ToList();
+        }
+
         private async Task<List<FeedItem>> GetCategoryFeedItemsFromDb(FeedCategory category, int skip, int take)
         {
             var db = _dbFactory.CreateDbContext();
@@ -130,6 +143,30 @@ namespace FeedReader.ServerCore.Services
                     .Take(take).ToListAsync();
             }
             return feedItems;
+        }
+
+
+        private FeedItem SolrFeedItemToFeedItem(Solrs.FeedItem s)
+        {
+            var feedItem = new FeedItem
+            {
+                FeedId = s.FeedId.FirstOrDefault(),
+                Feed = new Feed
+                {
+                    Id = s.FeedId.FirstOrDefault(),
+                    IconUri = s.FeedIconUri?.FirstOrDefault(),
+                    Category = s.FeedCategory?.FirstOrDefault(),
+                    Name = s.FeedName?.FirstOrDefault(),
+                },
+                Summary = s.Summary?.FirstOrDefault(),
+                Content = s.Content?.FirstOrDefault(),
+                Title = s.Title?.FirstOrDefault(),
+                Id = s.Id,
+                PublishTimeInUtc = s.PublishTimeInUtc.FirstOrDefault(),
+                TopicPictureUri = s.TopicPictureUri?.FirstOrDefault(),
+                Uri = s.Uri.FirstOrDefault(),
+            };
+            return feedItem;
         }
     }
 }

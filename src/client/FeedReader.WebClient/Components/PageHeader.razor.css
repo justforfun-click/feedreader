@@ -21,10 +21,11 @@
 .page-header > .title a {
   font-size: 20px;
 }
-.page-header > .feed-description {
-  display: flex;
-  flex: 1;
+
+.feed-description {
+    display: flex;
 }
+
 .page-header > .feed-description > div {
   height: 40px;
 }
@@ -36,9 +37,7 @@
 }
 .page-header > .feed-description > .name-and-description span {
   white-space: nowrap;
-  overflow: hidden;
   text-overflow: ellipsis;
-  width: 0;
   flex: 1;
 }
 .page-header > .feed-description > .name-and-description .name {
@@ -56,6 +55,36 @@
   font-size: 14px;
   color: #9f9f9f;
   margin-top: -6px;
+}
+
+.search {
+    display: flex;
+    flex: 1;
+    margin: 0px 20px;
+    position: relative;
+}
+
+.search input {
+    flex: 1;
+    height: 100%;
+    background-color: #f0f2f5;
+    border-radius: 8px;
+    border: 0px;
+    padding: 5px 20px;
+    width: 0px;
+}
+
+.search input:focus {
+    outline: none;
+}
+
+.search .btn {
+    position: absolute;
+    right: 0;
+    padding: 20px;
+    display: flex;
+    height: 100%;
+    align-items: center;
 }
 
 .side-bar-btn {
@@ -84,5 +113,9 @@
 @media (max-width: 600px) {
   .side-bar-btn {
     display: none !important;
+  }
+
+  .name-and-description {
+      display: none !important;
   }
 }

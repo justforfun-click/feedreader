@@ -26,6 +26,8 @@ service FeedReaderServerApi
     rpc UnsubscribeFeed(UnsubscribeFeedRequest) returns (google.protobuf.Empty);
 
     rpc UpdateFeed(UpdateFeedRequest) returns (google.protobuf.Empty);
+
+    rpc Search(SearchRequest) returns (SearchResponse);
 }
 
 message LoginRequest
@@ -106,6 +108,17 @@ message UpdateFeedRequest
     string FeedUri = 1;
 
     string FeedGroup = 3;
+}
+
+message SearchRequest
+{
+    string KeyWords = 1;
+    int32 Page = 2;
+}
+
+message SearchResponse
+{
+    repeated FeedItemMessageWithFeedInfo FeedItems = 1;
 }
 
 enum FeedCategory {

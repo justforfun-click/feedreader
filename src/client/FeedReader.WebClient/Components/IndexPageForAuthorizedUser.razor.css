@@ -268,3 +268,33 @@
   flex: 1;
   overflow: auto;
 }
+
+.search-results {
+    padding: 10px;
+}
+
+.search-results > h3 {
+    padding: 10px 0;
+}
+
+::deep .search-results > div {
+    margin-bottom: 10px;
+}
+
+.no-result {
+    display: flex;
+    padding: 40px;
+}
+
+.no-result img {
+    width: 60px;
+    height: 60px;
+}
+
+.no-result .text {
+    display: flex;
+    font-size: 24px;
+    font-weight: 700;
+    padding-left: 10px;
+    align-items: center;
+}

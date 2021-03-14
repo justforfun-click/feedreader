@@ -1,5 +1,6 @@
 ﻿using SolrNet.Attributes;
 using System;
+using System.Collections.Generic;
 
 namespace FeedReader.ServerCore.Models.Solrs
 {
@@ -9,34 +10,34 @@ namespace FeedReader.ServerCore.Models.Solrs
         public string Id { get; set; }
 
         [SolrField("uri")]
-        public string Uri { get; set; }
+        public ICollection<string> Uri { get; set; }
 
         [SolrField("publish_time_in_utc")]
-        public DateTime PublishTimeInUtc { get; set; }
+        public ICollection<DateTime> PublishTimeInUtc { get; set; }
 
         [SolrField("summary")]
-        public string Summary { get; set; }
+        public ICollection<string> Summary { get; set; }
 
         [SolrField("content")]
-        public string Content { get; set; }
+        public ICollection<string> Content { get; set; }
 
         [SolrField("title")]
-        public string Title { get; set; }
+        public ICollection<string> Title { get; set; }
 
         [SolrField("topic_picture_uri")]
-        public string TopicPictureUri { get; set; }
+        public ICollection<string> TopicPictureUri { get; set; }
 
         [SolrField("feed_id")]
-        public string FeedId { get; set; }
+        public ICollection<string> FeedId { get; set; }
 
         [SolrField("feed_name")]
-        public string FeedName { get; set; }
+        public ICollection<string> FeedName { get; set; }
 
         [SolrField("feed_category")]
-        public string FeedCategory { get; set; }
+        public ICollection<string> FeedCategory { get; set; }
 
         [SolrField("feed_icon_uri")]
-        public string FeedIconUri { get; set; }
+        public ICollection<string> FeedIconUri { get; set; }
 
         public FeedItem()
         {
@@ -45,16 +46,16 @@ namespace FeedReader.ServerCore.Models.Solrs
         public FeedItem(Models.FeedItem feedItem, Models.Feed feed)
         {
             Id = feedItem.Id;
-            Uri = feedItem.Uri;
-            PublishTimeInUtc = feedItem.PublishTimeInUtc;
-            Summary = Utils.RemoveHtmlTag(feedItem.Summary);
-            Content = Utils.RemoveHtmlTag(feedItem.Content);
-            Title = Utils.RemoveHtmlTag(feedItem.Title);
-            TopicPictureUri = feedItem.TopicPictureUri;
-            FeedId = feed.Id;
-            FeedName = feed.Name;
-            FeedCategory = feed.Category;
-            FeedIconUri = feed.IconUri;
+            Uri = new List<string> { feedItem.Uri };
+            PublishTimeInUtc = new List<DateTime> { feedItem.PublishTimeInUtc };
+            Summary = new List<string> { Utils.RemoveHtmlTag(feedItem.Summary) };
+            Content = new List<string> { Utils.RemoveHtmlTag(feedItem.Content) };
+            Title = new List<string> { Utils.RemoveHtmlTag(feedItem.Title) };
+            TopicPictureUri = new List<string> { feedItem.TopicPictureUri };
+            FeedId = new List<string> { feed.Id };
+            FeedName = new List<string> { feed.Name };
+            FeedCategory = new List<string> { feed.Category };
+            FeedIconUri = new List<string> { feed.IconUri };
         }
     }
 }

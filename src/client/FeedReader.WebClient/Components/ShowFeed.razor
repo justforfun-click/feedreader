@@ -2,6 +2,15 @@
 @inject IJSRuntime JsRuntime
 
 <div class="show-feed">
+    <div class="feed-info">
+        <div class="icon">
+            <FallbackImage Src="@WebClient.Utils.SafeImageUri(Feed.IconUri)" FallbackSrc="@($"https://www.google.com/s2/favicons?domain={new Uri(Feed.Uri).Host}")"/>
+        </div>
+        <div class="name-and-description">
+            <div class="name"><a href="@WebsiteLink" title="@Name" target="_blank">@Name</a></div>
+            <div class="description"><a href="@Uri" title="@Description" target="_blank">@Description</a></div>
+        </div>
+    </div>
     <div class="feed-items">
         @if (!string.IsNullOrWhiteSpace(Feed.Error))
         {
