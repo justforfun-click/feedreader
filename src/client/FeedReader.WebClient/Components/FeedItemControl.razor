@@ -8,9 +8,18 @@
     </div>
 
     <div class="content">
-        <div class="item-title">@Title</div>
+        <div class="item-title"><a href="@FeedItem.PermentLink" target="_blank">@Title</a></div>
         <div class="item-content">@Content</div>
         <img class="item-topic-picture" src="@TopicPicture"/>
+    </div>
+
+    <div class="toolbar">
+        <div class="btn">
+            <a href="@TranslateUri" target="_blank">
+                <i class="fa fa-language"/>
+                <span>Translate</span>
+            </a>
+        </div>
     </div>
 </div>
 
@@ -28,4 +37,5 @@
     private string Title => FeedItem.Title;
     private string Content => FeedItem.Content;
     private string TopicPicture => FeedItem.TopicPictureUri;
+    private string TranslateUri => $"https://translate.google.com/translate?hl=en&sl=auto&tl=zh-CN&u={HttpUtility.UrlEncode(FeedItem.PermentLink)}";
 }
