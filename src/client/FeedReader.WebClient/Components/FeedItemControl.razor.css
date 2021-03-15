@@ -62,3 +62,36 @@
 .item-topic-picture {
     max-width: 100%;
 }
+
+.toolbar {
+    display: flex;
+    margin-top: 10px;
+    border-top: 1px solid #ececed;
+    padding-top: 10px;
+}
+
+.toolbar .btn {
+    padding-right: 5px;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.toolbar .btn:hover {
+    background-color: #f5f8fa;
+    cursor: pointer;
+}
+
+.toolbar .btn a {
+    display: flex;
+    align-items: center;
+}
+
+.toolbar .btn i {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.toolbar .btn span {
+    font-size: 13px;
+    font-family: 'system-ui';
+}
